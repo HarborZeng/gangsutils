@@ -73,9 +73,9 @@
     </build>
 
     <scm>
-        <connection>scm:git:https://github.com/HarborZeng/gangsutils.git</connection>
+        <connection>scm:git:git@github.com:HarborZeng/gangsutils.git</connection>
         <url>https://github.com/HarborZeng/gangsutils</url>
-        <developerConnection>scm:git:https://github.com/HarborZeng/gangsutils.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:HarborZeng/gangsutils.git</developerConnection>
       <tag>v0.0.1</tag>
   </scm>
 
