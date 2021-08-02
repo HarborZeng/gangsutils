@@ -7,7 +7,7 @@
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils</artifactId>
     <packaging>pom</packaging>
-    <version>1.0</version>
+    <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>gangsutils-common</module>
         <module>gangsutils-useless</module>
@@ -16,6 +16,11 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <spark.version>3.1.2</spark.version>
+        <scala.version>2.12</scala.version>
+        <scala.fullversion>${scala.version}.14</scala.fullversion>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     </properties>
 
     <dependencyManagement>
@@ -23,26 +28,70 @@
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-common</artifactId>
-                <version>1.0</version>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-core_${scala.version}</artifactId>
+                <version>3.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_${scala.version}</artifactId>
+                <version>3.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scalaj</groupId>
+                <artifactId>scalaj-http_${scala.version}</artifactId>
+                <version>2.4.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.tellyouwhat</groupId>
-            <artifactId>gangsutils-common</artifactId>
-        </dependency>
+
     </dependencies>
 
     <build>
         <pluginManagement>
             <plugins>
-
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
+    <scm>
+        <connection>scm:git:https://github.com/HarborZeng/gangsutils.git</connection>
+        <url>https://github.com/HarborZeng/gangsutils</url>
+        <developerConnection>scm:git:https://github.com/HarborZeng/gangsutils.git</developerConnection>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>deploymentRepo</id>
+            <name>releases</name>
+            <url>http://localhost:8081/repository/maven-releases//</url>
+            <uniqueVersion>true</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>deploymentRepo</id>
+            <name>snapshots</name>
+            <url>http://localhost:8081/repository/maven-snapshots//</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
