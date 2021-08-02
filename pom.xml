@@ -83,13 +83,13 @@
         <repository>
             <id>deploymentRepo</id>
             <name>releases</name>
-            <url>http://localhost:8081/repository/maven-releases//</url>
+            <url>http://localhost:8081/repository/maven-releases/</url>
             <uniqueVersion>true</uniqueVersion>
         </repository>
         <snapshotRepository>
             <id>deploymentRepo</id>
             <name>snapshots</name>
-            <url>http://localhost:8081/repository/maven-snapshots//</url>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
             <uniqueVersion>true</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
