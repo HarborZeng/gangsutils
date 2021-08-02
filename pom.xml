@@ -5,7 +5,7 @@
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>gangsutils-common</module>
         <module>gangsutils-useless</module>
@@ -26,7 +26,7 @@
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-common</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
@@ -76,7 +76,6 @@
         <connection>scm:git:git@github.com:HarborZeng/gangsutils.git</connection>
         <url>https://github.com/HarborZeng/gangsutils</url>
         <developerConnection>scm:git:git@github.com:HarborZeng/gangsutils.git</developerConnection>
-      <tag>v0.0.1</tag>
   </scm>
 
     <distributionManagement>
