@@ -1,8 +1,12 @@
 name: Maven Central Repo Deployment For gangsutils
 
 on:
-  release:
-    types: [released]
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - main
 
 jobs:
   publish:
@@ -17,7 +21,13 @@ jobs:
           server-id: ossrh
           server-username: ${{ secrets.OSSRH_USER }}
           server-password: ${{ secrets.OSSRH_PASSWORD }}
-          gpg-passphrase:  ${{ secrets.GPG_PASSWORD }}
+          gpg-passphrase: ${{ secrets.GPG_PASSWORD }}
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Publish to Maven Central Repo
         uses: samuelmeuli/action-maven-publish@v1
         with:
