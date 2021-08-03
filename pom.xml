@@ -46,7 +46,7 @@
     <spark.version>3.1.2</spark.version>
     <scala.version>2.12</scala.version>
     <scala.fullversion>2.12.14</scala.fullversion>
-    <maven.javadoc.skip>false</maven.javadoc.skip>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
   </properties>
 
