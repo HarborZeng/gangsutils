@@ -5,6 +5,9 @@ import cn.tellyouwhat.gangsutils.common.gangfunctions.chainSideEffect
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 
 
+/**
+ * BaseLogger 的具体实现，混入了 PrintlnLogger 和 WoaWebhookLogger
+ */
 class GangLogger extends PrintlnLogger with WoaWebhookLogger {
 
   override val isDTEnabled: Boolean = GangLogger.isDTEnabled
@@ -14,9 +17,9 @@ class GangLogger extends PrintlnLogger with WoaWebhookLogger {
 
   private def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value]): Unit = {
     if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id))
-      super[PrintlnLogger].doTheLogAction(msg, level, isDTEnabled, isTraceEnabled)
+      super[PrintlnLogger].doTheLogAction(msg, level)
     if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id))
-      super[WoaWebhookLogger].doTheLogAction(msg, level, isDTEnabled, isTraceEnabled)
+      super[WoaWebhookLogger].doTheLogAction(msg, level)
   }
 
 
@@ -27,8 +30,8 @@ class GangLogger extends PrintlnLogger with WoaWebhookLogger {
   @throws[GangException]
   override def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit =
     msg.toString |!
-      (msgStr => log(if (throwable != null) s"${msgStr}，exception.getMessage: ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled)) |!
-      (msgStr => throw GangException(s"出现致命错误: ${msgStr}", throwable))
+      (msgStr => log(if (throwable != null) s"$msgStr，exception.getMessage: ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled)) |!
+      (msgStr => throw GangException(s"出现致命错误: $msgStr", throwable))
 
   override def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.WARNING)(enabled)
 

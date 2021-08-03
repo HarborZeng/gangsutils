@@ -1,14 +1,14 @@
 package cn.tellyouwhat.gangsutils.useless
 
 import cn.tellyouwhat.gangsutils.common.helper.{Timeit, TimeitLogger}
-import cn.tellyouwhat.gangsutils.common.logger.{GangLogger, LogLevel}
+import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
 
 class MyApp extends Timeit {
 
-  private val logger: GangLogger = MyApp.logger
+  private val logger: BaseLogger = MyApp.logger
 
-  override def run(desc: String)(implicit logger: GangLogger): Unit = {
+  override def run(desc: String)(implicit logger: BaseLogger): Unit = {
     Thread.sleep(1000)
 
     logger.trace("trace")
@@ -22,12 +22,13 @@ class MyApp extends Timeit {
 
 object MyApp {
 
-  private implicit var logger: GangLogger = _
+  private implicit var logger: BaseLogger = _
 
   def apply(): MyApp = new MyApp() with TimeitLogger
 
   def main(args: Array[String]): Unit = {
     GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE))
+    GangLogger.disableTrace()
 
     logger = GangLogger()
 

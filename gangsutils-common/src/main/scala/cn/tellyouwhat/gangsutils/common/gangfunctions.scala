@@ -2,7 +2,7 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.logger.GangLogger
+import cn.tellyouwhat.gangsutils.common.logger.BaseLogger
 
 import java.sql.{Connection, DriverManager}
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
@@ -159,10 +159,10 @@ object gangfunctions {
 
   def getMysql5Conn(connectionProperties: Properties)(host: String)(port: Int = 3306)(db: String)(encoding: String = "utf8"): Connection = {
     Class.forName("com.mysql.jdbc.Driver")
-    DriverManager.getConnection(s"jdbc:mysql://${host}:${port}/${db}?characterEncoding=${encoding}", connectionProperties)
+    DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
   }
 
-  def timeit[R](block: => R)(desc: String)(implicit logger: GangLogger): R = {
+  def timeit[R](block: => R)(desc: String)(implicit logger: BaseLogger): R = {
     logger.trace(s"开始$desc")
     val t0 = System.currentTimeMillis()
     val result = block // call-by-name
@@ -177,7 +177,7 @@ object gangfunctions {
   def retry[T](n: Int)(fn: => T): Try[T] = {
     Try(fn) match {
       case Failure(e) if n > 1 =>
-        println(s"【失败】${RED}执行失败，重试最后${n - 1}次${RESET}", e.getMessage)
+        println(s"【失败】${RED}执行失败，重试最后${n - 1}次$RESET", e.getMessage)
         retry(n - 1)(fn)
       case fn => fn
     }
