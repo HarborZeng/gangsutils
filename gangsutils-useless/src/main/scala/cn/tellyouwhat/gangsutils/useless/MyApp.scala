@@ -4,6 +4,9 @@ import cn.tellyouwhat.gangsutils.common.helper.{Timeit, TimeitLogger}
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
 
+/**
+ * 代码实验田
+ */
 class MyApp extends Timeit {
 
   private val logger: BaseLogger = MyApp.logger

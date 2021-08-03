@@ -1,12 +1,12 @@
 name: Maven Central Repo Deployment For gangsutils
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - main
+#on:
+#  push:
+#    branches:
+#      - master
+#  pull_request:
+#    branches:
+#      - main
 
 jobs:
   publish:
