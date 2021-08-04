@@ -3,6 +3,9 @@ package cn.tellyouwhat.gangsutils.useless
 import cn.tellyouwhat.gangsutils.common.helper.{Timeit, TimeitLogger}
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
+import org.apache.hadoop.fs.Path
+
+import java.nio.file.Paths
 
 /**
  * 代码实验田
@@ -19,7 +22,9 @@ class MyApp extends Timeit {
     logger.success("success")
     logger.warning("warning")
     logger.error("error")
-    logger.critical("critical")
+//    logger.critical("critical")
+
+    logger.info(new Path("path/to", "_SUCCESS").toString)
   }
 }
 

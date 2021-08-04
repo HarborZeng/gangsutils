@@ -18,7 +18,7 @@ trait BaseLogger {
   /**
    * 是否在日志中启用跟踪（包名类名方法名行号）字段
    */
-  protected val isTraceEnabled: Boolean = true
+  protected val isTraceEnabled: Boolean = false
 
   /**
    * 默认的日志输出目的地
