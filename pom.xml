@@ -5,7 +5,7 @@
   <groupId>cn.tellyouwhat</groupId>
   <artifactId>gangsutils</artifactId>
   <packaging>pom</packaging>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
 
   <description>scala spark utils pack</description>
 
@@ -52,7 +52,7 @@
       <dependency>
         <groupId>cn.tellyouwhat</groupId>
         <artifactId>gangsutils-common</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
@@ -208,6 +208,13 @@
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <!-- Prevent `gpg` from using pinentry programs -->
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
           </plugin>
         </plugins>
       </build>
