@@ -83,6 +83,9 @@ object gangfunctions {
 
   def endWithTxt(sl: String): Boolean = sl.endsWith("txt")
 
+  /**
+   * 隐式调用
+   */
   implicit def chainSideEffect[A](a: A) = new {
     def withSideEffect(fun: A => Unit): A = {
       fun(a);
@@ -108,6 +111,11 @@ object gangfunctions {
     def |!![T](fun: A => T): T = tapRT[T](fun)
   }
 
+  /**
+   * 获取文件系统
+   * @param spark sparkSession
+   * @return 文件系统
+   */
   private def getFS(implicit spark: SparkSession): FileSystem =
     FileSystem.get(spark.sparkContext.hadoopConfiguration)
 
