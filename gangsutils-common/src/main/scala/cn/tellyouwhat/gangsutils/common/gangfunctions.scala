@@ -13,6 +13,9 @@ import org.apache.spark.sql.SparkSession
 import scala.language.implicitConversions
 import scala.util._
 
+/**
+ * gang 函数库
+ */
 object gangfunctions {
 
   def reduceByKey[K, V](collection: Traversable[(K, V)])(implicit num: Numeric[V]): Map[K, V] = {
@@ -105,17 +108,11 @@ object gangfunctions {
     def |!![T](fun: A => T): T = tapRT[T](fun)
   }
 
-  object GangPath {
-    def apply(parent: String, child: String): Path = new Path(parent, child)
-
-    def apply(path: String): Path = new Path(path)
-  }
-
   private def getFS(implicit spark: SparkSession): FileSystem =
     FileSystem.get(spark.sparkContext.hadoopConfiguration)
 
   def isPathExists(path: String)(implicit spark: SparkSession): Boolean =
-    isPathExists(GangPath(path))
+    isPathExists(new Path(path))
 
   def isPathExists(path: Path)(implicit spark: SparkSession): Boolean =
     getFS.exists(path)
@@ -124,7 +121,7 @@ object gangfunctions {
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
    */
   def fileModifiedTime(path: String)(implicit spark: SparkSession): Either[GangException, Long] =
-    fileModifiedTime(GangPath(path))
+    fileModifiedTime(new Path(path))
 
   /**
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
@@ -138,10 +135,10 @@ object gangfunctions {
   }
 
   def isSparkSaveDirExists(path: String)(implicit spark: SparkSession): Boolean =
-    isPathExists(GangPath(path, "_SUCCESS"))
+    isPathExists(new Path(path, "_SUCCESS").toString)
 
   def isSparkSaveDirModifiedToday(path: String)(implicit spark: SparkSession): Boolean =
-    fileModifiedTime(GangPath(path, "_SUCCESS")) match {
+    fileModifiedTime(new Path(path, "_SUCCESS").toString) match {
       case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDate
@@ -150,7 +147,7 @@ object gangfunctions {
 
 
   def isSparkSaveDirModifiedWithinNHours(path: String)(n: Int)(implicit spark: SparkSession): Boolean =
-    fileModifiedTime(GangPath(path, "_SUCCESS")) match {
+    fileModifiedTime(new Path(path, "_SUCCESS").toString) match {
       case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDateTime
