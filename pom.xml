@@ -5,7 +5,7 @@
   <groupId>cn.tellyouwhat</groupId>
   <artifactId>gangsutils</artifactId>
   <packaging>pom</packaging>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
 
   <description>scala spark utils pack</description>
 
@@ -52,7 +52,7 @@
       <dependency>
         <groupId>cn.tellyouwhat</groupId>
         <artifactId>gangsutils-common</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
@@ -147,7 +147,7 @@
 
   <profiles>
     <profile>
-      <id>release</id>
+      <id>deploy</id>
       <build>
         <plugins>
           <plugin>
