@@ -192,13 +192,11 @@ object gangfunctions {
   private def calcExecDuration[R](t0: Long, t1: Long): String =
     Duration.ofMillis(t1 - t0).toString.drop(2).toLowerCase
 
-  import scala.io.AnsiColor.{RED, RESET}
-
   @annotation.tailrec
   def retry[T](n: Int)(fn: => T)(implicit logger: BaseLogger = null): Try[T] = {
     Try(fn) match {
       case Failure(e) if n > 1 =>
-        printOrLog(s"${RED}执行失败，重试最后${n - 1}次${RESET}", level = LogLevel.ERROR)
+        printOrLog(s"执行失败，重试最后${n - 1}次", level = LogLevel.ERROR)
         retry(n - 1)(fn)
       case fn => fn
     }
