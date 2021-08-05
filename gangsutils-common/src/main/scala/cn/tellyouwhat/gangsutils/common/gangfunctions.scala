@@ -18,6 +18,15 @@ import scala.util._
  */
 object gangfunctions {
 
+  /**
+   * group and for each group do a reduce by key
+   *
+   * @param collection the collection to reduce by key
+   * @param num        import numeric operations
+   * @tparam K key Type
+   * @tparam V value Type
+   * @return a map of key and reduce result
+   */
   def reduceByKey[K, V](collection: Traversable[(K, V)])(implicit num: Numeric[V]): Map[K, V] = {
     import num._
     collection.groupBy(_._1).map {
@@ -26,7 +35,9 @@ object gangfunctions {
   }
 
   /**
-   * convert case class of Mappable to map of Any recursively
+   * convert case class of {@link Mappable} to map of Any recursively
+   *
+   * @param cc the object to convert, note that the object must be a {@link Mappable} object
    */
   def ccToMap(cc: Mappable): Map[String, Any] = {
     if (cc == null)
@@ -50,6 +61,8 @@ object gangfunctions {
 
   /**
    * convert object to map of Any recursively
+   *
+   * @param o the object to convert
    */
   def toMap(o: Any): Map[String, Any] = {
     if (o == null)
@@ -67,21 +80,58 @@ object gangfunctions {
     }
   }
 
+  /**
+   * whether the input string ends with wpp type
+   *
+   * @param sl the input string
+   * @return true if it ends, false otherwise
+   */
   def endWithWPP(sl: String): Boolean =
     sl.endsWith("ppt") || sl.endsWith("pptx") || sl.endsWith("wpp")
 
+  /**
+   * whether the input string ends with wps type
+   *
+   * @param sl the input string
+   * @return true if it ends, false otherwise
+   */
   def endWithWPS(sl: String): Boolean =
     sl.endsWith("doc") || sl.endsWith("docx") || sl.endsWith("wps")
 
+  /**
+   * whether the input string ends with et type
+   *
+   * @param sl the input string
+   * @return true if it ends, false otherwise
+   */
   def endWithET(sl: String): Boolean =
     sl.endsWith("xls") || sl.endsWith("xlsx") || sl.endsWith("et")
 
+  /**
+   * whether the input string ends with pdf type
+   *
+   * @param sl the input string
+   * @return true if it ends, false otherwise
+   */
   def endWithPDF(sl: String): Boolean = sl.endsWith("pdf")
 
+  /**
+   * whether the input string ends with image type
+   *
+   * @param sl the input string
+   * @return true if it ends, false otherwise
+   */
   def endWithImage(sl: String): Boolean =
     sl.endsWith("jpg") || sl.endsWith("jpeg") || sl.endsWith("png") || sl.endsWith("bmp") || sl.endsWith("gif")
 
+  /**
+   * whether the input string ends with text type
+   *
+   * @param sl the input string
+   * @return true if it ends, false otherwise
+   */
   def endWithTxt(sl: String): Boolean = sl.endsWith("txt")
+
 
   /**
    * 隐式调用
@@ -113,26 +163,51 @@ object gangfunctions {
 
   /**
    * 获取文件系统
+   *
    * @param spark sparkSession
    * @return 文件系统
    */
   private def getFS(implicit spark: SparkSession): FileSystem =
     FileSystem.get(spark.sparkContext.hadoopConfiguration)
 
+  /**
+   * 查看 hdfs 目标路径是否存在
+   *
+   * @param path  目标路径
+   * @param spark sparkSession
+   * @return true if the path exists, false otherwise
+   */
   def isPathExists(path: String)(implicit spark: SparkSession): Boolean =
     isPathExists(new Path(path))
 
+  /**
+   * 查看 hdfs 目标路径是否存在
+   *
+   * @param path  目标路径
+   * @param spark sparkSession
+   * @return true if the path exists, false otherwise
+   */
   def isPathExists(path: Path)(implicit spark: SparkSession): Boolean =
     getFS.exists(path)
 
   /**
+   * 获取 hdfs 目标路径的修改时间
+   *
+   * @param path  目标路径
+   * @param spark sparkSession
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
+   * @throws GangException if the path does not exists
    */
   def fileModifiedTime(path: String)(implicit spark: SparkSession): Either[GangException, Long] =
     fileModifiedTime(new Path(path))
 
   /**
+   * 获取 hdfs 目标路径的修改时间
+   *
+   * @param path  目标路径
+   * @param spark sparkSession
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
+   * @throws GangException if the path does not exists
    */
   def fileModifiedTime(path: Path)(implicit spark: SparkSession): Either[GangException, Long] = {
     if (isPathExists(path)) {
@@ -142,9 +217,24 @@ object gangfunctions {
     }
   }
 
+  /**
+   * spark 保存的路径是否已存在
+   *
+   * @param path  spark 保存的路径
+   * @param spark sparkSession
+   * @return true if the path exists, false otherwise
+   */
   def isSparkSaveDirExists(path: String)(implicit spark: SparkSession): Boolean =
     isPathExists(new Path(path, "_SUCCESS").toString)
 
+  /**
+   * spark 保存的路径是否已存在
+   *
+   * @param path  spark 保存的路径
+   * @param spark sparkSession
+   * @return true if the path exists, false otherwise
+   * @throws GangException if failed to get the mtime of the path
+   */
   def isSparkSaveDirModifiedToday(path: String)(implicit spark: SparkSession): Boolean =
     fileModifiedTime(new Path(path, "_SUCCESS").toString) match {
       case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
@@ -154,6 +244,15 @@ object gangfunctions {
     }
 
 
+  /**
+   * spark 保存的路径是否已存在 n 小时
+   *
+   * @param path  spark 保存的路径
+   * @param n     n 小时
+   * @param spark sparkSession
+   * @return true if the path exists, false otherwise
+   * @throws GangException if failed to get the mtime of the path
+   */
   def isSparkSaveDirModifiedWithinNHours(path: String)(n: Int)(implicit spark: SparkSession): Boolean =
     fileModifiedTime(new Path(path, "_SUCCESS").toString) match {
       case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
@@ -162,12 +261,28 @@ object gangfunctions {
         .isAfter(LocalDateTime.now().minusHours(n))
     }
 
+  /**
+   * 创建简单的 mysql 连接
+   *
+   * @param connectionProperties 连接属性，包括用户名密码
+   * @param host                 主机，ip 或域名
+   * @param port                 端口，默认 3306
+   * @param db                   数据库名
+   * @param encoding             编码，默认 utf8
+   * @return
+   */
   def getMysql5Conn(connectionProperties: Properties)(host: String)(port: Int = 3306)(db: String)(encoding: String = "utf8"): Connection = {
     Class.forName("com.mysql.jdbc.Driver")
     DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
   }
 
-
+  /**
+   * print 或者执行 logger
+   *
+   * @param content 要输出的内容
+   * @param level   日志级别
+   * @param logger  日志对象
+   */
   def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger = null): Unit =
     if (logger == null) {
       println(s"【$level】$content")
@@ -175,6 +290,15 @@ object gangfunctions {
       logger.log(content, level)
     }
 
+  /**
+   * 计时 + 切面日志
+   *
+   * @param block  要执行的方法
+   * @param desc   描述，将作用于切面日志
+   * @param logger 日志对象
+   * @tparam R 返回值 Type
+   * @return block 的执行结果
+   */
   def timeit[R](block: => R)(desc: String = "任务")(implicit logger: BaseLogger = null): R = {
     printOrLog(s"开始$desc")
     val t0 = System.currentTimeMillis()
@@ -190,9 +314,25 @@ object gangfunctions {
     result
   }
 
-  private def calcExecDuration[R](t0: Long, t1: Long): String =
+  /**
+   * 使用字符串描述的两个时间差，如 1m20.3s
+   *
+   * @param t0 先前的时间
+   * @param t1 后来的时间
+   * @return 描述时间的字符串
+   */
+  private def calcExecDuration(t0: Long, t1: Long): String =
     Duration.ofMillis(t1 - t0).toString.drop(2).toLowerCase
 
+  /**
+   * 重试一个函数
+   *
+   * @param n      尝试的总次数
+   * @param fn     要执行的函数
+   * @param logger 如果失败打印日志时所使用的日志对象
+   * @tparam T 尝试的函数的返回值类型
+   * @return 尝试的函数的结果
+   */
   @annotation.tailrec
   def retry[T](n: Int)(fn: => T)(implicit logger: BaseLogger = null): Try[T] = {
     Try(fn) match {
