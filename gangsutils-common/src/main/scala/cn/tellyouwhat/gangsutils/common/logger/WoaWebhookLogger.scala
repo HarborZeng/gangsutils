@@ -65,8 +65,11 @@ object WoaWebhookLogger {
    *
    * @param robotsKeys 密钥，如果是多个，中间用逗号隔开
    */
-  def initializeWoaWebhook(robotsKeys: String): Unit =
+  def initializeWoaWebhook(robotsKeys: String): Unit = {
+    if (robotsKeys == null)
+      initializeWoaWebhook(robotsKeys)
     robotsKeys.split(",").map(_.trim) |! initializeWoaWebhook
+  }
 
 
   /**
@@ -74,9 +77,9 @@ object WoaWebhookLogger {
    *
    * @param robotsKeys 密钥数组
    */
-  def initializeWoaWebhook(robotsKeys: Array[String])(implicit logger: BaseLogger = null): Unit = robotsToSend = {
-    if (robotsKeys != null && robotsKeys.isEmpty) {
-      printOrLog(s"$YELLOW${new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${robotsKeys.mkString("Array(", ", ", ")")}")}$RESET", level = LogLevel.WARNING)
+  def initializeWoaWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
+    if ((robotsKeys != null && robotsKeys.isEmpty) || robotsKeys == null || robotsKeys.exists(_.isEmpty)) {
+      throw new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${robotsKeys.mkString("Array(", ", ", ")")}")
     }
     robotsKeys
   }

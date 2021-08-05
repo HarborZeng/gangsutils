@@ -5,8 +5,6 @@ import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
 import org.apache.hadoop.fs.Path
 
-import java.nio.file.Paths
-
 /**
  * 代码实验田
  */
@@ -37,7 +35,6 @@ object MyApp {
   def main(args: Array[String]): Unit = {
     GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE))
     GangLogger.disableTrace()
-
     logger = GangLogger()
 
     MyApp().run()
