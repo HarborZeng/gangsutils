@@ -167,7 +167,8 @@ object gangfunctions {
     DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
   }
 
-  def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger): Unit =
+
+  def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger = null): Unit =
     if (logger == null) {
       println(s"【${level}】$content")
     } else {
