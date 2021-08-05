@@ -15,7 +15,7 @@ class GangLogger extends PrintlnLogger with WoaWebhookLogger {
   override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest
   override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels
 
-  private def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value]): Unit = {
+  override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = {
     if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id))
       super[PrintlnLogger].doTheLogAction(msg, level)
     if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id))

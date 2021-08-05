@@ -2,7 +2,7 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.logger.BaseLogger
+import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, LogLevel}
 
 import java.sql.{Connection, DriverManager}
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
@@ -167,22 +167,37 @@ object gangfunctions {
     DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
   }
 
-  def timeit[R](block: => R)(desc: String)(implicit logger: BaseLogger): R = {
-    logger.trace(s"开始$desc")
+
+  def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger = null): Unit =
+    if (logger == null) {
+      println(s"【$level】$content")
+    } else {
+      logger.log(content, level)
+    }
+
+  def timeit[R](block: => R)(desc: String = "任务")(implicit logger: BaseLogger = null): R = {
+    printOrLog(s"开始$desc")
     val t0 = System.currentTimeMillis()
-    val result = block // call-by-name
+    val result = Try(block) match {
+      case Failure(e) =>
+        val t1 = System.currentTimeMillis()
+        printOrLog(s"执行${desc}失败，耗时${calcExecDuration(t0, t1)}", level = LogLevel.CRITICAL);
+        throw e
+      case Success(v) => v
+    }
     val t1 = System.currentTimeMillis()
-    logger.success(s"完成$desc，耗时${Duration.ofMillis(t1 - t0).toString.drop(2).toLowerCase}")
+    printOrLog(s"完成$desc，耗时${calcExecDuration(t0, t1)}", level = LogLevel.SUCCESS)
     result
   }
 
-  import scala.io.AnsiColor.{RED, RESET}
+  private def calcExecDuration[R](t0: Long, t1: Long): String =
+    Duration.ofMillis(t1 - t0).toString.drop(2).toLowerCase
 
   @annotation.tailrec
-  def retry[T](n: Int)(fn: => T): Try[T] = {
+  def retry[T](n: Int)(fn: => T)(implicit logger: BaseLogger = null): Try[T] = {
     Try(fn) match {
       case Failure(e) if n > 1 =>
-        println(s"【失败】${RED}执行失败，重试最后${n - 1}次$RESET", e.getMessage)
+        printOrLog(s"执行失败，重试最后${n - 1}次", level = LogLevel.ERROR)
         retry(n - 1)(fn)
       case fn => fn
     }
