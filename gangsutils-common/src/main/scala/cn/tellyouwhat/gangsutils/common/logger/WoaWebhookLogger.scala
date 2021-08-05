@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.gangfunctions.chainSideEffect
+import cn.tellyouwhat.gangsutils.common.gangfunctions.{chainSideEffect, printOrLog}
 
 
 /**
@@ -74,9 +74,9 @@ object WoaWebhookLogger {
    *
    * @param robotsKeys 密钥数组
    */
-  def initializeWoaWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
+  def initializeWoaWebhook(robotsKeys: Array[String])(implicit logger: BaseLogger = null): Unit = robotsToSend = {
     if (robotsKeys != null && robotsKeys.isEmpty) {
-      println(s"$YELLOW${new IllegalArgumentException(s"【警告】 initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${robotsKeys.mkString("Array(", ", ", ")")}")}$RESET")
+      printOrLog(s"$YELLOW${new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${robotsKeys.mkString("Array(", ", ", ")")}")}$RESET", level = LogLevel.WARNING)
     }
     robotsKeys
   }

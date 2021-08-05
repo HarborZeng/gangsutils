@@ -175,7 +175,7 @@ object gangfunctions {
       logger.log(content, level)
     }
 
-  def timeit[R](block: => R)(desc: String)(implicit logger: BaseLogger = null): R = {
+  def timeit[R](block: => R)(desc: String = "任务")(implicit logger: BaseLogger = null): R = {
     printOrLog(s"开始$desc")
     val t0 = System.currentTimeMillis()
     val result = Try(block) match {

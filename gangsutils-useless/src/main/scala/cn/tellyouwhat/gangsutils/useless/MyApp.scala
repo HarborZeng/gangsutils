@@ -40,6 +40,6 @@ object MyApp {
 
     logger = GangLogger()
 
-    MyApp().run("MyApp instance")
+    MyApp().run()
   }
 }

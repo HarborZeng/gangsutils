@@ -13,7 +13,7 @@ trait Timeit {
    * @param desc   对此次计时任务的描述
    * @param logger 日志实例
    */
-  def run(desc: String)(implicit logger: BaseLogger = null): Unit
+  def run(desc: String = "任务")(implicit logger: BaseLogger = null): Unit
 }
 
 /**
