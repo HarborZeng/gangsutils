@@ -58,6 +58,8 @@ trait BaseLogger {
    */
   protected def doTheLogAction(msg: String, level: LogLevel.Value): Unit
 
+  def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit
+
   /**
    * 记录一条跟踪级别的日志
    *

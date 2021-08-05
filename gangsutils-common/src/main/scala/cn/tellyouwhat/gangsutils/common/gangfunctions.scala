@@ -2,7 +2,7 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.logger.BaseLogger
+import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, LogLevel}
 
 import java.sql.{Connection, DriverManager}
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
@@ -170,7 +170,7 @@ object gangfunctions {
 
   def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger = null): Unit =
     if (logger == null) {
-      println(s"【${level}】$content")
+      println(s"【$level】$content")
     } else {
       logger.log(content, level)
     }
