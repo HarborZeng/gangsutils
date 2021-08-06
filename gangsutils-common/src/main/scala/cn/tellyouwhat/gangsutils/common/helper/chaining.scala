@@ -17,6 +17,7 @@ object chaining {
      * <li>Lets you perform a side effect with the value, such as printing/logging it</li>
      *
      * <pre>
+     * import knagene.ai.common.helper.chaining._
      * calcSomeDF(spark)
      * .tap(_.printSchema())
      * .tap(_.cache().show())
@@ -38,6 +39,7 @@ object chaining {
      * <li>Lets you perform a side effect with the value, such as printing/logging it</li>
      *
      * <pre>
+     * import knagene.ai.common.helper.chaining._
      * calcSomeDF(spark) |! (_.printSchema()) |! (_.cache().show())
      * </pre>
      *
@@ -52,6 +54,7 @@ object chaining {
      * pipe works like a Unix pipe
      *
      * <pre>
+     * import knagene.ai.common.helper.chaining._
      * calcSomeDF(spark)
      * .pipe(model.transform)
      * .write.mode("overwrite").parquet(savepath)
@@ -67,6 +70,7 @@ object chaining {
      * pipe works like a Unix pipe
      *
      * <pre>
+     * import knagene.ai.common.helper.chaining._
      * val transformedDF = someDataframe |> model.transform
      * </pre>
      *
