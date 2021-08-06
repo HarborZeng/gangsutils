@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.gangfunctions.{chainSideEffect, printOrLog}
+import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
 
 
 /**
@@ -42,8 +42,6 @@ trait WoaWebhookLogger extends WebhookLogger {
     woaWebhookLog(msg, level)
   }
 }
-
-import scala.io.AnsiColor.{YELLOW, RESET}
 
 /**
  * woa webhook 日志的伴生对象

@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.gangfunctions.chainSideEffect
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 
 
@@ -127,7 +127,7 @@ object GangLogger {
       throw new IllegalArgumentException(s"levels map 不合法：$levels")
     }
     // ValueSet object is a sorted set by design
-    (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |!! setLogsLevels
+    (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |> setLogsLevels
   }
 
 }

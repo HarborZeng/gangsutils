@@ -2,6 +2,7 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
+import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, LogLevel}
 
 import java.sql.{Connection, DriverManager}
@@ -132,35 +133,6 @@ object gangfunctions {
    */
   def endWithTxt(sl: String): Boolean = sl.endsWith("txt")
 
-
-  /**
-   * 隐式调用
-   */
-  implicit def chainSideEffect[A](a: A) = new {
-    def withSideEffect(fun: A => Unit): A = {
-      fun(a);
-      a
-    }
-
-    def withSideEffectRT[T](fun: A => T): T = fun(a)
-
-    def |!(fun: A => Unit): A = tap(fun)
-
-    def tap(fun: A => Unit): A = withSideEffect(fun)
-
-    /**
-     * tap return with same type
-     */
-    def tapR(fun: A => A): A = withSideEffectRT[A](fun)
-
-    /**
-     * tap return with type T
-     */
-    def tapRT[T](fun: A => T): T = withSideEffectRT(fun)
-
-    def |!![T](fun: A => T): T = tapRT[T](fun)
-  }
-
   /**
    * 获取文件系统
    *
@@ -211,9 +183,9 @@ object gangfunctions {
    */
   def fileModifiedTime(path: Path)(implicit spark: SparkSession): Either[GangException, Long] = {
     if (isPathExists(path)) {
-      getFS.getFileStatus(path).getModificationTime |!! Right.apply
+      getFS.getFileStatus(path).getModificationTime |> Right.apply
     } else {
-      GangException(s"path：$path 不存在") |!! Left.apply
+      GangException(s"path：$path 不存在") |> Left.apply
     }
   }
 

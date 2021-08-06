@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.gangfunctions.chainSideEffect
+import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 
 import java.time.LocalDateTime
 
@@ -48,7 +48,7 @@ trait BaseLogger {
       s" - ${theTrace.getClassName}#${theTrace.getMethodName}第${theTrace.getLineNumber}行"
     } else {
       ""
-    }) |!! (traceStr => s"【$level】${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: $msg")
+    }) |> (traceStr => s"【$level】${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: $msg")
 
   /**
    * 真正去输出一条日志
