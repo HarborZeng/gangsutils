@@ -34,3 +34,5 @@ jobs:
           nexus_username: ${{ secrets.OSSRH_USER }}
           nexus_password: ${{ secrets.OSSRH_PASSWORD }}
           server_id: ossrh
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
