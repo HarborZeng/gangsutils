@@ -193,18 +193,23 @@
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
-                                <phase>install</phase>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <show>public</show>
+                                    <failOnError>false</failOnError>
+                                    <detectOfflineLinks>false</detectOfflineLinks>
+                                    <doclint>none</doclint>
+                                    <nohelp>true</nohelp>
+                                    <excludePackageNames/>
+                                    <quiet>true</quiet>
+                                </configuration>
                             </execution>
                         </executions>
                         <configuration>
-                            <encoding>UTF-8</encoding>
-                            <charset>UTF-8</charset>
-                            <additionalOptions>
-                                <additionalOption>-Xdoclint:none</additionalOption>
-                            </additionalOptions>
+                            <failOnError>false</failOnError>
                         </configuration>
                     </plugin>
                     <plugin>
