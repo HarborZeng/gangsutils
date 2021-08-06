@@ -6,7 +6,7 @@
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.8</version>
+    <version>0.2.9</version>
 
     <description>scala spark utils pack</description>
 
@@ -53,7 +53,7 @@
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-common</artifactId>
-                <version>0.2.8</version>
+                <version>0.2.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
@@ -193,18 +193,23 @@
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
-                                <phase>install</phase>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <show>public</show>
+                                    <failOnError>false</failOnError>
+                                    <detectOfflineLinks>false</detectOfflineLinks>
+                                    <doclint>none</doclint>
+                                    <nohelp>true</nohelp>
+                                    <excludePackageNames/>
+                                    <quiet>true</quiet>
+                                </configuration>
                             </execution>
                         </executions>
                         <configuration>
-                            <encoding>UTF-8</encoding>
-                            <charset>UTF-8</charset>
-                            <additionalOptions>
-                                <additionalOption>-Xdoclint:none</additionalOption>
-                            </additionalOptions>
+                            <failOnError>false</failOnError>
                         </configuration>
                     </plugin>
                     <plugin>
