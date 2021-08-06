@@ -3,7 +3,7 @@ package cn.tellyouwhat.gangsutils.common.helper
 /**
  * chaining implicit helpers for scala 2.12.x
  * <pre>
- * import knagene.ai.common.helper.chaining._
+ * import cn.tellyouwhat.gangsutils.common.helper.chaining._
  * </pre>
  *
  * @see <a>https://alvinalexander.com/scala/scala-2.13-pipe-tap-chaining-operations/</a> for more details
@@ -17,7 +17,7 @@ object chaining {
      * <li>Lets you perform a side effect with the value, such as printing/logging it</li>
      *
      * <pre>
-     * import knagene.ai.common.helper.chaining._
+     * import cn.tellyouwhat.gangsutils.common.helper.chaining._
      * calcSomeDF(spark)
      * .tap(_.printSchema())
      * .tap(_.cache().show())
@@ -39,7 +39,7 @@ object chaining {
      * <li>Lets you perform a side effect with the value, such as printing/logging it</li>
      *
      * <pre>
-     * import knagene.ai.common.helper.chaining._
+     * import cn.tellyouwhat.gangsutils.common.helper.chaining._
      * calcSomeDF(spark) |! (_.printSchema()) |! (_.cache().show())
      * </pre>
      *
@@ -54,7 +54,7 @@ object chaining {
      * pipe works like a Unix pipe
      *
      * <pre>
-     * import knagene.ai.common.helper.chaining._
+     * import cn.tellyouwhat.gangsutils.common.helper.chaining._
      * calcSomeDF(spark)
      * .pipe(model.transform)
      * .write.mode("overwrite").parquet(savepath)
@@ -70,7 +70,7 @@ object chaining {
      * pipe works like a Unix pipe
      *
      * <pre>
-     * import knagene.ai.common.helper.chaining._
+     * import cn.tellyouwhat.gangsutils.common.helper.chaining._
      * val transformedDF = someDataframe |> model.transform
      * </pre>
      *
