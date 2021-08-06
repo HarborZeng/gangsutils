@@ -97,14 +97,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>artima</id>
-            <name>Artima Maven Repository</name>
-            <url>https://repo.artima.com/releases</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
