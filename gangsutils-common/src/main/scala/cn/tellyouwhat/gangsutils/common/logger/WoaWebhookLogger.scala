@@ -11,7 +11,7 @@ trait WoaWebhookLogger extends WebhookLogger {
   /**
    * 要发往的机器人的密钥
    */
-  protected val robotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
+  val robotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
 
   /**
    * 执行一条 woa 日志
@@ -64,8 +64,6 @@ object WoaWebhookLogger {
    * @param robotsKeys 密钥，如果是多个，中间用逗号隔开
    */
   def initializeWoaWebhook(robotsKeys: String): Unit = {
-    if (robotsKeys == null)
-      initializeWoaWebhook(robotsKeys)
     robotsKeys.split(",").map(_.trim) |! initializeWoaWebhook
   }
 
