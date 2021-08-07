@@ -44,7 +44,8 @@ object gangfunctions {
     if (cc == null)
       return null
     cc.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) {
-      (map, field) =>
+      // ignore $ initial member
+      case (map, field) if !field.getName.startsWith("$") =>
         field.setAccessible(true)
         val value = field.get(cc) match {
           case Some(m: Mappable) => ccToMap(m)
@@ -57,6 +58,7 @@ object gangfunctions {
           case _ => field.get(cc)
         }
         map + (field.getName -> value)
+      case (map, _) => map
     }
   }
 
