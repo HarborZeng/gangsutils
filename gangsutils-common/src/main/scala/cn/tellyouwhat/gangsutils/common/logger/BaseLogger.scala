@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
 import java.time.LocalDateTime
 
@@ -77,7 +77,7 @@ trait BaseLogger {
    * @param msg     日志内容
    * @param enabled 启用的日志目的地
    */
-  def trace(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit
+  def trace(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.TRACE)(enabled)
 
   /**
    * 记录一条信息级别的日志
@@ -85,7 +85,7 @@ trait BaseLogger {
    * @param msg     日志内容
    * @param enabled 启用的日志目的地
    */
-  def info(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit
+  def info(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.INFO)(enabled)
 
   /**
    * 记录一条成功级别的日志
@@ -93,7 +93,7 @@ trait BaseLogger {
    * @param msg     日志内容
    * @param enabled 启用的日志目的地
    */
-  def success(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit
+  def success(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.SUCCESS)(enabled)
 
   /**
    * 记录一条警告级别的日志
@@ -101,7 +101,7 @@ trait BaseLogger {
    * @param msg     日志内容
    * @param enabled 启用的日志目的地
    */
-  def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit
+  def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.WARNING)(enabled)
 
   /**
    * 记录一条错误级别的日志
@@ -109,7 +109,7 @@ trait BaseLogger {
    * @param msg     日志内容
    * @param enabled 启用的日志目的地
    */
-  def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit
+  def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.ERROR)(enabled)
 
   /**
    * 记录一条致命级别的日志
@@ -118,5 +118,8 @@ trait BaseLogger {
    * @param enabled 启用的日志目的地
    */
   @throws[GangException]
-  def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit
+  def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = msg.toString |!
+    (msgStr => log(if (throwable != null) s"$msgStr，exception.getMessage: ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled)) |!
+    (msgStr => throw GangException(s"出现致命错误: $msgStr", throwable))
+
 }

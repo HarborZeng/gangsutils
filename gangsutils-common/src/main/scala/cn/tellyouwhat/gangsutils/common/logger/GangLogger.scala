@@ -23,23 +23,6 @@ class GangLogger(
       super[WoaWebhookLogger].doTheLogAction(msg, level)
   }
 
-
-  override def info(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.INFO)(enabled)
-
-  override def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.ERROR)(enabled)
-
-  @throws[GangException]
-  override def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit =
-    msg.toString |!
-      (msgStr => log(if (throwable != null) s"$msgStr，exception.getMessage: ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled)) |!
-      (msgStr => throw GangException(s"出现致命错误: $msgStr", throwable))
-
-  override def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.WARNING)(enabled)
-
-  override def success(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.SUCCESS)(enabled)
-
-  override def trace(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.TRACE)(enabled)
-
 }
 
 object GangLogger {
@@ -50,6 +33,13 @@ object GangLogger {
    * @return 一个新的 GangLogger 实例
    */
   def apply() = new GangLogger()
+
+  def apply(
+             isDTEnabled: Boolean = isDTEnabled,
+             isTraceEnabled: Boolean = isTraceEnabled,
+             defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
+             logsLevels: Array[LogLevel.Value] = logsLevels
+           ) = new GangLogger(isDTEnabled = isDTEnabled, isTraceEnabled = isTraceEnabled, defaultLogDest = defaultLogDest, logsLevels = logsLevels)
 
   /**
    * 是否在日志中启用时间
