@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.gangfunctions.{chainSideEffect, printOrLog}
+import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
 
 
 /**
@@ -11,7 +11,7 @@ trait WoaWebhookLogger extends WebhookLogger {
   /**
    * 要发往的机器人的密钥
    */
-  protected val robotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
+  val robotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
 
   /**
    * 执行一条 woa 日志
@@ -43,8 +43,6 @@ trait WoaWebhookLogger extends WebhookLogger {
   }
 }
 
-import scala.io.AnsiColor.{YELLOW, RESET}
-
 /**
  * woa webhook 日志的伴生对象
  */
@@ -66,8 +64,6 @@ object WoaWebhookLogger {
    * @param robotsKeys 密钥，如果是多个，中间用逗号隔开
    */
   def initializeWoaWebhook(robotsKeys: String): Unit = {
-    if (robotsKeys == null)
-      initializeWoaWebhook(robotsKeys)
     robotsKeys.split(",").map(_.trim) |! initializeWoaWebhook
   }
 
@@ -79,7 +75,7 @@ object WoaWebhookLogger {
    */
   def initializeWoaWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
     if ((robotsKeys != null && robotsKeys.isEmpty) || robotsKeys == null || robotsKeys.exists(_.isEmpty)) {
-      throw new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${robotsKeys.mkString("Array(", ", ", ")")}")
+      throw new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")}")
     }
     robotsKeys
   }

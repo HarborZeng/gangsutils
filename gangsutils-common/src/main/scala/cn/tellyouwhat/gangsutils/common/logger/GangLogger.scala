@@ -1,19 +1,20 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.gangfunctions.chainSideEffect
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 
 
 /**
  * BaseLogger 的具体实现，混入了 PrintlnLogger 和 WoaWebhookLogger
  */
-class GangLogger extends PrintlnLogger with WoaWebhookLogger {
+class GangLogger(
+                  override val isDTEnabled: Boolean = GangLogger.isDTEnabled,
+                  override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
+                  override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
+                  override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
+                ) extends PrintlnLogger with WoaWebhookLogger {
 
-  override val isDTEnabled: Boolean = GangLogger.isDTEnabled
-  override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled
-  override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest
-  override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels
 
   override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = {
     if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id))
@@ -21,23 +22,6 @@ class GangLogger extends PrintlnLogger with WoaWebhookLogger {
     if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id))
       super[WoaWebhookLogger].doTheLogAction(msg, level)
   }
-
-
-  override def info(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.INFO)(enabled)
-
-  override def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.ERROR)(enabled)
-
-  @throws[GangException]
-  override def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit =
-    msg.toString |!
-      (msgStr => log(if (throwable != null) s"$msgStr，exception.getMessage: ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled)) |!
-      (msgStr => throw GangException(s"出现致命错误: $msgStr", throwable))
-
-  override def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.WARNING)(enabled)
-
-  override def success(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.SUCCESS)(enabled)
-
-  override def trace(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = log(msg.toString, LogLevel.TRACE)(enabled)
 
 }
 
@@ -49,6 +33,13 @@ object GangLogger {
    * @return 一个新的 GangLogger 实例
    */
   def apply() = new GangLogger()
+
+  def apply(
+             isDTEnabled: Boolean = isDTEnabled,
+             isTraceEnabled: Boolean = isTraceEnabled,
+             defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
+             logsLevels: Array[LogLevel.Value] = logsLevels
+           ) = new GangLogger(isDTEnabled = isDTEnabled, isTraceEnabled = isTraceEnabled, defaultLogDest = defaultLogDest, logsLevels = logsLevels)
 
   /**
    * 是否在日志中启用时间
@@ -127,7 +118,7 @@ object GangLogger {
       throw new IllegalArgumentException(s"levels map 不合法：$levels")
     }
     // ValueSet object is a sorted set by design
-    (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |!! setLogsLevels
+    (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |> setLogsLevels
   }
 
 }

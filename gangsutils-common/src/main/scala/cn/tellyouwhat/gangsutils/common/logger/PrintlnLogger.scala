@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.gangfunctions.chainSideEffect
+import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
 
 import scala.io.AnsiColor._
 
