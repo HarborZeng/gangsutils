@@ -42,8 +42,12 @@ trait BaseLogger {
       val stackTraceElements = Thread.currentThread().getStackTrace
       val slicedElements = stackTraceElements.drop(stackTraceElements
         .lastIndexWhere(_.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.logger")) + 1
-      ).filterNot(e => e.getClassName.startsWith("sun.") || e.getClassName.startsWith("java.") ||
-        e.getClassName.startsWith("scala.") || (e.getClassName == "cn.tellyouwhat.gangsutils.common.gangfunctions$" && e.getMethodName == "timeit"))
+      ).filterNot(e => e.getClassName.startsWith("sun.") ||
+        e.getClassName.startsWith("java.") ||
+        e.getClassName.startsWith("scala.") ||
+        (e.getClassName == "cn.tellyouwhat.gangsutils.common.gangfunctions$" &&
+          (e.getMethodName == "timeit") || e.getMethodName == "printOrLog")
+      )
       val theTrace = slicedElements(0)
       s" - ${theTrace.getClassName}#${theTrace.getMethodName}第${theTrace.getLineNumber}行"
     } else {
