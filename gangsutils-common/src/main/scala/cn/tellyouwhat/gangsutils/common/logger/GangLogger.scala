@@ -8,12 +8,13 @@ import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER,
 /**
  * BaseLogger 的具体实现，混入了 PrintlnLogger 和 WoaWebhookLogger
  */
-class GangLogger extends PrintlnLogger with WoaWebhookLogger {
+class GangLogger(
+                  override val isDTEnabled: Boolean = GangLogger.isDTEnabled,
+                  override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
+                  override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
+                  override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
+                ) extends PrintlnLogger with WoaWebhookLogger {
 
-  override val isDTEnabled: Boolean = GangLogger.isDTEnabled
-  override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled
-  override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest
-  override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels
 
   override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = {
     if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id))
