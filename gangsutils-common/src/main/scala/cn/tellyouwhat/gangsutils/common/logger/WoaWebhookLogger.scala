@@ -75,7 +75,7 @@ object WoaWebhookLogger {
    */
   def initializeWoaWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
     if ((robotsKeys != null && robotsKeys.isEmpty) || robotsKeys == null || robotsKeys.exists(_.isEmpty)) {
-      throw new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${robotsKeys.mkString("Array(", ", ", ")")}")
+      throw new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")}")
     }
     robotsKeys
   }
