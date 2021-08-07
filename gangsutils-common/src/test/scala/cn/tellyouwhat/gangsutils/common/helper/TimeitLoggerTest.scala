@@ -22,7 +22,7 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers {
       }
       TL.tl()
     }
-    stream.toString should startWith regex
+    stream.toString should fullyMatch regex
       """【跟踪】开始任务\s+【成功】完成任务，耗时\d*\.*\d+s\s+""".r
   }
 
@@ -43,7 +43,7 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers {
       }
       TL.tl()
     }
-    stream.toString should startWith regex
+    stream.toString should fullyMatch regex
           """【跟踪】 - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+: 开始任务\s+\u001b\[32m【成功】 - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+: 完成任务，耗时\d*\.*\d+s\u001b\[0m\s+""".r
   }
 
