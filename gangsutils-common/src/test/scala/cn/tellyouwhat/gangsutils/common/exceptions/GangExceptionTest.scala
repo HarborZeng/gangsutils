@@ -48,6 +48,15 @@ class GangExceptionTest extends AnyFlatSpec with Matchers  {
     e1.isWritableStackTrace shouldEqual e2.isWritableStackTrace
   }
 
+  "GangException.apply(message: String, cause: Throwable)" should "return a new GangException with null message and null cause" in {
+    val message = None
+    val cause = None
+    val e1 = GangException.apply(message, cause)
+
+    e1.optionMessage shouldBe None
+    e1.optionCause shouldBe None
+  }
+
   "GangException.apply(optionMessage: Option[String] = None, optionCause: Option[Throwable] = None, isEnableSuppression: Boolean = false, isWritableStackTrace: Boolean = false)" should "return a new GangException with message, cause, isEnableSuppression and isWritableStackTrace" in {
     val message = "some exceptions"
     val cause = GangException("I am the cause")
