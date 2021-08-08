@@ -1,7 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
+import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 
 

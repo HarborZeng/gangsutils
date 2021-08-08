@@ -23,7 +23,7 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers {
       TL.tl()
     }
     stream.toString should fullyMatch regex
-      """【跟踪】开始任务\s+【成功】完成任务，耗时\d*\.*\d+s\s+""".r
+      """【跟踪】: 开始任务\s+【成功】: 完成任务，耗时\d*\.*\d*s\s+""".r
   }
 
   "timeit logger run with logger instance" should "run a method and log the start, end and time duration to invoke that method" in {

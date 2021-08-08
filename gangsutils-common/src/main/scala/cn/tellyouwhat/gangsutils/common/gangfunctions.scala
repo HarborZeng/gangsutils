@@ -199,7 +199,7 @@ object gangfunctions {
    * @return true if the path exists, false otherwise
    */
   def isSparkSaveDirExists(path: String)(implicit spark: SparkSession): Boolean =
-    isPathExists(new Path(path, "_SUCCESS").toString)
+    isPathExists(new Path(path, "_SUCCESS"))
 
   /**
    * spark 保存的路径是否已存在
@@ -210,7 +210,7 @@ object gangfunctions {
    * @throws GangException if failed to get the mtime of the path
    */
   def isSparkSaveDirModifiedToday(path: String)(implicit spark: SparkSession): Boolean =
-    fileModifiedTime(new Path(path, "_SUCCESS").toString) match {
+    fileModifiedTime(new Path(path, "_SUCCESS")) match {
       case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDate
@@ -228,7 +228,7 @@ object gangfunctions {
    * @throws GangException if failed to get the mtime of the path
    */
   def isSparkSaveDirModifiedWithinNHours(path: String)(n: Int)(implicit spark: SparkSession): Boolean =
-    fileModifiedTime(new Path(path, "_SUCCESS").toString) match {
+    fileModifiedTime(new Path(path, "_SUCCESS")) match {
       case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDateTime
@@ -259,7 +259,7 @@ object gangfunctions {
    */
   def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger = null): Unit =
     if (logger == null) {
-      println(s"【$level】$content")
+      println(s"【$level】: $content")
     } else {
       logger.log(content, level)
     }
@@ -273,7 +273,7 @@ object gangfunctions {
    * @tparam R 返回值 Type
    * @return block 的执行结果
    */
-  def timeit[R](block: => R)(desc: String = "任务")(implicit logger: BaseLogger = null): R = {
+  def timeit[R](block: => R, desc: String = "任务")(implicit logger: BaseLogger = null): R = {
     printOrLog(s"开始$desc")
     val t0 = System.currentTimeMillis()
     val result = Try(block) match {

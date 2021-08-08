@@ -25,6 +25,6 @@ trait TimeitLogger extends Timeit {
    * @param desc   对此次计时任务的描述
    * @param logger 日志实例
    */
-  abstract override def run(desc: String)(implicit logger: BaseLogger = null): Unit = timeit(super.run(desc))(desc)
+  abstract override def run(desc: String)(implicit logger: BaseLogger = null): Unit = timeit(super.run(desc), desc)
 }
 
