@@ -23,11 +23,11 @@ trait WebhookLogger extends BaseLogger {
    * @param method    请求的动词
    * @param body      请求带上的内容
    */
-  protected def sendRequest(targetURL: String, method: String = "POST", body: String = ""): Unit = {
+  protected def sendRequest(targetURL: String, method: String = "POST", body: String = ""): String = {
     if (method == "POST") {
-      Http(targetURL).postData(body).asString
+      Http(targetURL).postData(body).asString.body
     } else if (method == "GET") {
-      Http(targetURL).asString
+      Http(targetURL).asString.body
     } else {
       throw GangException("错误的 HTTP METHOD")
     }
