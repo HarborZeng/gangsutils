@@ -40,7 +40,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers {
     Console.withOut(stream) {
       logger.log("a log", level = LogLevel.TRACE)
     }
-    stream.toString should fullyMatch regex """【跟踪】: a log\s+""".r
+    stream.toString() should fullyMatch regex """【跟踪】: a log\s+""".r
   }
 
   it should "critical" in {

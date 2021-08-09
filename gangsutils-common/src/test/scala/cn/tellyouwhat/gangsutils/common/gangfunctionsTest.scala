@@ -1,14 +1,18 @@
 package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
+import cn.tellyouwhat.gangsutils.common.exceptions.GangException
 import cn.tellyouwhat.gangsutils.common.logger.{GangLogger, LogLevel}
+import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.spark.sql.SparkSession
+import org.scalatest.PrivateMethodTester
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.io.ByteArrayOutputStream
 import scala.util.{Failure, Success}
 
-class gangfunctionsTest extends AnyFlatSpec with Matchers {
+class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTester {
 
   behavior of "gangfunctionsTest"
 
@@ -183,6 +187,9 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers {
     stringToDoubleIn should contain allOf("c" -> 0.4d, "d" -> 0.5d)
   }
 
+  it should "get null if the parameter is null" in {
+    gangfunctions.ccToMap(null) shouldBe null
+  }
 
   "timeit" should "time a function invocation and log the start and execution duration" in {
     val stream = new ByteArrayOutputStream()
@@ -198,6 +205,12 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers {
       }
     }
     stream.toString() should fullyMatch regex """【跟踪】: 开始任务\s+【致命】: 执行任务失败，耗时\d+\.*\d*s\s+""".r
+
+    stream.reset()
+    Console.withOut(stream) {
+      gangfunctions.timeit(2 / 2)(GangLogger(isDTEnabled = false, isTraceEnabled = true))
+    }
+    stream.toString() should fullyMatch regex """【跟踪】 - [\w.$#\d]+第\d+行: 开始任务\s+\u001b\[32m【成功】 - [\w.$#\d]+第\d+行: 完成任务，耗时\d+\.*\d*s\u001b\[0m\s+""".r
   }
 
   "reduceByKey" should "group and for each group do a reduce by key" in {
@@ -234,6 +247,44 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers {
     }
     stream.toString() should fullyMatch regex
       """【错误】: 执行失败，重试最后2次，error: java.lang.ArithmeticException: / by zero\s+【错误】: 执行失败，重试最后1次，error: java.lang.ArithmeticException: / by zero\s+""".r
+  }
+
+  implicit val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
+
+  "getFS" should "get you a hadoop file system object" in {
+    val getFS = PrivateMethod[FileSystem]('getFS)
+    val fs = gangfunctions invokePrivate getFS(spark)
+    fs.getHomeDirectory.toString should startWith ("file:/")
+  }
+
+  "isPathExists" should "test a string path existence" in {
+    gangfunctions.isPathExists("file:/") shouldBe true
+  }
+
+  it should "test a Path existence" in {
+    gangfunctions.isPathExists(new Path("file:/")) shouldBe true
+  }
+
+  "fileModifiedTime" should "get mtime of string path" in {
+    gangfunctions.fileModifiedTime("file:/") match {
+      case Left(_) =>
+      case Right(t) => t shouldBe >= (0L)
+    }
+    gangfunctions.fileModifiedTime("file:/a") match {
+      case Left(e) => a [GangException] should be thrownBy (throw e)
+      case Right(_) =>
+    }
+  }
+
+  it should "get mtime of Path" in {
+    gangfunctions.fileModifiedTime(new Path("file:/")) match {
+      case Left(_) =>
+      case Right(t) => t shouldBe >= (0L)
+    }
+    gangfunctions.fileModifiedTime(new Path("file:/a")) match {
+      case Left(e) => a [GangException] should be thrownBy (throw e)
+      case Right(_) =>
+    }
   }
 
 }
