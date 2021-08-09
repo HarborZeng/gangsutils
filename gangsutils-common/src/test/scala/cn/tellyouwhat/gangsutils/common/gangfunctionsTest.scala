@@ -207,7 +207,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers {
     ext_count should contain allOf("txt" -> 2, "pdf" -> 1, "docx" -> 2, "ppt" -> 3)
   }
 
-  "printOrLog" should "print to stdout ablout the built log content or use logger(BaseLogger) to do a log action if the parameter logger in filled" in {
+  "printOrLog" should "print to stdout about the built log content or use logger(BaseLogger) to do a log action if the parameter logger is fulfilled" in {
     val stream = new ByteArrayOutputStream()
     Console.withOut(stream) {
       gangfunctions.printOrLog("content", LogLevel.TRACE)
@@ -222,7 +222,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers {
   }
 
 
-  "retry" should "inkove a function with tolerance of n times failure and printOrLog if it did" in {
+  "retry" should "invoke a function with tolerance of n times failure and printOrLog when it did" in {
     gangfunctions.retry(3)(1 + 1) match {
       case Failure(_) =>
       case Success(v) => v shouldBe 2
