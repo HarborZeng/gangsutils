@@ -45,7 +45,7 @@ object gangfunctions {
       return null
     cc.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) {
       // ignore $ initial member
-      case (map, field) if !field.getName.startsWith("$") =>
+      case (map, field) if !(field.getName.startsWith("$") || field.getName.startsWith("__")) =>
         field.setAccessible(true)
         val value = field.get(cc) match {
           case Some(m: Mappable) => ccToMap(m)
@@ -59,27 +59,6 @@ object gangfunctions {
         }
         map + (field.getName -> value)
       case (map, _) => map
-    }
-  }
-
-  /**
-   * convert object to map of Any recursively
-   *
-   * @param o the object to convert
-   */
-  def toMap(o: Any): Map[String, Any] = {
-    if (o == null)
-      return null
-    o.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) {
-      (map, field) =>
-        field.setAccessible(true)
-        val value = field.get(o) match {
-          case listOfM: List[Any] => listOfM.map(toMap)
-          case None => null
-          case Some(o) => o
-          case _ => field.get(o)
-        }
-        map + (field.getName -> value)
     }
   }
 
