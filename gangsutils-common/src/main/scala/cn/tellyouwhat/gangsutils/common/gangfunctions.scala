@@ -224,8 +224,22 @@ object gangfunctions {
    * @param encoding             编码，默认 utf8
    * @return
    */
-  def getMysql5Conn(connectionProperties: Properties)(host: String)(port: Int = 3306)(db: String)(encoding: String = "utf8"): Connection = {
+  def getMysql5Conn(connectionProperties: Properties, host: String, db: String, port: Int = 3306, encoding: String = "utf8"): Connection = {
     Class.forName("com.mysql.jdbc.Driver")
+    DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
+  }
+  /**
+   * 创建简单的 mysql 连接
+   *
+   * @param connectionProperties 连接属性，包括用户名密码
+   * @param host                 主机，ip 或域名
+   * @param port                 端口，默认 3306
+   * @param db                   数据库名
+   * @param encoding             编码，默认 utf8
+   * @return
+   */
+  def getMysql8Conn(connectionProperties: Properties, host: String, db: String, port: Int = 3306, encoding: String = "utf8"): Connection = {
+    Class.forName("com.mysql.cj.jdbc.Driver")
     DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
   }
 
