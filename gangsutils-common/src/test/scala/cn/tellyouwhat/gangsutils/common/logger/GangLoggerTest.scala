@@ -103,7 +103,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers {
     logger1.defaultLogDest should contain theSameElementsAs logger2.defaultLogDest
   }
 
-  it should "apply(isDTEnabled: Boolean = isDTEnabled,isTraceEnabled: Boolean = isTraceEnabled,defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,logsLevels: Array[LogLevel.Value] = logsLevels)" in {
+  it should "apply(isDTEnabled: Boolean = isDTEnabled,isTraceEnabled: Boolean = isTraceEnabled,defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,logsLevels: Array[LogLevel.Value] = logsLevels, logPrefix = logPrefix)" in {
     val logger1 = GangLogger.apply(isDTEnabled = false, isTraceEnabled = true, defaultLogDest = SupportedLogDest.values.toSeq, logsLevels = Array.fill(SupportedLogDest.maxId)(LogLevel.INFO))
     val logger2 = new GangLogger(isDTEnabled = false, isTraceEnabled = true, defaultLogDest = SupportedLogDest.values.toSeq, logsLevels = Array.fill(SupportedLogDest.maxId)(LogLevel.INFO))
 
@@ -129,6 +129,28 @@ class GangLoggerTest extends AnyFlatSpec with Matchers {
     GangLogger().isDTEnabled shouldBe true
     GangLogger.disableDateTime()
     GangLogger().isDTEnabled shouldBe false
+  }
+
+  it should "apply with logPrefix" in {
+    val logger2 = GangLogger(isDTEnabled = false, logPrefix = "a prefix")
+    val stream = new java.io.ByteArrayOutputStream()
+    Console.withOut(stream) {
+      logger2.trace("a log with prefix")
+    }
+    stream.toString() should fullyMatch regex """【跟踪】: a prefix - a log with prefix\s+""".r
+  }
+
+  "setLogPrefix" should "set logPrefix variable" in {
+    GangLogger.setLogPrefix("another prefix")
+    val logger1 = GangLogger(isDTEnabled = false)
+
+    logger1.logPrefix shouldBe "another prefix"
+
+    val stream = new java.io.ByteArrayOutputStream()
+    Console.withOut(stream) {
+      logger1.trace("another log with prefix")
+    }
+    stream.toString() should fullyMatch regex """【跟踪】: another prefix - another log with prefix\s+""".r
   }
 
 }

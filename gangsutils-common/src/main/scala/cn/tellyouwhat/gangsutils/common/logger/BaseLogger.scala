@@ -31,6 +31,12 @@ trait BaseLogger {
   protected val logsLevels: Array[LogLevel.Value] = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
 
   /**
+   * 每条日志的前缀
+   */
+  protected val logPrefix: String = ""
+
+
+  /**
    * 构建日志文本
    *
    * @param msg   日志内容
@@ -52,7 +58,8 @@ trait BaseLogger {
       s" - ${theTrace.getClassName}#${theTrace.getMethodName}第${theTrace.getLineNumber}行"
     } else {
       ""
-    }) |> (traceStr => s"【$level】${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: $msg")
+    }) |> (traceStr => s"【$level】${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")
+
 
   /**
    * 真正去输出一条日志
