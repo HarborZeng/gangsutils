@@ -12,6 +12,7 @@ class GangLogger(
                   override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
                   override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
                   override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
+                  override val logPrefix: String = GangLogger.logPrefix,
                 ) extends PrintlnLogger with WoaWebhookLogger {
 
 
@@ -37,8 +38,9 @@ object GangLogger {
              isDTEnabled: Boolean = isDTEnabled,
              isTraceEnabled: Boolean = isTraceEnabled,
              defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
-             logsLevels: Array[LogLevel.Value] = logsLevels
-           ) = new GangLogger(isDTEnabled = isDTEnabled, isTraceEnabled = isTraceEnabled, defaultLogDest = defaultLogDest, logsLevels = logsLevels)
+             logsLevels: Array[LogLevel.Value] = logsLevels,
+             logPrefix: String = logPrefix
+           ) = new GangLogger(isDTEnabled = isDTEnabled, isTraceEnabled = isTraceEnabled, defaultLogDest = defaultLogDest, logsLevels = logsLevels, logPrefix = logPrefix)
 
   /**
    * 是否在日志中启用时间
@@ -59,6 +61,8 @@ object GangLogger {
    * 默认的不同的日志输出目的地的级别
    */
   private var logsLevels: Array[LogLevel.Value] = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
+
+  private var logPrefix: String = ""
 
   /**
    * 关闭日志中的日期时间
@@ -119,5 +123,7 @@ object GangLogger {
     // ValueSet object is a sorted set by design
     (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |> setLogsLevels
   }
+
+  def setLogPrefix(prefix: String): Unit = logPrefix = prefix
 
 }
