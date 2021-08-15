@@ -58,6 +58,7 @@ object WoaWebhookLogger {
    */
   private var robotsToSend: Array[String] = Array.empty[String]
 
+  def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
   /**
    * 初始化 woa webhook 的密钥
    *
