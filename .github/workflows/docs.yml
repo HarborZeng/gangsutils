@@ -1,8 +1,9 @@
 name: docs
 
 on:
-  push:
-    branches: [ master ]
+  release:
+    types:
+      - created
 
 jobs:
   api-website:
@@ -10,8 +11,6 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - name: Set up the Java JDK
         uses: actions/setup-java@v2
