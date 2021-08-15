@@ -1,9 +1,9 @@
-name: Maven Central Repo Deployment For gangsutils
+name: master build
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types:
+      - created
 
 jobs:
   publish:
