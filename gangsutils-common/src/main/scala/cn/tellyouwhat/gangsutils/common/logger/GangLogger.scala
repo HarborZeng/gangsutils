@@ -51,6 +51,8 @@ object GangLogger {
     }
   }
 
+  def killLogger(): Unit = _logger = None
+
   private[logger] var _logger: Option[BaseLogger] = None
   /**
    * 是否在日志中启用时间

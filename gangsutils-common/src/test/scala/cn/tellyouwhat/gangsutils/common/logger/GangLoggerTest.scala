@@ -2,11 +2,20 @@ package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
-import org.scalatest.PrivateMethodTester
+import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester {
+class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester  with BeforeAndAfter {
+
+  before {
+    GangLogger.disableDateTime()
+  }
+
+  after {
+    GangLogger.killLogger()
+    GangLogger.resetLoggerConfig()
+  }
 
   behavior of "GangLoggerTest"
 
@@ -127,7 +136,13 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     GangLogger.disableDateTime()
     GangLogger().isDTEnabled shouldBe false
     GangLogger.enableDateTime()
-    GangLogger().isDTEnabled shouldBe true
+    val logger3 = GangLogger()
+    logger3.isDTEnabled shouldBe true
+    val stream = new java.io.ByteArrayOutputStream()
+    Console.withOut(stream) {
+      logger3.trace("logger3 info")
+    }
+    stream.toString() should fullyMatch regex """【跟踪】 - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+: logger3 info\s+""".r
     GangLogger.disableDateTime()
     GangLogger().isDTEnabled shouldBe false
   }
@@ -166,7 +181,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   "getLogger" should "return an existing GangLogger or a new GangLogger()" in {
-    GangLogger.resetLoggerConfig()
     val newLogger = GangLogger(logPrefix = "123")
     val logger1 = GangLogger.getLogger
     logger1 shouldEqual newLogger
@@ -179,7 +193,15 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     logger2 shouldEqual GangLogger._logger.get
 
     stream.toString() should fullyMatch regex
-    """\u001b\[33m【警告】 - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+: cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: logger is not initialized yet, initialize a default GangLogger for you\u001b\[0m\s+""".r
+    """\u001b\[33m【警告】: cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: logger is not initialized yet, initialize a default GangLogger for you\u001b\[0m\s+""".r
+  }
+
+  "killLogger" should "reset the _logger variable to None" in {
+    GangLogger()
+    GangLogger._logger shouldNot be (None)
+
+    GangLogger.killLogger()
+    GangLogger._logger shouldBe None
   }
 
 }

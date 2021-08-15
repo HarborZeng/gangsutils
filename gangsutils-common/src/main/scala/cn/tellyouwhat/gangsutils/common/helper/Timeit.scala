@@ -11,9 +11,8 @@ trait Timeit {
    * 实现此方法，即可获得日志功能和计时功能
    *
    * @param desc   对此次计时任务的描述
-   * @param logger 日志实例
    */
-  def run(desc: String = "任务")(implicit logger: BaseLogger = null): Unit
+  def run(desc: String = "任务"): Unit
 }
 
 /**
@@ -23,8 +22,7 @@ trait TimeitLogger extends Timeit {
   /**
    * @inheritdoc
    * @param desc   对此次计时任务的描述
-   * @param logger 日志实例
    */
-  abstract override def run(desc: String)(implicit logger: BaseLogger = null): Unit = timeit(super.run(desc), desc)
+  abstract override def run(desc: String): Unit = timeit(super.run(desc), desc)
 }
 

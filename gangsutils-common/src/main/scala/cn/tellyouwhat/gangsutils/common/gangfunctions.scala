@@ -3,7 +3,7 @@ package cn.tellyouwhat.gangsutils.common
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
-import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, LogLevel}
+import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
 
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
 import org.apache.hadoop.fs.{FileSystem, Path}
@@ -231,12 +231,11 @@ object gangfunctions {
    *
    * @param block  要执行的方法
    * @param desc   描述，将作用于切面日志
-   * @param logger 日志对象
    * @tparam R 返回值 Type
    * @return block 的执行结果
    */
-  // TODO remove implicit logger
-  def timeit[R](block: => R, desc: String = "任务")(implicit logger: BaseLogger = null): R = {
+  def timeit[R](block: => R, desc: String = "任务"): R = {
+    implicit val logger: BaseLogger = GangLogger.getLogger
     printOrLog(s"开始$desc")
     val t0 = System.currentTimeMillis()
     val result = Try(block) match {
