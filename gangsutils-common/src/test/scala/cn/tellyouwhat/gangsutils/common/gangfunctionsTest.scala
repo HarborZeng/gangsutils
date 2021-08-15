@@ -342,14 +342,4 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     a [GangException] should be thrownBy gangfunctions.isSparkSaveDirModifiedWithinNHours(doesNotExistsDirPath.toString)(1)
   }
 
-  "getMysql5Conn" should "connect to mysql server" in {
-    val p = new Properties() |! (_.setProperty("username", "the_name")) |! (_.setProperty("password", "the_pass"))
-    a [CommunicationsException] should be thrownBy gangfunctions.getMysql5Conn(p, "localhost", "db_name")
-  }
-
-  "getMysql8Conn" should "connect to mysql server" in {
-    val p = new Properties() |! (_.setProperty("username", "the_name")) |! (_.setProperty("password", "the_pass"))
-    a [CommunicationsException] should be thrownBy gangfunctions.getMysql8Conn(p, "localhost", "db_name")
-  }
-
 }

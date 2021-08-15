@@ -5,9 +5,7 @@ import cn.tellyouwhat.gangsutils.common.exceptions.GangException
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, LogLevel}
 
-import java.sql.{Connection, DriverManager}
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
-import java.util.Properties
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.SparkSession
 
@@ -215,35 +213,6 @@ object gangfunctions {
     }
 
   /**
-   * 创建简单的 mysql 连接
-   *
-   * @param connectionProperties 连接属性，包括用户名密码
-   * @param host                 主机，ip 或域名
-   * @param port                 端口，默认 3306
-   * @param db                   数据库名
-   * @param encoding             编码，默认 utf8
-   * @return
-   */
-  def getMysql5Conn(connectionProperties: Properties, host: String, db: String, port: Int = 3306, encoding: String = "utf8"): Connection = {
-    Class.forName("com.mysql.jdbc.Driver")
-    DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
-  }
-  /**
-   * 创建简单的 mysql 连接
-   *
-   * @param connectionProperties 连接属性，包括用户名密码
-   * @param host                 主机，ip 或域名
-   * @param port                 端口，默认 3306
-   * @param db                   数据库名
-   * @param encoding             编码，默认 utf8
-   * @return
-   */
-  def getMysql8Conn(connectionProperties: Properties, host: String, db: String, port: Int = 3306, encoding: String = "utf8"): Connection = {
-    Class.forName("com.mysql.cj.jdbc.Driver")
-    DriverManager.getConnection(s"jdbc:mysql://$host:$port/$db?characterEncoding=$encoding", connectionProperties)
-  }
-
-  /**
    * print 或者执行 logger
    *
    * @param content 要输出的内容
@@ -266,13 +235,14 @@ object gangfunctions {
    * @tparam R 返回值 Type
    * @return block 的执行结果
    */
+  // TODO remove implicit logger
   def timeit[R](block: => R, desc: String = "任务")(implicit logger: BaseLogger = null): R = {
     printOrLog(s"开始$desc")
     val t0 = System.currentTimeMillis()
     val result = Try(block) match {
       case Failure(e) =>
         val t1 = System.currentTimeMillis()
-        printOrLog(s"执行${desc}失败，耗时${calcExecDuration(t0, t1)}", level = LogLevel.CRITICAL);
+        printOrLog(s"执行${desc}失败，耗时${calcExecDuration(t0, t1)}", level = LogLevel.CRITICAL)
         throw e
       case Success(v) => v
     }
