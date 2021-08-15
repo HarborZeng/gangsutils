@@ -2,21 +2,28 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
 import cn.tellyouwhat.gangsutils.common.logger.{GangLogger, LogLevel}
-import com.mysql.cj.jdbc.exceptions.CommunicationsException
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.SparkSession
-import org.scalatest.PrivateMethodTester
+import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.io.ByteArrayOutputStream
 import java.time.{LocalDateTime, ZoneId}
-import java.util.Properties
 import scala.util.{Failure, Success}
 
-class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTester {
+class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
+
+  before {
+    GangLogger.disableDateTime()
+    GangLogger()
+  }
+
+  after {
+    GangLogger.killLogger()
+    GangLogger.resetLoggerConfig()
+  }
 
   behavior of "gangfunctionsTest"
 
@@ -200,7 +207,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     Console.withOut(stream) {
       gangfunctions.timeit(1 + 1) shouldBe 2
     }
-    stream.toString() should fullyMatch regex """【跟踪】: 开始任务\s+【成功】: 完成任务，耗时\d+\.*\d*s\s+""".r
+    stream.toString() should fullyMatch regex """【跟踪】: 开始任务\s+\u001b\[32m【成功】: 完成任务，耗时\d+\.*\d*s\u001b\[0m\s+""".r
 
     stream.reset()
     Console.withOut(stream) {
@@ -208,13 +215,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
         gangfunctions.timeit(1 / 0)
       }
     }
-    stream.toString() should fullyMatch regex """【跟踪】: 开始任务\s+【致命】: 执行任务失败，耗时\d+\.*\d*s\s+""".r
-
-    stream.reset()
-    Console.withOut(stream) {
-      gangfunctions.timeit(2 / 2)(GangLogger(isDTEnabled = false, isTraceEnabled = true))
-    }
-    stream.toString() should fullyMatch regex """【跟踪】 - [\w.$#\d]+第\d+行: 开始任务\s+\u001b\[32m【成功】 - [\w.$#\d]+第\d+行: 完成任务，耗时\d+\.*\d*s\u001b\[0m\s+""".r
+    stream.toString() should fullyMatch regex """【跟踪】: 开始任务\s+\u001b\[31m\u001b\[1m【致命】: 执行任务失败，耗时\d+\.*\d*s\u001b\[0m\s+""".r
   }
 
   "reduceByKey" should "group and for each group do a reduce by key" in {
@@ -340,16 +341,6 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     gangfunctions.isSparkSaveDirModifiedWithinNHours(sparkJobDirPath.toString)(1) shouldBe false
 
     a [GangException] should be thrownBy gangfunctions.isSparkSaveDirModifiedWithinNHours(doesNotExistsDirPath.toString)(1)
-  }
-
-  "getMysql5Conn" should "connect to mysql server" in {
-    val p = new Properties() |! (_.setProperty("username", "the_name")) |! (_.setProperty("password", "the_pass"))
-    a [CommunicationsException] should be thrownBy gangfunctions.getMysql5Conn(p, "localhost", "db_name")
-  }
-
-  "getMysql8Conn" should "connect to mysql server" in {
-    val p = new Properties() |! (_.setProperty("username", "the_name")) |! (_.setProperty("password", "the_pass"))
-    a [CommunicationsException] should be thrownBy gangfunctions.getMysql8Conn(p, "localhost", "db_name")
   }
 
 }

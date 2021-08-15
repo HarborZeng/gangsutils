@@ -23,6 +23,8 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
       logger.log("a info log", LogLevel.INFO)
     }
     stream.toString() should fullyMatch regex """\u001b\[1m【信息】: a info log\u001b\[0m\s+""".r
+    GangLogger.resetLoggerConfig()
+    GangLogger.killLogger()
   }
 
 }

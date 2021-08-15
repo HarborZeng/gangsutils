@@ -15,7 +15,7 @@ class MyApp extends Timeit {
 
   private val logger: BaseLogger = MyApp.logger
 
-  override def run(desc: String)(implicit logger: BaseLogger): Unit = {
+  override def run(desc: String): Unit = {
     Thread.sleep(1000)
 
     logger.trace("trace")
@@ -28,6 +28,7 @@ class MyApp extends Timeit {
     logger.info(new Path("path/to", "_SUCCESS").toString)
 
     retry(2)(fun())
+    AnotherJob.job001()
   }
 
   def fun(): Nothing = {
@@ -44,7 +45,8 @@ object MyApp {
   def main(args: Array[String]): Unit = {
     GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE))
     GangLogger.disableTrace()
-    logger = GangLogger()
+    logger = GangLogger(isTraceEnabled = true)
+    logger.trace("tracing")
 
     MyApp().run()
   }

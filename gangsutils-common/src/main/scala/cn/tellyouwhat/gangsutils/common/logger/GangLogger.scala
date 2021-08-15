@@ -1,13 +1,14 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
+import cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 
 
 /**
  * BaseLogger 的具体实现，混入了 PrintlnLogger 和 WoaWebhookLogger
  */
-class GangLogger(
+protected class GangLogger(
                   override val isDTEnabled: Boolean = GangLogger.isDTEnabled,
                   override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
                   override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
@@ -32,7 +33,7 @@ object GangLogger {
    *
    * @return 一个新的 GangLogger 实例
    */
-  def apply() = new GangLogger()
+  def apply(): GangLogger = new GangLogger() |! (l => _logger = Some(l))
 
   def apply(
              isDTEnabled: Boolean = isDTEnabled,
@@ -40,8 +41,19 @@ object GangLogger {
              defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
              logsLevels: Array[LogLevel.Value] = logsLevels,
              logPrefix: String = logPrefix
-           ) = new GangLogger(isDTEnabled = isDTEnabled, isTraceEnabled = isTraceEnabled, defaultLogDest = defaultLogDest, logsLevels = logsLevels, logPrefix = logPrefix)
+           ): GangLogger =
+    new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix) |! (l => _logger = Some(l))
 
+  def getLogger: BaseLogger = {
+    _logger match {
+      case Some(logger) => logger
+      case None => apply() |! (logger => logger.warning(NoAliveLoggerException("logger is not initialized yet, initialize a default GangLogger for you")))
+    }
+  }
+
+  def killLogger(): Unit = _logger = None
+
+  private[logger] var _logger: Option[BaseLogger] = None
   /**
    * 是否在日志中启用时间
    */
@@ -64,6 +76,13 @@ object GangLogger {
 
   private var logPrefix: String = ""
 
+  def resetLoggerConfig(): Unit = {
+    isDTEnabled = true
+    isTraceEnabled = false
+    defaultLogDest = Seq(PRINTLN_LOGGER)
+    logsLevels = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
+    logPrefix = ""
+  }
   /**
    * 关闭日志中的日期时间
    */
@@ -125,5 +144,7 @@ object GangLogger {
   }
 
   def setLogPrefix(prefix: String): Unit = logPrefix = prefix
+
+  def clearLogPrefix(): Unit = logPrefix = ""
 
 }
