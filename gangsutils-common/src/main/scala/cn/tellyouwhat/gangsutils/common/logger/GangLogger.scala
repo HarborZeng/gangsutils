@@ -17,11 +17,17 @@ protected class GangLogger(
                 ) extends PrintlnLogger with WoaWebhookLogger {
 
 
-  override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Unit = {
-    if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id))
-      super[PrintlnLogger].doTheLogAction(msg, level)
-    if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id))
-      super[WoaWebhookLogger].doTheLogAction(msg, level)
+  override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
+    val logStatus = Array.newBuilder[Boolean]
+    if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id)) {
+      val status = super[PrintlnLogger].doTheLogAction(msg, level)
+      logStatus += status
+    }
+    if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id)) {
+      val status = super[WoaWebhookLogger].doTheLogAction(msg, level)
+      logStatus += status
+    }
+    logStatus.result().forall(b => b)
   }
 
 }

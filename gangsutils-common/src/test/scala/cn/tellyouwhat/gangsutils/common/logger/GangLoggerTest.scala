@@ -6,7 +6,7 @@ import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester  with BeforeAndAfter {
+class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
 
   before {
     GangLogger.disableDateTime()
@@ -55,10 +55,8 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "critical" in {
     val stream = new java.io.ByteArrayOutputStream()
-    an[GangException] should be thrownBy {
-      Console.withOut(stream) {
-        logger.critical("a critical log")
-      }
+    Console.withOut(stream) {
+      logger.critical("a critical log")
     }
     stream.toString should fullyMatch regex """\u001b\[31m\u001b\[1m【致命】: a critical log\u001b\[0m\s+""".r
   }
@@ -193,12 +191,12 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     logger2 shouldEqual GangLogger._logger.get
 
     stream.toString() should fullyMatch regex
-    """\u001b\[33m【警告】: cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: logger is not initialized yet, initialize a default GangLogger for you\u001b\[0m\s+""".r
+      """\u001b\[33m【警告】: cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: logger is not initialized yet, initialize a default GangLogger for you\u001b\[0m\s+""".r
   }
 
   "killLogger" should "reset the _logger variable to None" in {
     GangLogger()
-    GangLogger._logger shouldNot be (None)
+    GangLogger._logger shouldNot be(None)
 
     GangLogger.killLogger()
     GangLogger._logger shouldBe None

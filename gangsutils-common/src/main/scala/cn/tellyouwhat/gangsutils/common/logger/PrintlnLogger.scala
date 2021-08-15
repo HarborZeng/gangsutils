@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
 import scala.io.AnsiColor._
 
@@ -16,8 +16,8 @@ trait PrintlnLogger extends BaseLogger {
    * @param msg   日志内容
    * @param level 日志级别
    */
-  protected def printlnLog(msg: String, level: LogLevel.Value): Unit =
-    buildLogContent(msg, level) |! { content =>
+  protected def printlnLog(msg: String, level: LogLevel.Value): Boolean =
+    buildLogContent(msg, level) |> { content =>
       level match {
         case LogLevel.ERROR => println(s"$RED$content$RESET")
         case LogLevel.CRITICAL => println(s"$RED$BOLD$content$RESET")
@@ -27,9 +27,10 @@ trait PrintlnLogger extends BaseLogger {
         case LogLevel.TRACE => println(content)
         case _ => throw GangException(s"Unknown log level: $level")
       }
+      true
     }
 
-  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Unit =
+  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean =
     printlnLog(msg, level)
 }
 

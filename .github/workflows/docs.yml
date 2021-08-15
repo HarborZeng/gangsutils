@@ -1,0 +1,61 @@
+name: docs
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  api-website:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up the Java JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'zulu'
+
+      - name: Build docs with Maven
+        run: mvn scala:doc -pl gangsutils-common
+
+      - name: Copy to Documentation Website Location
+        run: |
+          rm -rf docs
+          cp -rf gangsutils-common/target/site/scaladocs/. docs
+
+      - name: Tidy up the javadocs
+        id: tidy
+        uses: cicirello/javadoc-cleanup@v1
+        with:
+          path-to-root: docs
+          base-url-path: https://gangsutils.tellyouwhat.cn/
+
+      - name: Log javadoc-cleanup output
+        run: |
+          echo "modified-count = ${{ steps.tidy.outputs.modified-count }}"
+
+      - name: Commit documentation changes
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            git config --global user.name 'scaladoc publisher'
+            git config --global user.email 'harborzeng@qq.com'
+            git add -A
+            git commit -m "Automated API website updates."
+          fi
+
+      - name: Generate the sitemap
+        id: sitemap
+        uses: cicirello/generate-sitemap@v1
+        with:
+          base-url-path: https://gangsutils.tellyouwhat.cn/
+          path-to-root: docs
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.8.2
+        with:
+          title: "Automated API website updates."
+          commit-message: "Automated API documentation website updates."
