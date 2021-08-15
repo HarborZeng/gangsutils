@@ -19,7 +19,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Build docs with Maven
-        run: mvn scala:doc -pl gangsutils-common
+        run: mvn clean scala:doc -pl gangsutils-common
 
       - name: Copy to Documentation Website Location
         run: |
