@@ -37,7 +37,7 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers {
       object TL {
         def tl(): Unit = {
           val o = new TL with TimeitLogger
-          implicit val logger: GangLogger = new GangLogger(isDTEnabled = true, isTraceEnabled = false)
+          implicit val logger: BaseLogger = GangLogger(isDTEnabled = true, isTraceEnabled = false)
           o.run()
         }
       }
