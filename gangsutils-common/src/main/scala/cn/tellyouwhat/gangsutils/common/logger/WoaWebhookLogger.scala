@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
 
 /**
@@ -19,7 +19,7 @@ trait WoaWebhookLogger extends WebhookLogger {
    * @param msg   日志内容
    * @param level 日志级别
    */
-  protected def woaWebhookLog(msg: String, level: LogLevel.Value): Unit = webhookLog(msg, level)
+  protected def woaWebhookLog(msg: String, level: LogLevel.Value): Boolean = webhookLog(msg, level)
 
   /**
    * 检查 woa 的 webhook 机器人的密钥是否已经设置
@@ -28,16 +28,16 @@ trait WoaWebhookLogger extends WebhookLogger {
     if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
       throw new IllegalArgumentException("必须要先调用 WoaWebhookLogger.initializeWoaWebhook 初始化机器人的秘钥才能创建 WoaWebhookLogger 实例")
 
-  protected override def webhookLog(msg: String, level: LogLevel.Value): Unit = {
-    robotsToSend.foreach(key =>
-      buildLogContent(msg, level) |! (content => sendRequest(
+  protected override def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
+    robotsToSend.map(key =>
+      buildLogContent(msg, level) |> (content => sendRequest(
         s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
         body = "{\"msgtype\": \"text\",\"text\": {\"content\": \" " + content + "\"}}"
       ))
-    )
+    ).forall(b => b)
   }
 
-  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Unit = {
+  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = {
     checkRobotsInitialized()
     woaWebhookLog(msg, level)
   }

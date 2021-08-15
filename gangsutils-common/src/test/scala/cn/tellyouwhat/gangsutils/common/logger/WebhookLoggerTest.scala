@@ -14,12 +14,12 @@ class WebhookLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTest
   behavior of "WebhookLoggerTest"
 
   it should "sendRequest" in {
-    val sendRequest = PrivateMethod[String]('sendRequest)
+    val sendRequest = PrivateMethod[Boolean]('sendRequest)
     val logger: WebhookLogger = GangLogger()
     val res = retry(1)(logger invokePrivate sendRequest("https://tellyouwhat.cn/google9dee8b8a6358ecc8.html", "GET", ""))
     res match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
-      case Success(v) => v shouldBe "google-site-verification: google9dee8b8a6358ecc8.html"
+      case Success(v) => v shouldBe true
     }
 
     a [GangException] should be thrownBy {

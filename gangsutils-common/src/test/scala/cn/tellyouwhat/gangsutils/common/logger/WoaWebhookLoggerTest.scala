@@ -32,10 +32,16 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     an [IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook(Array.empty[String])
   }
 
-  "woa webhook logger" should "send a log into woa" in {
+  "woa webhook logger" should "send a log into woa with correct key" in {
     WoaWebhookLogger.initializeWoaWebhook("a35a9ed09b9a7bb50dc5cc13c4cc20af")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.WOA_WEBHOOK_LOGGER))
-    logger.info("woa webhook logger send a log into woa")
+    logger.info("woa webhook logger send a log into woa with correct key") shouldBe true
+  }
+
+  it should "not send a log into woa with incorrect key" in {
+    WoaWebhookLogger.initializeWoaWebhook("a3af")
+    val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.WOA_WEBHOOK_LOGGER))
+    logger.info("woa webhook logger not send a log into woa with incorrect key") shouldBe false
   }
 
   "checkRobotsInitialized" should "throw an IllegalArgumentException if robotsToSend is empty" in {
