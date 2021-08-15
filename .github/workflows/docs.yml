@@ -58,3 +58,5 @@ jobs:
         with:
           title: "Automated API website updates."
           commit-message: "Automated API documentation website updates."
+          base: master
+          delete-branch: true
