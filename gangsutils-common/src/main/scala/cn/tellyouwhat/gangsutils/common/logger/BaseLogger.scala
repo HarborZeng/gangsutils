@@ -13,27 +13,27 @@ trait BaseLogger {
   /**
    * 是否在日志中启用时间
    */
-  protected val isDTEnabled: Boolean = true
+  private[logger] val isDTEnabled: Boolean = true
 
   /**
    * 是否在日志中启用跟踪（包名类名方法名行号）字段
    */
-  protected val isTraceEnabled: Boolean = false
+  private[logger] val isTraceEnabled: Boolean = false
 
   /**
    * 默认的日志输出目的地
    */
-  protected implicit val defaultLogDest: Seq[SupportedLogDest.Value] = null
+  private[logger] implicit val defaultLogDest: Seq[SupportedLogDest.Value] = null
 
   /**
    * 默认的不同的日志输出目的地的级别
    */
-  protected val logsLevels: Array[LogLevel.Value] = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
+  private[logger] val logsLevels: Array[LogLevel.Value] = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
 
   /**
    * 每条日志的前缀
    */
-  protected val logPrefix: String = ""
+  private[logger] val logPrefix: String = ""
 
 
   /**
