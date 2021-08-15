@@ -15,7 +15,7 @@ class MyApp extends Timeit {
 
   private val logger: BaseLogger = MyApp.logger
 
-  override def run(desc: String)(implicit logger: BaseLogger): Unit = {
+  override def run(desc: String): Unit = {
     Thread.sleep(1000)
 
     logger.trace("trace")
