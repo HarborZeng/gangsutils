@@ -28,3 +28,5 @@ jobs:
       - name: Maven Clean Package
         run: |
           mvn clean package
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
