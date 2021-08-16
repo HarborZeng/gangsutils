@@ -2,7 +2,7 @@
 
 | __Goal__ | Badges |
 | :--- | :--- |
-| __Packages and Releases__ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils) |
+| __Packages and Releases__ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils) [![Sonatype Nexus](https://img.shields.io/nexus/r/cn.tellyouwhat/gangsutils?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/releases/cn/tellyouwhat/gangsutils/) |
 | __Java Documentation__ | [![javadoc](https://javadoc.io/badge2/cn.tellyouwhat/gangsutils-common/javadoc.svg)](https://javadoc.io/doc/cn.tellyouwhat/gangsutils-common) |
 | __Build Status__ | [![develop build](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml/badge.svg)](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml) [![master build](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml/badge.svg?branch=master)](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml) |
 | __JaCoCo Test Coverage__ | [![codecov](https://codecov.io/gh/HarborZeng/gangsutils/branch/master/graph/badge.svg?token=MUYXET5V4O)](https://codecov.io/gh/HarborZeng/gangsutils) |
