@@ -3,7 +3,7 @@ package cn.tellyouwhat.gangsutils.common
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
 import cn.tellyouwhat.gangsutils.common.logger.{GangLogger, LogLevel}
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{FileSystem, Path, PathNotFoundException}
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
@@ -289,7 +289,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
       case Right(t) => t shouldBe >= (0L)
     }
     gangfunctions.fileModifiedTime(doesNotExistsDirPath.toString) match {
-      case Left(e) => a [GangException] should be thrownBy (throw e)
+      case Left(e) => a [PathNotFoundException] should be thrownBy (throw e)
       case Right(_) =>
     }
   }
@@ -300,7 +300,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
       case Right(t) => t shouldBe >= (0L)
     }
     gangfunctions.fileModifiedTime(doesNotExistsDirPath) match {
-      case Left(e) => a [GangException] should be thrownBy (throw e)
+      case Left(e) => a [PathNotFoundException] should be thrownBy (throw e)
       case Right(_) =>
     }
   }

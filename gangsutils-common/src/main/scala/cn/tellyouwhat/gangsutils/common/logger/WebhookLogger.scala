@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.exceptions.GangException
+import cn.tellyouwhat.gangsutils.common.exceptions.WrongHttpMethodException
 import scalaj.http.Http
 
 /**
@@ -29,7 +29,7 @@ trait WebhookLogger extends BaseLogger {
     } else if (method == "GET") {
       Http(targetURL).asString.isSuccess
     } else {
-      throw GangException("错误的 HTTP METHOD")
+      throw WrongHttpMethodException(s"错误的 HTTP METHOD: $method")
     }
   }
 }

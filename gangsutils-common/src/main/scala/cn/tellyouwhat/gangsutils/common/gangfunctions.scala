@@ -6,7 +6,7 @@ import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
 
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{FileSystem, Path, PathNotFoundException}
 import org.apache.spark.sql.SparkSession
 
 import scala.language.implicitConversions
@@ -149,7 +149,7 @@ object gangfunctions {
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
    * @throws GangException if the path does not exists
    */
-  def fileModifiedTime(path: String)(implicit spark: SparkSession): Either[GangException, Long] =
+  def fileModifiedTime(path: String)(implicit spark: SparkSession): Either[PathNotFoundException, Long] =
     fileModifiedTime(new Path(path))
 
   /**
@@ -160,11 +160,11 @@ object gangfunctions {
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
    * @throws GangException if the path does not exists
    */
-  def fileModifiedTime(path: Path)(implicit spark: SparkSession): Either[GangException, Long] = {
+  def fileModifiedTime(path: Path)(implicit spark: SparkSession): Either[PathNotFoundException, Long] = {
     if (isPathExists(path)) {
       getFS.getFileStatus(path).getModificationTime |> Right.apply
     } else {
-      GangException(s"path：$path 不存在") |> Left.apply
+      new PathNotFoundException(path.toString) |> Left.apply
     }
   }
 

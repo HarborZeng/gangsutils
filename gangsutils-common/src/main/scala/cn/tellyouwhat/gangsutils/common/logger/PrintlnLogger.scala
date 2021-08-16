@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.exceptions.GangException
-import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
+import cn.tellyouwhat.gangsutils.common.exceptions.WrongLogLevelException
+import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 
 import scala.io.AnsiColor._
 
@@ -25,7 +25,7 @@ trait PrintlnLogger extends BaseLogger {
         case LogLevel.SUCCESS => println(s"$GREEN$content$RESET")
         case LogLevel.INFO => println(s"$BOLD$content$RESET")
         case LogLevel.TRACE => println(content)
-        case _ => throw GangException(s"Unknown log level: $level")
+        case _ => throw WrongLogLevelException(s"Unknown log level: $level")
       }
       true
     }
