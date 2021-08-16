@@ -9,12 +9,12 @@ import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER,
  * BaseLogger 的具体实现，混入了 PrintlnLogger 和 WoaWebhookLogger
  */
 protected class GangLogger(
-                  override val isDTEnabled: Boolean = GangLogger.isDTEnabled,
-                  override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
-                  override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
-                  override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
-                  override val logPrefix: String = GangLogger.logPrefix,
-                ) extends PrintlnLogger with WoaWebhookLogger {
+                            override val isDTEnabled: Boolean = GangLogger.isDTEnabled,
+                            override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
+                            override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
+                            override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
+                            override val logPrefix: String = GangLogger.logPrefix,
+                          ) extends PrintlnLogger with WoaWebhookLogger {
 
 
   override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
@@ -41,6 +41,16 @@ object GangLogger {
    */
   def apply(): GangLogger = new GangLogger() |! (l => _logger = Some(l))
 
+  /**
+   * 创建一个新的 GangLogger 实例
+   *
+   * @param isDTEnabled    是否在日志中启用时间
+   * @param isTraceEnabled 是否在日志中启用跟踪（包名类名方法名行号）字段
+   * @param defaultLogDest 默认的日志输出目的地
+   * @param logsLevels     默认的不同的日志输出目的地的级别
+   * @param logPrefix      每条日志的前缀
+   * @return 一个新的 GangLogger 实例
+   */
   def apply(
              isDTEnabled: Boolean = isDTEnabled,
              isTraceEnabled: Boolean = isTraceEnabled,
@@ -50,6 +60,11 @@ object GangLogger {
            ): GangLogger =
     new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix) |! (l => _logger = Some(l))
 
+  /**
+   * 获取 BaseLogger 单例对象
+   *
+   * @return
+   */
   def getLogger: BaseLogger = {
     _logger match {
       case Some(logger) => logger
@@ -57,9 +72,16 @@ object GangLogger {
     }
   }
 
+  /**
+   * 清除单例 BaseLogger 对象
+   */
   def killLogger(): Unit = _logger = None
 
+  /**
+   * BaseLogger 的单例对象
+   */
   private[logger] var _logger: Option[BaseLogger] = None
+
   /**
    * 是否在日志中启用时间
    */
@@ -80,8 +102,14 @@ object GangLogger {
    */
   private var logsLevels: Array[LogLevel.Value] = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
 
+  /**
+   * 日志前缀，每条日志前都会被加上的前缀
+   */
   private var logPrefix: String = ""
 
+  /**
+   * 将 GangLogger 伴生对像变量初始化
+   */
   def resetLoggerConfig(): Unit = {
     isDTEnabled = true
     isTraceEnabled = false
@@ -89,6 +117,7 @@ object GangLogger {
     logsLevels = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
     logPrefix = ""
   }
+
   /**
    * 关闭日志中的日期时间
    */

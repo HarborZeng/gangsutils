@@ -1,7 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.helper
 
 import cn.tellyouwhat.gangsutils.common.gangfunctions.timeit
-import cn.tellyouwhat.gangsutils.common.logger.BaseLogger
 
 /**
  * 计时日志特质
