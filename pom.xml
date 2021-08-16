@@ -172,6 +172,15 @@
                             <goal>doc-jar</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>gen-doc-site</id>
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                        <configuration>
+                            <args>-notimestamp</args>
+                        </configuration>
+                    </execution>
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.fullversion}</scalaVersion>
