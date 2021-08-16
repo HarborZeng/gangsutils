@@ -178,7 +178,9 @@
                             <goal>doc</goal>
                         </goals>
                         <configuration>
-                            <args>-notimestamp</args>
+                            <args>
+                                <arg>-notimestamp</arg>
+                            </args>
                         </configuration>
                     </execution>
                 </executions>
