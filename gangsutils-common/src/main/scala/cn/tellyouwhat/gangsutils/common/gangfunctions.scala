@@ -270,10 +270,10 @@ object gangfunctions {
    * @return 尝试的函数的结果
    */
   @annotation.tailrec
-  def retry[T](n: Int)(fn: => T)(implicit logger: BaseLogger = null): Try[T] = {
+  def retry[T](n: Int)(fn: => T): Try[T] = {
     Try(fn) match {
       case Failure(e) if n > 1 =>
-        printOrLog(s"执行失败，重试最后${n - 1}次，error: $e", level = LogLevel.ERROR)
+        GangLogger.getLogger.error(s"执行失败，重试最后${n - 1}次，error: $e")
         retry(n - 1)(fn)
       case fn => fn
     }

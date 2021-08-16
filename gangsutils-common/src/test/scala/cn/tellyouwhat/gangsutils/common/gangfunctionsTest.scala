@@ -251,7 +251,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
       gangfunctions.retry(3)(1 / 0)
     }
     stream.toString() should fullyMatch regex
-      """【错误】: 执行失败，重试最后2次，error: java.lang.ArithmeticException: / by zero\s+【错误】: 执行失败，重试最后1次，error: java.lang.ArithmeticException: / by zero\s+""".r
+      """\u001b\[31m【错误】: 执行失败，重试最后2次，error: java.lang.ArithmeticException: / by zero\u001b\[0m\s+\u001b\[31m【错误】: 执行失败，重试最后1次，error: java.lang.ArithmeticException: / by zero\u001b\[0m\s+""".r
   }
 
   implicit val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
