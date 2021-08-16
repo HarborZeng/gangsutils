@@ -43,7 +43,7 @@ jobs:
           if [[ `git status --porcelain` ]]; then
             git config --global user.name 'scaladoc publisher'
             git config --global user.email 'harborzeng@qq.com'
-            git add -A
+            git add gangsutils-common/docs/
             git commit -m "Automated API website updates."
           fi
 

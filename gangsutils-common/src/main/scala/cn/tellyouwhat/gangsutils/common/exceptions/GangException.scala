@@ -50,7 +50,7 @@ object GangException {
 }
 
 /**
- * @inheritdoc
+ * GangException who extends RuntimeException
  */
 class GangException private[exceptions](val optionMessage: Option[String],
                                         val optionCause: Option[Throwable],

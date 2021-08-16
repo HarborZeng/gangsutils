@@ -6,6 +6,9 @@ class NoAliveLoggerException(override val optionMessage: Option[String],
                              override val isWritableStackTrace: Boolean
                             ) extends GangException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
 
+/**
+ * NoAliveLoggerException who extends RuntimeException
+ */
 object NoAliveLoggerException {
   /**
    * 生成一个新的 NoAliveLoggerException
