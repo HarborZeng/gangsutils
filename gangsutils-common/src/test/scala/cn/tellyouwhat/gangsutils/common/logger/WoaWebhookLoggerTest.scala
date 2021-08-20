@@ -6,6 +6,9 @@ import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.net.SocketTimeoutException
+import scala.util.{Failure, Success}
+
 class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter with PrivateMethodTester {
 
   before {
@@ -36,7 +39,10 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
   "woa webhook logger" should "send a log into woa with correct key" in {
     WoaWebhookLogger.initializeWoaWebhook("a35a9ed09b9a7bb50dc5cc13c4cc20af")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.WOA_WEBHOOK_LOGGER))
-    retry(5)(logger.info("woa webhook logger send a log into woa with correct key")) shouldBe true
+    retry(5)(logger.info("woa webhook logger send a log into woa with correct key")) match {
+      case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
+      case Success(v) => v shouldBe true
+    }
   }
 
   it should "not send a log into woa with incorrect key" in {
