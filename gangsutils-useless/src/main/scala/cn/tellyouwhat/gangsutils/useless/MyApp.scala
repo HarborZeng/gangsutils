@@ -1,10 +1,12 @@
 package cn.tellyouwhat.gangsutils.useless
 
 import cn.tellyouwhat.gangsutils.common.gangfunctions.retry
+import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
 import cn.tellyouwhat.gangsutils.common.helper.{Timeit, TimeitLogger}
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
 import org.apache.hadoop.fs.Path
+import org.apache.spark.sql.SparkSession
 
 import java.sql.SQLDataException
 
@@ -14,22 +16,19 @@ import java.sql.SQLDataException
 class MyApp extends Timeit {
 
   private val logger: BaseLogger = MyApp.logger
+  private val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
+
+  import spark.implicits._
 
   override def run(desc: String): Unit = {
-    Thread.sleep(1000)
+    val a = Seq("1", "2", "3", "4", "4", "5").toDF("uid")
+    val b = Seq(1, 3, 4, 5, 5, 7).toDF("uid")
+    a.join(b, "uid").distinct()
+      .tap(_.printSchema())
+      .tap(_.show())
 
-    logger.trace("trace")
-    logger.info("info")
-    logger.success("success")
-    logger.warning("warning")
-    logger.error("error")
-    //    logger.critical("critical")
-
-    logger.info(new Path("path/to", "_SUCCESS").toString)
-
-    retry(2)(fun())
-    AnotherJob.job001()
   }
+
 
   def fun(): Nothing = {
     throw new SQLDataException("haha")
