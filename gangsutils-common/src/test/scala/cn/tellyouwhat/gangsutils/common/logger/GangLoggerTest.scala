@@ -81,9 +81,9 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     an[IllegalArgumentException] should be thrownBy GangLogger.setLogsLevels(Array.empty[LogLevel.Value])
     a[NullPointerException] should be thrownBy GangLogger.setLogsLevels(null: Array[LogLevel.Value])
 
-    GangLogger.setLogsLevels(Array.fill(2)(LogLevel.TRACE))
+    GangLogger.setLogsLevels(Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE))
     val levels = GangLogger().logsLevels
-    levels should contain theSameElementsAs Array.fill(2)(LogLevel.TRACE)
+    levels should contain theSameElementsAs Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
   }
 
   it should "setLogsLevels(levels: Map[SupportedLogDest.Value, LogLevel.Value])" in {
@@ -92,7 +92,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
     GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE, WOA_WEBHOOK_LOGGER -> LogLevel.INFO))
     val levels = GangLogger().logsLevels
-    levels should contain theSameElementsAs Array(LogLevel.TRACE, LogLevel.INFO)
+    levels should contain theSameElementsAs Array(LogLevel.TRACE, LogLevel.INFO, LogLevel.TRACE)
   }
 
   it should "setDefaultLogDest" in {

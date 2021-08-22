@@ -2,14 +2,14 @@ package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.gangfunctions.retry
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.WOA_WEBHOOK_LOGGER
-import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
+import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.net.SocketTimeoutException
 import scala.util.{Failure, Success}
 
-class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter with PrivateMethodTester {
+class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
 
   before {
     GangLogger.resetLoggerConfig()
@@ -51,10 +51,9 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     logger.info("woa webhook logger not send a log into woa with incorrect key") shouldBe false
   }
 
-  "checkRobotsInitialized" should "throw an IllegalArgumentException if robotsToSend is empty" in {
+  "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger(defaultLogDest = WOA_WEBHOOK_LOGGER :: Nil)
-    val checkRobotsInitialized = PrivateMethod[Unit]('checkRobotsInitialized)
-    an [IllegalArgumentException] should be thrownBy { logger invokePrivate checkRobotsInitialized() }
+    an [IllegalArgumentException] should be thrownBy { logger.info() }
   }
 
 }

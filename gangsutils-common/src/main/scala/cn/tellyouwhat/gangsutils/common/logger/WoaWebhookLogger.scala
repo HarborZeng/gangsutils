@@ -13,33 +13,18 @@ trait WoaWebhookLogger extends WebhookLogger {
    */
   val robotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
 
-  /**
-   * 执行一条 woa 日志
-   *
-   * @param msg   日志内容
-   * @param level 日志级别
-   */
-  protected def woaWebhookLog(msg: String, level: LogLevel.Value): Boolean = webhookLog(msg, level)
-
-  /**
-   * 检查 woa 的 webhook 机器人的密钥是否已经设置
-   */
-  protected def checkRobotsInitialized(): Unit =
-    if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
-      throw new IllegalArgumentException("必须要先调用 WoaWebhookLogger.initializeWoaWebhook 初始化机器人的秘钥才能创建 WoaWebhookLogger 实例")
-
-  protected override def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
+  override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
     robotsToSend.map(key =>
       buildLogContent(msg, level) |> (content => sendRequest(
         s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
-        body = "{\"msgtype\": \"text\",\"text\": {\"content\": \" " + content + "\"}}"
+        body = s"""{"msgtype": "text","text": {"content": "$content"}}"""
       ))
     ).forall(b => b)
   }
 
-  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = {
-    checkRobotsInitialized()
-    woaWebhookLog(msg, level)
+  override protected def checkPrerequisite(): Unit = {
+    if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
+      throw new IllegalArgumentException("必须要先调用 WoaWebhookLogger.initializeWoaWebhook 初始化机器人的秘钥才能创建 WoaWebhookLogger 实例")
   }
 }
 
@@ -59,6 +44,7 @@ object WoaWebhookLogger {
   private var robotsToSend: Array[String] = Array.empty[String]
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
+
   /**
    * 初始化 woa webhook 的密钥
    *

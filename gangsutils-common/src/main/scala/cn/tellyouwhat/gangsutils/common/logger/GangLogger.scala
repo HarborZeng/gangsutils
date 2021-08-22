@@ -2,7 +2,7 @@ package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
+import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, SLACK_WEBHOOK_LOGGER, WOA_WEBHOOK_LOGGER}
 
 
 /**
@@ -14,7 +14,7 @@ protected class GangLogger(
                             override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
                             override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
                             override val logPrefix: String = GangLogger.logPrefix,
-                          ) extends PrintlnLogger with WoaWebhookLogger {
+                          ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger {
 
 
   override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
@@ -24,12 +24,25 @@ protected class GangLogger(
       logStatus += status
     }
     if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id)) {
-      val status = super[WoaWebhookLogger].doTheLogAction(msg, level)
+      val status = doTheLogAction4WOA(msg, level)
+      logStatus += status
+    }
+    if (enabled.contains(SLACK_WEBHOOK_LOGGER) && level >= logsLevels(SLACK_WEBHOOK_LOGGER.id)) {
+      val status = doTheLogAction4Slack(msg, level)
       logStatus += status
     }
     logStatus.result().forall(b => b)
   }
 
+  private def doTheLogAction4WOA(msg: String, level: LogLevel.Value): Boolean = {
+    super[WoaWebhookLogger].checkPrerequisite()
+    super[WoaWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4Slack(msg: String, level: LogLevel.Value): Boolean = {
+    super[SlackWebhookLogger].checkPrerequisite()
+    super[SlackWebhookLogger].webhookLog(msg, level)
+  }
 }
 
 object GangLogger {
