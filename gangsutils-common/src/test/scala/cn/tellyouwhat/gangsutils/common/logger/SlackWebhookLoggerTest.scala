@@ -4,12 +4,12 @@ import cn.tellyouwhat.gangsutils.common.gangfunctions.retry
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.SLACK_WEBHOOK_LOGGER
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
+import org.scalatest.BeforeAndAfter
 
 import java.net.SocketTimeoutException
 import scala.util.{Failure, Success}
 
-class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter with PrivateMethodTester {
+class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
 
   before {
     GangLogger.resetLoggerConfig()
@@ -53,8 +53,7 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
 
   "checkPrerequisite" should "throw an IllegalArgumentException if slackWebhookURLs is empty" in {
     val logger = GangLogger(defaultLogDest = SLACK_WEBHOOK_LOGGER :: Nil)
-    val checkPrerequisite = PrivateMethod[Unit]('checkPrerequisite)
-    an [IllegalArgumentException] should be thrownBy { logger invokePrivate checkPrerequisite() }
+    an [IllegalArgumentException] should be thrownBy { logger.info() }
   }
 
 }

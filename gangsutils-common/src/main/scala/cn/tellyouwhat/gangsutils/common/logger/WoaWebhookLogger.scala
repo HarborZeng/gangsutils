@@ -22,8 +22,10 @@ trait WoaWebhookLogger extends WebhookLogger {
     ).forall(b => b)
   }
 
-  override protected def checkPrerequisite(): Unit = if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
-    throw new IllegalArgumentException("必须要先调用 WoaWebhookLogger.initializeWoaWebhook 初始化机器人的秘钥才能创建 WoaWebhookLogger 实例")
+  override protected def checkPrerequisite(): Unit = {
+    if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
+      throw new IllegalArgumentException("必须要先调用 WoaWebhookLogger.initializeWoaWebhook 初始化机器人的秘钥才能创建 WoaWebhookLogger 实例")
+  }
 }
 
 /**
