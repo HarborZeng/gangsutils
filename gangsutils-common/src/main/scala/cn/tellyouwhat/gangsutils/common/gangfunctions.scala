@@ -42,7 +42,7 @@ object gangfunctions {
     if (cc == null)
       return null
     cc.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) {
-      // ignore $ initial member
+      // ignore $ or __ initial member
       case (map, field) if !(field.getName.startsWith("$") || field.getName.startsWith("__")) =>
         field.setAccessible(true)
         val value = field.get(cc) match {
