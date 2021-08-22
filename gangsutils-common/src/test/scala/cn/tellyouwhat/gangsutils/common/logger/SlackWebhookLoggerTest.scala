@@ -37,7 +37,7 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
   }
 
   "slack webhook logger" should "send a log into slack with correct webhook url" in {
-    SlackWebhookLogger.initializeSlackUrls("https://hooks.slack.com/services/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")
+    SlackWebhookLogger.initializeSlackUrls("https://hooks.slack.com/services/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")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SLACK_WEBHOOK_LOGGER))
     retry(5)(logger.info("slack webhook logger send a log into slack with correct url")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
