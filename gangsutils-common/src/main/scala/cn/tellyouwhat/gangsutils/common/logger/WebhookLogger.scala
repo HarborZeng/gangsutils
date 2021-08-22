@@ -32,4 +32,7 @@ trait WebhookLogger extends BaseLogger {
       throw WrongHttpMethodException(s"错误的 HTTP METHOD: $method")
     }
   }
+
+  protected def checkPrerequisite(): Unit
+
 }

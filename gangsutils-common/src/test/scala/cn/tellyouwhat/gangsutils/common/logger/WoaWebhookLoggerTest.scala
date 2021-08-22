@@ -51,10 +51,10 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     logger.info("woa webhook logger not send a log into woa with incorrect key") shouldBe false
   }
 
-  "checkRobotsInitialized" should "throw an IllegalArgumentException if robotsToSend is empty" in {
+  "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger(defaultLogDest = WOA_WEBHOOK_LOGGER :: Nil)
-    val checkRobotsInitialized = PrivateMethod[Unit]('checkRobotsInitialized)
-    an [IllegalArgumentException] should be thrownBy { logger invokePrivate checkRobotsInitialized() }
+    val checkPrerequisite = PrivateMethod[Unit]('checkPrerequisite)
+    an [IllegalArgumentException] should be thrownBy { logger invokePrivate checkPrerequisite() }
   }
 
 }
