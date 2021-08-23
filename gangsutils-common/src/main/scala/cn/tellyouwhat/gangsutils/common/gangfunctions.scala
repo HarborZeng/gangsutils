@@ -189,7 +189,7 @@ object gangfunctions {
    */
   def isSparkSaveDirModifiedToday(path: String)(implicit spark: SparkSession): Boolean =
     fileModifiedTime(new Path(path, "_SUCCESS")) match {
-      case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
+      case Left(e) => throw GangException(s"error looking $path mtime", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDate
         .isEqual(LocalDate.now())
@@ -207,7 +207,7 @@ object gangfunctions {
    */
   def isSparkSaveDirModifiedWithinNHours(path: String)(n: Int)(implicit spark: SparkSession): Boolean =
     fileModifiedTime(new Path(path, "_SUCCESS")) match {
-      case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
+      case Left(e) => throw GangException(s"error looking $path mtime", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDateTime
         .isAfter(LocalDateTime.now().minusHours(n))
