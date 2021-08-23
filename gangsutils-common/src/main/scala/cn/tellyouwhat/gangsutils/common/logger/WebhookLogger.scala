@@ -26,7 +26,7 @@ trait WebhookLogger extends BaseLogger {
    */
   protected def sendRequest(targetURL: String, method: String = "POST", body: String = ""): Boolean = {
     if (method == "POST") {
-      Http(targetURL).header("Content-Type", "application/json").postData(body).asString.isSuccess
+      Http(targetURL).header("Content-Type", "application/json").postData(body.replaceAll("""\e\[[\d;]*[^\d;]""","")).asString.isSuccess
     } else if (method == "GET") {
       Http(targetURL).asString.isSuccess
     } else {

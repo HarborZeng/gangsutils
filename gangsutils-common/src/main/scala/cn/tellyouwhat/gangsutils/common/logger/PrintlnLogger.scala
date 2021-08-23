@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.WrongLogLevelException
+import cn.tellyouwhat.gangsutils.common.gangconstants._
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 
 import scala.io.AnsiColor._
@@ -17,16 +18,9 @@ trait PrintlnLogger extends BaseLogger {
    * @param level 日志级别
    */
   protected def printlnLog(msg: String, level: LogLevel.Value): Boolean =
-    buildLogContent(msg, level) |> { content =>
-      level match {
-        case LogLevel.ERROR => println(s"$RED$content$RESET")
-        case LogLevel.CRITICAL => println(s"$RED$BOLD$content$RESET")
-        case LogLevel.WARNING => println(s"$YELLOW$content$RESET")
-        case LogLevel.SUCCESS => println(s"$GREEN$content$RESET")
-        case LogLevel.INFO => println(s"$BOLD$content$RESET")
-        case LogLevel.TRACE => println(content)
-        case _ => throw WrongLogLevelException(s"Unknown log level: $level")
-      }
+    buildLogContent(msg) |> { content =>
+      val fullLog = addLeadingHead(content, level)
+      println(fullLog)
       true
     }
 

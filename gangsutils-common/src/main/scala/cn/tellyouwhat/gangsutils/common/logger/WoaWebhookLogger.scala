@@ -16,10 +16,13 @@ trait WoaWebhookLogger extends WebhookLogger {
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
     robotsToSend.map(key =>
-      buildLogContent(msg, level) |> (content => sendRequest(
-        s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
-        body = s"""{"msgtype": "text","text": {"content": "$content"}}"""
-      ))
+      buildLogContent(msg) |> (content => {
+        val fullLog = addLeadingHead(content, level)
+        sendRequest(
+          s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
+          body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}"""
+        )
+      })
     ).forall(b => b)
   }
 

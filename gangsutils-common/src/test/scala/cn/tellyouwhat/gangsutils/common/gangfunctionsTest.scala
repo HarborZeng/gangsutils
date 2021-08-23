@@ -2,6 +2,8 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
+import cn.tellyouwhat.gangsutils.common.gangconstants.{criticalHead, criticalLog, errorLog, successHead, successLog, traceHead, traceLog}
+import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.common.logger.{GangLogger, LogLevel}
 import org.apache.hadoop.fs.{FileSystem, Path, PathNotFoundException}
 import org.apache.spark.sql.SparkSession
@@ -11,6 +13,7 @@ import org.scalatest.matchers.should.Matchers
 
 import java.io.ByteArrayOutputStream
 import java.time.{LocalDateTime, ZoneId}
+import scala.Console.{GREEN, RESET}
 import scala.util.{Failure, Success}
 
 class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
@@ -207,15 +210,20 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     Console.withOut(stream) {
       gangfunctions.timeit(1 + 1) shouldBe 2
     }
-    stream.toString() should fullyMatch regex """【跟踪】: 开始任务\s+\u001b\[32m【成功】: 完成任务，耗时\d+\.*\d*s\u001b\[0m\s+""".r
+
+    stream.toString() should fullyMatch regex
+      traceLog.format(s": ${getRB.getString("timeit.start").format(getRB.getString("task"))}") +
+        successLog.format(s": ${getRB.getString("timeit.finished").format(getRB.getString("task"), """\d*\.*\d*s""")}")
 
     stream.reset()
     Console.withOut(stream) {
-      a [ArithmeticException] should be thrownBy {
+      a[ArithmeticException] should be thrownBy {
         gangfunctions.timeit(1 / 0)
       }
     }
-    stream.toString() should fullyMatch regex """【跟踪】: 开始任务\s+\u001b\[31m\u001b\[1m【致命】: 执行任务失败，耗时\d+\.*\d*s\u001b\[0m\s+""".r
+    stream.toString() should fullyMatch regex
+      traceLog.format(s": ${getRB.getString("timeit.start").format(getRB.getString("task"))}") +
+        criticalLog.format(s": ${getRB.getString("timeit.failed").format(getRB.getString("task"), """\d*\.*\d*s""")}")
   }
 
   "reduceByKey" should "group and for each group do a reduce by key" in {
@@ -230,13 +238,13 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     Console.withOut(stream) {
       gangfunctions.printOrLog("content", LogLevel.TRACE)
     }
-    stream.toString() should fullyMatch regex  """【跟踪】: content\s+""".r
+    stream.toString() should fullyMatch regex traceLog.format(": content")
 
     stream.reset()
     Console.withOut(stream) {
       gangfunctions.printOrLog("content", LogLevel.TRACE)(GangLogger(isDTEnabled = false))
     }
-    stream.toString() should fullyMatch regex  """【跟踪】: content\s+""".r
+    stream.toString() should fullyMatch regex traceLog.format(": content")
   }
 
 
@@ -251,7 +259,8 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
       gangfunctions.retry(3)(1 / 0)
     }
     stream.toString() should fullyMatch regex
-      """\u001b\[31m【错误】: 执行失败，重试最后2次，error: java.lang.ArithmeticException: / by zero\u001b\[0m\s+\u001b\[31m【错误】: 执行失败，重试最后1次，error: java.lang.ArithmeticException: / by zero\u001b\[0m\s+""".r
+      errorLog.format(s": ${getRB.getString("retry.failure").format(2, "java.lang.ArithmeticException: / by zero")}") +
+        errorLog.format(s": ${getRB.getString("retry.failure").format(1, "java.lang.ArithmeticException: / by zero")}")
   }
 
   implicit val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
@@ -268,7 +277,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
   "getFS" should "get you a hadoop file system object" in {
     val getFS = PrivateMethod[FileSystem]('getFS)
     val fs = gangfunctions invokePrivate getFS(spark)
-    fs.getHomeDirectory.toString should startWith ("file:/")
+    fs.getHomeDirectory.toString should startWith("file:/")
   }
 
   "isPathExists" should "test a string path existence" in {
@@ -286,10 +295,10 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
   "fileModifiedTime" should "get mtime of string path" in {
     gangfunctions.fileModifiedTime(sparkJobDirPath.toString) match {
       case Left(_) =>
-      case Right(t) => t shouldBe >= (0L)
+      case Right(t) => t shouldBe >=(0L)
     }
     gangfunctions.fileModifiedTime(doesNotExistsDirPath.toString) match {
-      case Left(e) => a [PathNotFoundException] should be thrownBy (throw e)
+      case Left(e) => a[PathNotFoundException] should be thrownBy (throw e)
       case Right(_) =>
     }
   }
@@ -297,10 +306,10 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
   it should "get mtime of Path" in {
     gangfunctions.fileModifiedTime(sparkJobDirPath) match {
       case Left(_) =>
-      case Right(t) => t shouldBe >= (0L)
+      case Right(t) => t shouldBe >=(0L)
     }
     gangfunctions.fileModifiedTime(doesNotExistsDirPath) match {
-      case Left(e) => a [PathNotFoundException] should be thrownBy (throw e)
+      case Left(e) => a[PathNotFoundException] should be thrownBy (throw e)
       case Right(_) =>
     }
   }
@@ -326,7 +335,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     fs.setTimes(new Path(sparkJobDirPath, "_SUCCESS"), yesterdayTimeMill, yesterdayTimeMill)
     gangfunctions.isSparkSaveDirModifiedToday(sparkJobDirPath.toString) shouldBe false
 
-    a [GangException] should be thrownBy gangfunctions.isSparkSaveDirModifiedToday(doesNotExistsDirPath.toString)
+    a[GangException] should be thrownBy gangfunctions.isSparkSaveDirModifiedToday(doesNotExistsDirPath.toString)
   }
 
   "isSparkSaveDirModifiedWithinNHours" should "test a spark save dir whether modified within n hours" in {
@@ -340,7 +349,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     gangfunctions.isSparkSaveDirModifiedWithinNHours(sparkJobDirPath.toString)(3) shouldBe true
     gangfunctions.isSparkSaveDirModifiedWithinNHours(sparkJobDirPath.toString)(1) shouldBe false
 
-    a [GangException] should be thrownBy gangfunctions.isSparkSaveDirModifiedWithinNHours(doesNotExistsDirPath.toString)(1)
+    a[GangException] should be thrownBy gangfunctions.isSparkSaveDirModifiedWithinNHours(doesNotExistsDirPath.toString)(1)
   }
 
 }

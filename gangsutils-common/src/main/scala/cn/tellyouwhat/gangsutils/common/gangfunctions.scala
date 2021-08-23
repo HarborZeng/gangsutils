@@ -2,13 +2,14 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
+import cn.tellyouwhat.gangsutils.common.gangconstants.placeholderHead_unquote
 
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
 import org.apache.hadoop.fs.{FileSystem, Path, PathNotFoundException}
 import org.apache.spark.sql.SparkSession
-
 import scala.language.implicitConversions
 import scala.util._
 
@@ -221,7 +222,7 @@ object gangfunctions {
    */
   def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger = null): Unit =
     if (logger == null) {
-      println(s"【$level】: $content")
+      println(s"${placeholderHead_unquote.format(level)}: $content")
     } else {
       logger.log(content, level)
     }
@@ -229,24 +230,24 @@ object gangfunctions {
   /**
    * 计时 + 切面日志
    *
-   * @param block  要执行的方法
-   * @param desc   描述，将作用于切面日志
+   * @param block 要执行的方法
+   * @param desc  描述，将作用于切面日志
    * @tparam R 返回值 Type
    * @return block 的执行结果
    */
-  def timeit[R](block: => R, desc: String = "任务"): R = {
+  def timeit[R](block: => R, desc: String = I18N.getRB.getString("task")): R = {
     implicit val logger: BaseLogger = GangLogger.getLogger
-    printOrLog(s"开始$desc")
+    printOrLog(I18N.getRB.getString("timeit.start").format(desc))
     val t0 = System.currentTimeMillis()
     val result = Try(block) match {
       case Failure(e) =>
         val t1 = System.currentTimeMillis()
-        printOrLog(s"执行${desc}失败，耗时${calcExecDuration(t0, t1)}", level = LogLevel.CRITICAL)
+        printOrLog(I18N.getRB.getString("timeit.failed").format(desc, calcExecDuration(t0, t1)), level = LogLevel.CRITICAL)
         throw e
       case Success(v) => v
     }
     val t1 = System.currentTimeMillis()
-    printOrLog(s"完成$desc，耗时${calcExecDuration(t0, t1)}", level = LogLevel.SUCCESS)
+    printOrLog(I18N.getRB.getString("timeit.finished").format(desc, calcExecDuration(t0, t1)), level = LogLevel.SUCCESS)
     result
   }
 
@@ -273,7 +274,7 @@ object gangfunctions {
   def retry[T](n: Int)(fn: => T): Try[T] = {
     Try(fn) match {
       case Failure(e) if n > 1 =>
-        GangLogger.getLogger.error(s"执行失败，重试最后${n - 1}次，error: $e")
+        GangLogger.getLogger.error(I18N.getRB.getString("retry.failure").format(n - 1, e))
         retry(n - 1)(fn)
       case fn => fn
     }

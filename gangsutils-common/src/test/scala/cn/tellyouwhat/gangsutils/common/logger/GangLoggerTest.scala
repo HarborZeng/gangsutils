@@ -2,6 +2,7 @@ package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
 import cn.tellyouwhat.gangsutils.common.helper.I18N
+import cn.tellyouwhat.gangsutils.common.gangconstants._
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
@@ -27,7 +28,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.success("a success log")
     }
-    stream.toString should fullyMatch regex """\u001b\[32m【成功】: a success log\u001b\[0m\s+""".r
+    stream.toString should fullyMatch regex successLog.format(": a success log")
   }
 
   it should "info" in {
@@ -35,7 +36,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.info("an info log")
     }
-    stream.toString should fullyMatch regex """\u001b\[1m【信息】: an info log\u001b\[0m\s+""".r
+    stream.toString should fullyMatch regex infoLog.format(": an info log")
   }
 
   it should "trace" in {
@@ -43,7 +44,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.trace("a trace log")
     }
-    stream.toString should fullyMatch regex """【跟踪】: a trace log\s+""".r
+    stream.toString should fullyMatch regex traceLog.format(": a trace log")
   }
 
   it should "log" in {
@@ -51,7 +52,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.log("a log", level = LogLevel.TRACE)
     }
-    stream.toString() should fullyMatch regex """【跟踪】: a log\s+""".r
+    stream.toString() should fullyMatch regex traceLog.format(": a log")
   }
 
   it should "critical" in {
@@ -59,7 +60,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.critical("a critical log")
     }
-    stream.toString should fullyMatch regex """\u001b\[31m\u001b\[1m【致命】: a critical log\u001b\[0m\s+""".r
+    stream.toString should fullyMatch regex criticalLog.format(": a critical log")
   }
 
   it should "warning" in {
@@ -67,7 +68,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.warning("a warning log")
     }
-    stream.toString should fullyMatch regex """\u001b\[33m【警告】: a warning log\u001b\[0m\s+""".r
+    stream.toString should fullyMatch regex warningLog.format(": a warning log")
   }
 
   it should "error" in {
@@ -75,7 +76,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.error("an error log")
     }
-    stream.toString should fullyMatch regex """\u001b\[31m【错误】: an error log\u001b\[0m\s+""".r
+    stream.toString should fullyMatch regex errorLog.format(": an error log")
   }
 
   it should "setLogsLevels(levels: Array[LogLevel.Value])" in {
@@ -141,7 +142,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger3.trace("logger3 info")
     }
-    stream.toString() should fullyMatch regex """【跟踪】 - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+: logger3 info\s+""".r
+    stream.toString() should fullyMatch regex traceLog.format(""" - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+: logger3 info""")
     GangLogger.disableDateTime()
     GangLogger().isDTEnabled shouldBe false
   }
@@ -152,7 +153,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger2.trace("a log with prefix")
     }
-    stream.toString() should fullyMatch regex """【跟踪】: a prefix - a log with prefix\s+""".r
+    stream.toString() should fullyMatch regex traceLog.format(": a prefix - a log with prefix")
   }
 
   "setLogPrefix" should "set logPrefix variable" in {
@@ -165,7 +166,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger1.trace("another log with prefix")
     }
-    stream.toString() should fullyMatch regex """【跟踪】: another prefix - another log with prefix\s+""".r
+    stream.toString() should fullyMatch regex traceLog.format(": another prefix - another log with prefix")
   }
 
   "clearLogPrefix" should "reset logPrefix variable to default empty string" in {
@@ -192,7 +193,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     logger2 shouldEqual GangLogger._logger.get
 
     stream.toString() should fullyMatch regex
-      """\u001b\[33m【警告】: cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: """ + I18N.getRB.getString("getLogger.NoAliveLogger") + """\u001b\[0m\s+""".r
+      warningLog.format(": cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: " + I18N.getRB.getString("getLogger.NoAliveLogger"))
   }
 
   "killLogger" should "reset the _logger variable to None" in {

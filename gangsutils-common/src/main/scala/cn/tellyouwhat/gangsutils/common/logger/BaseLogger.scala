@@ -1,6 +1,8 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.helper.I18N
+import cn.tellyouwhat.gangsutils.common.exceptions.WrongLogLevelException
+import cn.tellyouwhat.gangsutils.common.gangconstants.{criticalLog_unquote, errorLog_unquote, infoLog_unquote, successLog_unquote, traceLog_unquote, warningLog_unquote}
+import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 
 import java.time.LocalDateTime
@@ -40,10 +42,9 @@ trait BaseLogger {
    * 构建日志文本
    *
    * @param msg   日志内容
-   * @param level 日志级别
    * @return
    */
-  protected def buildLogContent(msg: String, level: LogLevel.Value): String =
+  protected def buildLogContent(msg: String): String =
     (if (isTraceEnabled) {
       val stackTraceElements = Thread.currentThread().getStackTrace
       val slicedElements = stackTraceElements.drop(stackTraceElements
@@ -53,11 +54,21 @@ trait BaseLogger {
         e.getClassName.startsWith("scala.") ||
         e.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.gangfunctions"))
       val theTrace = slicedElements(0)
-      s" - ${theTrace.getClassName}#${theTrace.getMethodName}${I18N.getRB.getString("nth_line").format(theTrace.getLineNumber)}"
+      s" - ${theTrace.getClassName}#${theTrace.getMethodName}${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
     } else {
       ""
-    }) |> (traceStr => s"【$level】${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")
+    }) |> (traceStr => s"${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")
 
+  protected def addLeadingHead(content: String, level: LogLevel.Value): String =
+    level match {
+      case LogLevel.TRACE => traceLog_unquote.format(content)
+      case LogLevel.INFO => infoLog_unquote.format(content)
+      case LogLevel.SUCCESS => successLog_unquote.format(content)
+      case LogLevel.WARNING => warningLog_unquote.format(content)
+      case LogLevel.ERROR => errorLog_unquote.format(content)
+      case LogLevel.CRITICAL => criticalLog_unquote.format(content)
+      case _ => throw WrongLogLevelException(s"Unknown log level: $level")
+    }
 
   /**
    * 真正去输出一条日志

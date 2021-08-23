@@ -1,5 +1,8 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.gangconstants.infoLog
+import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
+
 import java.io.ByteArrayOutputStream
 import org.scalatest.PrivateMethodTester
 import org.scalatest.flatspec.AnyFlatSpec
@@ -12,8 +15,8 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   "buildLogContent" should "build log using basic content and extra information" in {
     val buildLogContent = PrivateMethod[String]('buildLogContent)
     val logger: BaseLogger = GangLogger(isTraceEnabled = true, isDTEnabled = false)
-    val logContent = logger invokePrivate buildLogContent("a msg", LogLevel.TRACE)
-    logContent should fullyMatch regex """【跟踪】 - [\w.]+#[\w.]+第\d+行: a msg""".r
+    val logContent = logger invokePrivate buildLogContent("a msg")
+    logContent should fullyMatch regex """ - [\w.]+#[\w.]+""" + getRB.getString("nth_line").format("""\d+""") + ": a msg"
   }
 
   "log" should "print a log" in {
@@ -22,7 +25,7 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.log("a info log", LogLevel.INFO)
     }
-    stream.toString() should fullyMatch regex """\u001b\[1m【信息】: a info log\u001b\[0m\s+""".r
+    stream.toString() should fullyMatch regex infoLog.format(": a info log")
     GangLogger.resetLoggerConfig()
     GangLogger.killLogger()
   }
