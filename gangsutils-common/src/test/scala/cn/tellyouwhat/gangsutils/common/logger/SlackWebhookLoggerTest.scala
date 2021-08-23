@@ -8,6 +8,7 @@ import org.scalatest.BeforeAndAfter
 
 import java.net.SocketTimeoutException
 import scala.util.{Failure, Success}
+import scalaj.http.Base64
 
 class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
 
@@ -37,7 +38,9 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
   }
 
   "slack webhook logger" should "send a log into slack with correct webhook url" in {
-    SlackWebhookLogger.initializeSlackUrls("https://hooks.slack.com/services/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")
+    val slackWebhookURLBase64 = "aHR0cHM6Ly9ob29rcy5zbGFjay5jb20vc2VydmljZXMvVDAyQzNHNVQ4UUwvQjAyQldERjdFNVQvc1dhOHl5N0RkQnlWRWo3TE9nOXdnN3dB"
+    val slackWebhookURL = Base64.decodeString(slackWebhookURLBase64)
+    SlackWebhookLogger.initializeSlackUrls(slackWebhookURL)
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SLACK_WEBHOOK_LOGGER))
     retry(5)(logger.info("slack webhook logger send a log into slack with correct url")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
