@@ -10,7 +10,7 @@ object I18N {
   def getRB: ResourceBundle = {
     rbo match {
       case Some(rb) => rb
-      case None => ResourceBundle.getBundle("gangsutils", Locale.ENGLISH) |! (rb => rbo = Some(rb))
+      case None => ResourceBundle.getBundle("gangsutils") |! (rb => rbo = Some(rb))
     }
   }
 }
