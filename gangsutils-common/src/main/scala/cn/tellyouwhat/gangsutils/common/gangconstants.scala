@@ -6,13 +6,20 @@ import java.util.regex.Pattern
 import scala.io.AnsiColor._
 
 object gangconstants {
+  /**
+   * unquote square brackets for println
+   */
   private val leftSB_unquote: String = getRB.getString("left_square_bracket")
   private val rightSB_unquote: String = getRB.getString("right_square_bracket")
+
+  /**
+   * quoted square brackets for regex match
+   */
   private val leftSB: String = Pattern.quote(leftSB_unquote)
   private val rightSB: String = Pattern.quote(rightSB_unquote)
 
   /**
-   * heads with quote square bracket
+   * heads with quote square bracket for regex match
    */
   val traceHead: String = s"$leftSB${getRB.getString("logLevel.trace")}$rightSB"
   val criticalHead: String = s"$leftSB${getRB.getString("logLevel.critical")}$rightSB"
@@ -23,7 +30,7 @@ object gangconstants {
   val placeholderHead: String = s"$leftSB%s$rightSB"
 
   /**
-   * heads with unquote square bracket
+   * heads with unquote square bracket for println
    */
   val traceHead_unquote: String = s"$leftSB_unquote${getRB.getString("logLevel.trace")}$rightSB_unquote"
   val criticalHead_unquote: String = s"$leftSB_unquote${getRB.getString("logLevel.critical")}$rightSB_unquote"
@@ -34,7 +41,7 @@ object gangconstants {
   val placeholderHead_unquote: String = s"$leftSB_unquote%s$rightSB_unquote"
 
   /**
-   * regex quoted color pattern
+   * regex quoted color pattern for regex match
    */
   val yellowPattern: String = Pattern.quote(YELLOW)
   val redPattern: String = Pattern.quote(RED)
