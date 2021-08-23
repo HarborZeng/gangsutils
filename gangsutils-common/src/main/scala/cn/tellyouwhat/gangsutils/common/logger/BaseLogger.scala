@@ -1,5 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 
 import java.time.LocalDateTime
@@ -52,7 +53,7 @@ trait BaseLogger {
         e.getClassName.startsWith("scala.") ||
         e.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.gangfunctions"))
       val theTrace = slicedElements(0)
-      s" - ${theTrace.getClassName}#${theTrace.getMethodName}第${theTrace.getLineNumber}行"
+      s" - ${theTrace.getClassName}#${theTrace.getMethodName}${I18N.getRB.getString("nth_line").format(theTrace.getLineNumber)}"
     } else {
       ""
     }) |> (traceStr => s"【$level】${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")

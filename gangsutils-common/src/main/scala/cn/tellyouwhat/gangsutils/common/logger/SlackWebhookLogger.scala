@@ -1,5 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
 trait SlackWebhookLogger extends WebhookLogger {
@@ -14,7 +15,7 @@ trait SlackWebhookLogger extends WebhookLogger {
 
   override protected def checkPrerequisite(): Unit = {
     if (slackWebhookURLs.isEmpty || slackWebhookURLs.exists(_.isEmpty))
-      throw new IllegalArgumentException("必须要先调用 SlackWebhookLogger.initializeSlackUrls 初始化 Slack Webhook URL 才能创建 SlackWebhookLogger 实例")
+      throw new IllegalArgumentException(I18N.getRB.getString("slackWebhookLogger.prerequisite"))
   }
 
 }
@@ -33,7 +34,8 @@ object SlackWebhookLogger {
 
   def initializeSlackUrls(slackUrls: Array[String]): Unit = slackWebhookURLs = {
     if ((slackUrls != null && slackUrls.isEmpty) || slackUrls == null || slackUrls.exists(_.isEmpty)) {
-      throw new IllegalArgumentException(s"initializeSlackUrls 初始化，但 slackUrls 传入了: ${if (slackUrls == null) null else slackUrls.mkString("Array(", ", ", ")")}")
+      throw new IllegalArgumentException(
+        I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format(if (slackUrls == null) null else slackUrls.mkString("Array(", ", ", ")")))
     }
     slackUrls
   }

@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.WrongHttpMethodException
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import scalaj.http.Http
 
 /**
@@ -25,11 +26,11 @@ trait WebhookLogger extends BaseLogger {
    */
   protected def sendRequest(targetURL: String, method: String = "POST", body: String = ""): Boolean = {
     if (method == "POST") {
-      Http(targetURL).postData(body).asString.isSuccess
+      Http(targetURL).header("Content-Type", "application/json").postData(body).asString.isSuccess
     } else if (method == "GET") {
       Http(targetURL).asString.isSuccess
     } else {
-      throw WrongHttpMethodException(s"错误的 HTTP METHOD: $method")
+      throw WrongHttpMethodException(I18N.getRB.getString("sendRequest.wrongHttpMethod").format(method))
     }
   }
 

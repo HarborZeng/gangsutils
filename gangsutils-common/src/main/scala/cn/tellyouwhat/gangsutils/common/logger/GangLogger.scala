@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, SLACK_WEBHOOK_LOGGER, WOA_WEBHOOK_LOGGER}
 
@@ -81,7 +82,7 @@ object GangLogger {
   def getLogger: BaseLogger = {
     _logger match {
       case Some(logger) => logger
-      case None => apply() |! (logger => logger.warning(NoAliveLoggerException("logger is not initialized yet, initialize a default GangLogger for you")))
+      case None => apply() |! (logger => logger.warning(NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))))
     }
   }
 
@@ -172,8 +173,7 @@ object GangLogger {
    */
   def setLogsLevels(levels: Array[LogLevel.Value]): Unit = {
     if (levels.length != SupportedLogDest.values.size) {
-      throw new IllegalArgumentException(s"logsLevels 数量和 SupportedLogDest 所支持的数量不符：" +
-        s"levels.length ${levels.length}, SupportedLogDest.values.size ${SupportedLogDest.values.size}")
+      throw new IllegalArgumentException(I18N.getRB.getString("setLogsLevels.illegalArray").format(levels.length, SupportedLogDest.values.size))
     }
     logsLevels = levels
   }
@@ -185,7 +185,7 @@ object GangLogger {
    */
   def setLogsLevels(levels: Map[SupportedLogDest.Value, LogLevel.Value]): Unit = {
     if (levels == null || levels.isEmpty) {
-      throw new IllegalArgumentException(s"levels map 不合法：$levels")
+      throw new IllegalArgumentException(I18N.getRB.getString("setLogsLevels.IllegalMap").format(levels))
     }
     // ValueSet object is a sorted set by design
     (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |> setLogsLevels

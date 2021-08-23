@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
@@ -191,7 +192,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     logger2 shouldEqual GangLogger._logger.get
 
     stream.toString() should fullyMatch regex
-      """\u001b\[33m【警告】: cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: logger is not initialized yet, initialize a default GangLogger for you\u001b\[0m\s+""".r
+      """\u001b\[33m【警告】: cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException: """ + I18N.getRB.getString("getLogger.NoAliveLogger") + """\u001b\[0m\s+""".r
   }
 
   "killLogger" should "reset the _logger variable to None" in {

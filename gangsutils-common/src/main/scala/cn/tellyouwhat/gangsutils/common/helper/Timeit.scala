@@ -11,7 +11,7 @@ trait Timeit {
    *
    * @param desc   对此次计时任务的描述
    */
-  def run(desc: String = "任务"): Unit
+  def run(desc: String = I18N.getRB.getString("task")): Unit
 }
 
 /**

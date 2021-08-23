@@ -1,5 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
 
@@ -24,7 +25,7 @@ trait WoaWebhookLogger extends WebhookLogger {
 
   override protected def checkPrerequisite(): Unit = {
     if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
-      throw new IllegalArgumentException("必须要先调用 WoaWebhookLogger.initializeWoaWebhook 初始化机器人的秘钥才能创建 WoaWebhookLogger 实例")
+      throw new IllegalArgumentException(I18N.getRB.getString("woaWebhookLogger.prerequisite"))
   }
 }
 
@@ -62,7 +63,8 @@ object WoaWebhookLogger {
    */
   def initializeWoaWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
     if ((robotsKeys != null && robotsKeys.isEmpty) || robotsKeys == null || robotsKeys.exists(_.isEmpty)) {
-      throw new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")}")
+      throw new IllegalArgumentException(
+        I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format(if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")))
     }
     robotsKeys
   }
