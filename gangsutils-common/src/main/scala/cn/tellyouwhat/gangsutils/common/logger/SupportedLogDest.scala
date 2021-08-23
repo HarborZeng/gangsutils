@@ -18,4 +18,9 @@ object SupportedLogDest extends Enumeration {
    * Slack 通知的日志枚举
    */
   val SLACK_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(SlackWebhookLogger.SLACK_WEBHOOK_LOGGER)
+
+  /**
+   * 企业微信机器人通知的日志枚举
+   */
+  val QYWX_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(QYWXWebhookLogger.QYWX_WEBHOOK_LOGGER)
 }

@@ -12,10 +12,10 @@ trait WoaWebhookLogger extends WebhookLogger {
   /**
    * 要发往的机器人的密钥
    */
-  val robotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
+  val woaRobotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    robotsToSend.map(key =>
+    woaRobotsToSend.map(key =>
       buildLogContent(msg) |> (content => {
         val fullLog = addLeadingHead(content, level)
         sendRequest(
@@ -27,7 +27,7 @@ trait WoaWebhookLogger extends WebhookLogger {
   }
 
   override protected def checkPrerequisite(): Unit = {
-    if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
+    if (woaRobotsToSend.isEmpty || woaRobotsToSend.exists(_.isEmpty))
       throw new IllegalArgumentException(I18N.getRB.getString("woaWebhookLogger.prerequisite"))
   }
 }

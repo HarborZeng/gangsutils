@@ -24,9 +24,9 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
   it should "initializeWoaWebhook(robotsKeys: String)" in {
     a [NullPointerException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook(null: String)
     WoaWebhookLogger.initializeWoaWebhook("abc,def")
-    GangLogger().robotsToSend should contain theSameElementsAs Seq("abc", "def")
+    GangLogger().woaRobotsToSend should contain theSameElementsAs Seq("abc", "def")
     WoaWebhookLogger.initializeWoaWebhook("abc")
-    GangLogger().robotsToSend should contain theSameElementsAs Seq("abc")
+    GangLogger().woaRobotsToSend should contain theSameElementsAs Seq("abc")
   }
 
   it should "initializeWoaWebhook(robotsKeys: Array[String])" in {
