@@ -18,29 +18,33 @@ protected class GangLogger(
                             override val isHostnameEnabled: Boolean = GangLogger.isHostnameEnabled,
                           ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger with DingTalkWebhookLogger {
 
-  override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
-    val logStatus = Array.newBuilder[Boolean]
-    if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id)) {
-      val status = super[PrintlnLogger].doTheLogAction(msg, level)
-      logStatus += status
+  override def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
+    if (msg == null) false
+    else {
+      val msgStr = msg.toString
+      val logStatus = Array.newBuilder[Boolean]
+      if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id)) {
+        val status = super[PrintlnLogger].doTheLogAction(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4WOA(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(SLACK_WEBHOOK_LOGGER) && level >= logsLevels(SLACK_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4Slack(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(QYWX_WEBHOOK_LOGGER) && level >= logsLevels(QYWX_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4QYWX(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(DINGTALK_WEBHOOK_LOGGER) && level >= logsLevels(DINGTALK_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4DingTalk(msgStr, level)
+        logStatus += status
+      }
+      logStatus.result().forall(b => b)
     }
-    if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id)) {
-      val status = doTheLogAction4WOA(msg, level)
-      logStatus += status
-    }
-    if (enabled.contains(SLACK_WEBHOOK_LOGGER) && level >= logsLevels(SLACK_WEBHOOK_LOGGER.id)) {
-      val status = doTheLogAction4Slack(msg, level)
-      logStatus += status
-    }
-    if (enabled.contains(QYWX_WEBHOOK_LOGGER) && level >= logsLevels(QYWX_WEBHOOK_LOGGER.id)) {
-      val status = doTheLogAction4QYWX(msg, level)
-      logStatus += status
-    }
-    if (enabled.contains(DINGTALK_WEBHOOK_LOGGER) && level >= logsLevels(DINGTALK_WEBHOOK_LOGGER.id)) {
-      val status = doTheLogAction4DingTalk(msg, level)
-      logStatus += status
-    }
-    logStatus.result().forall(b => b)
   }
 
   private def doTheLogAction4WOA(msg: String, level: LogLevel.Value): Boolean = {
