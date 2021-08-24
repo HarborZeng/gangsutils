@@ -23,4 +23,9 @@ object SupportedLogDest extends Enumeration {
    * 企业微信机器人通知的日志枚举
    */
   val QYWX_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(QYWXWebhookLogger.QYWX_WEBHOOK_LOGGER)
+
+  /**
+   * 钉钉机器人通知的日志枚举
+   */
+  val DINGTALK_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(DingTalkWebhookLogger.DINGTALK_WEBHOOK_LOGGER)
 }

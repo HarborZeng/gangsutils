@@ -3,7 +3,7 @@ package cn.tellyouwhat.gangsutils.common.logger
 import cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException
 import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, QYWX_WEBHOOK_LOGGER, SLACK_WEBHOOK_LOGGER, WOA_WEBHOOK_LOGGER}
+import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{DINGTALK_WEBHOOK_LOGGER, PRINTLN_LOGGER, QYWX_WEBHOOK_LOGGER, SLACK_WEBHOOK_LOGGER, WOA_WEBHOOK_LOGGER}
 
 
 /**
@@ -16,8 +16,7 @@ protected class GangLogger(
                             override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
                             override val logPrefix: String = GangLogger.logPrefix,
                             override val isHostnameEnabled: Boolean = GangLogger.isHostnameEnabled,
-                          ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger {
-
+                          ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger with DingTalkWebhookLogger {
 
   override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
     val logStatus = Array.newBuilder[Boolean]
@@ -37,6 +36,10 @@ protected class GangLogger(
       val status = doTheLogAction4QYWX(msg, level)
       logStatus += status
     }
+    if (enabled.contains(DINGTALK_WEBHOOK_LOGGER) && level >= logsLevels(DINGTALK_WEBHOOK_LOGGER.id)) {
+      val status = doTheLogAction4DingTalk(msg, level)
+      logStatus += status
+    }
     logStatus.result().forall(b => b)
   }
 
@@ -53,6 +56,11 @@ protected class GangLogger(
   private def doTheLogAction4QYWX(msg: String, level: LogLevel.Value): Boolean = {
     super[QYWXWebhookLogger].checkPrerequisite()
     super[QYWXWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4DingTalk(msg: String, level: LogLevel.Value): Boolean = {
+    super[DingTalkWebhookLogger].checkPrerequisite()
+    super[DingTalkWebhookLogger].webhookLog(msg, level)
   }
 }
 
