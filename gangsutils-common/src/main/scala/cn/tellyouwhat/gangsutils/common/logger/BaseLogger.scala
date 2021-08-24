@@ -59,7 +59,7 @@ trait BaseLogger {
         e.getClassName.startsWith("scala.") ||
         e.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.gangfunctions"))
       val theTrace = slicedElements(0)
-      s" - ${theTrace.getClassName}#${theTrace.getMethodName}${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
+      s" - ${theTrace.getClassName}#${theTrace.getMethodName} ${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
     } else {
       ""
     }) |> (traceStr => s"${if (isHostnameEnabled) s" - $hostname" else ""}${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")
