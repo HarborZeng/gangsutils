@@ -26,7 +26,7 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     val buildLogContent = PrivateMethod[String]('buildLogContent)
     val logger: BaseLogger = GangLogger(isTraceEnabled = true, isDTEnabled = false)
     val logContent = logger invokePrivate buildLogContent("a msg")
-    logContent should fullyMatch regex """ - [\w.]+#[\w.]+""" + getRB.getString("nth_line").format("""\d+""") + ": a msg"
+    logContent should fullyMatch regex """ - [\w._$]+#[\w._$]+""" + getRB.getString("nth_line").format("""\d+""") + ": a msg"
   }
 
   "log" should "print a log" in {
