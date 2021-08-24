@@ -23,11 +23,11 @@ Replace `${gangsutils.version}` to the latest stable version showed above in the
 ```
 
 ```sbt
-libraryDependencies += "cn.tellyouwhat" % "gangsutils-common" % "0.3.0"
+libraryDependencies += "cn.tellyouwhat" % "gangsutils-common" % "${gangsutils.version}"
 ```
 
 ```groovy
-implementation 'cn.tellyouwhat:gangsutils-common:0.3.0'
+implementation 'cn.tellyouwhat:gangsutils-common:${gangsutils.version}'
 ```
 
 ### logger
