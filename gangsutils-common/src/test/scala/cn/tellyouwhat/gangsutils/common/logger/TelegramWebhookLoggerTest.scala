@@ -35,6 +35,9 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     an [IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook(Array.empty[Array[String]])
   }
 
+  // this can only be successfully executed outside of mainland China.
+  // so if you run this test case in mainland China, it will fail the google assertion and ignore testing.
+  // if you run this test outside mainland China, it will success.
   "telegram webhook logger" should "send a log into telegram with correct chat_id and token" in {
     TelegramWebhookLogger.initializeTelegramWebhook("-541655508;1957795670:AAE8KlT0LFdbvgiG1TJlR2kPUKVXLrenDT8")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.TELEGRAM_WEBHOOK_LOGGER))
