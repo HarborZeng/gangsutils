@@ -12,6 +12,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   before {
     GangLogger.disableDateTime()
+    GangLogger.disableHostname()
   }
 
   after {
@@ -21,9 +22,8 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   behavior of "GangLoggerTest"
 
-  val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
-
   it should "success" in {
+    val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.success("a success log")
@@ -32,6 +32,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "info" in {
+    val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.info("an info log")
@@ -40,6 +41,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "trace" in {
+    val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.trace("a trace log")
@@ -48,6 +50,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "log" in {
+    val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.log("a log", level = LogLevel.TRACE)
@@ -56,6 +59,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "critical" in {
+    val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.critical("a critical log")
@@ -64,6 +68,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "warning" in {
+    val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.warning("a warning log")
@@ -72,6 +77,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "error" in {
+    val logger: BaseLogger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.error("an error log")
@@ -130,6 +136,15 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     GangLogger().isTraceEnabled shouldBe true
     GangLogger.disableTrace()
     GangLogger().isTraceEnabled shouldBe false
+  }
+
+  it should "disable/enableHostname" in {
+    GangLogger.disableHostname()
+    GangLogger().isHostnameEnabled shouldBe false
+    GangLogger.enableHostname()
+    GangLogger().isHostnameEnabled shouldBe true
+    GangLogger.disableHostname()
+    GangLogger().isHostnameEnabled shouldBe false
   }
 
   it should "disable/enableDateTime" in {

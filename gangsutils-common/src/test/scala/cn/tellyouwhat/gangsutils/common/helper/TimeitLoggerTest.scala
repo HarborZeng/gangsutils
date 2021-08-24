@@ -11,6 +11,7 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
 
   before {
     GangLogger.resetLoggerConfig()
+    GangLogger.disableHostname()
     GangLogger()
   }
 

@@ -15,6 +15,7 @@ protected class GangLogger(
                             override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
                             override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
                             override val logPrefix: String = GangLogger.logPrefix,
+                            override val isHostnameEnabled: Boolean = GangLogger.isHostnameEnabled,
                           ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger {
 
 
@@ -67,11 +68,12 @@ object GangLogger {
   /**
    * 创建一个新的 GangLogger 实例
    *
-   * @param isDTEnabled    是否在日志中启用时间
-   * @param isTraceEnabled 是否在日志中启用跟踪（包名类名方法名行号）字段
-   * @param defaultLogDest 默认的日志输出目的地
-   * @param logsLevels     默认的不同的日志输出目的地的级别
-   * @param logPrefix      每条日志的前缀
+   * @param isDTEnabled       是否在日志中启用时间
+   * @param isTraceEnabled    是否在日志中启用跟踪（包名类名方法名行号）字段
+   * @param defaultLogDest    默认的日志输出目的地
+   * @param logsLevels        默认的不同的日志输出目的地的级别
+   * @param logPrefix         每条日志的前缀
+   * @param isHostnameEnabled 是否在日志中启用主机名字段
    * @return 一个新的 GangLogger 实例
    */
   def apply(
@@ -79,9 +81,10 @@ object GangLogger {
              isTraceEnabled: Boolean = isTraceEnabled,
              defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
              logsLevels: Array[LogLevel.Value] = logsLevels,
-             logPrefix: String = logPrefix
+             logPrefix: String = logPrefix,
+             isHostnameEnabled: Boolean = isHostnameEnabled
            ): GangLogger =
-    new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix) |! (l => _logger = Some(l))
+    new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix, isHostnameEnabled) |! (l => _logger = Some(l))
 
   /**
    * 获取 BaseLogger 单例对象
@@ -116,6 +119,11 @@ object GangLogger {
   private var isTraceEnabled: Boolean = false
 
   /**
+   * 是否在日志中启用主机名字段
+   */
+  private var isHostnameEnabled: Boolean = true
+
+  /**
    * 默认的日志输出目的地
    */
   private var defaultLogDest: Seq[SupportedLogDest.Value] = Seq(PRINTLN_LOGGER)
@@ -139,6 +147,7 @@ object GangLogger {
     defaultLogDest = Seq(PRINTLN_LOGGER)
     logsLevels = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
     logPrefix = ""
+    isHostnameEnabled = true
   }
 
   /**
@@ -166,6 +175,18 @@ object GangLogger {
    */
   def enableTrace(): Unit =
     isTraceEnabled = true
+
+  /**
+   * 关闭日志中的主机名字段
+   */
+  def disableHostname(): Unit =
+    isHostnameEnabled = false
+
+  /**
+   * 启用日志中的主机名字段
+   */
+  def enableHostname(): Unit =
+    isHostnameEnabled = true
 
   /**
    * 设置默认的日志输出目的地

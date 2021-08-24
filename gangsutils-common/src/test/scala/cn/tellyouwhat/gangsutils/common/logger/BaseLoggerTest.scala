@@ -4,11 +4,21 @@ import cn.tellyouwhat.gangsutils.common.gangconstants.infoLog
 import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
 
 import java.io.ByteArrayOutputStream
-import org.scalatest.PrivateMethodTester
+import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester {
+class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
+
+  before {
+    GangLogger.disableDateTime()
+    GangLogger.disableHostname()
+  }
+
+  after {
+    GangLogger.killLogger()
+    GangLogger.resetLoggerConfig()
+  }
 
   behavior of "BaseLoggerTest"
 
@@ -26,8 +36,6 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
       logger.log("a info log", LogLevel.INFO)
     }
     stream.toString() should fullyMatch regex infoLog.format(": a info log")
-    GangLogger.resetLoggerConfig()
-    GangLogger.killLogger()
   }
 
 }

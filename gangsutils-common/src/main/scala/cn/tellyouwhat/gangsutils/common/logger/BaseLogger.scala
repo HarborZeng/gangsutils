@@ -5,6 +5,7 @@ import cn.tellyouwhat.gangsutils.common.gangconstants.{criticalLog_unquote, erro
 import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 
+import java.net.InetAddress
 import java.time.LocalDateTime
 
 /**
@@ -37,6 +38,10 @@ trait BaseLogger {
    */
   private[logger] val logPrefix: String = ""
 
+  private[logger] val hostname: String = InetAddress.getLocalHost.getHostName
+
+  private[logger] val isHostnameEnabled: Boolean = true
+
 
   /**
    * 构建日志文本
@@ -57,7 +62,7 @@ trait BaseLogger {
       s" - ${theTrace.getClassName}#${theTrace.getMethodName}${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
     } else {
       ""
-    }) |> (traceStr => s"${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")
+    }) |> (traceStr => s"${if (isHostnameEnabled) s" - $hostname" else ""}${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")
 
   protected def addLeadingHead(content: String, level: LogLevel.Value): String =
     level match {

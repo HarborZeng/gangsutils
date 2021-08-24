@@ -20,6 +20,7 @@ class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTest
 
   before {
     GangLogger.disableDateTime()
+    GangLogger.disableHostname()
     GangLogger()
   }
 
