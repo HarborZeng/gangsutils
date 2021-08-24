@@ -26,7 +26,7 @@ Replace `${gangsutils.version}` to the latest stable version showed above in the
 libraryDependencies += "cn.tellyouwhat" % "gangsutils-common" % "0.3.0"
 ```
 
-``groovy
+```groovy
 implementation 'cn.tellyouwhat:gangsutils-common:0.3.0'
 ```
 
