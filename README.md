@@ -10,6 +10,26 @@
 
 ## Utilities
 
+To use this utils pack right away, add the following dependency to pom.xml or whatever.
+
+Replace `${gangsutils.version}` to the latest stable version showed above in the Maven Central badge
+
+```xml
+<dependency>
+  <groupId>cn.tellyouwhat</groupId>
+  <artifactId>gangsutils-common</artifactId>
+  <version>${gangsutils.version}</version>
+</dependency>
+```
+
+```sbt
+libraryDependencies += "cn.tellyouwhat" % "gangsutils-common" % "0.3.0"
+```
+
+``groovy
+implementation 'cn.tellyouwhat:gangsutils-common:0.3.0'
+```
+
 ### logger
 
 #### Quick Start
