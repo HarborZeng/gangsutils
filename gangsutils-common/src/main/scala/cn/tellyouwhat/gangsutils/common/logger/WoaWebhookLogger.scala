@@ -15,14 +15,11 @@ trait WoaWebhookLogger extends WebhookLogger {
   val woaRobotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
+    val content = buildLogContent(msg)
+    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
     woaRobotsToSend.map(key =>
-      buildLogContent(msg) |> (content => {
-        val fullLog = addLeadingHead(content, level)
-        sendRequest(
-          s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
-          body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}"""
-        )
-      })
+      sendRequest(s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
+        body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")
     ).forall(b => b)
   }
 

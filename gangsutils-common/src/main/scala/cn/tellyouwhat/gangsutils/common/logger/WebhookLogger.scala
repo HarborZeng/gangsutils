@@ -24,11 +24,26 @@ trait WebhookLogger extends BaseLogger {
    * @param method    请求的动词
    * @param body      请求带上的内容
    */
-  protected def sendRequest(targetURL: String, method: String = "POST", body: String = ""): Boolean = {
+  protected def sendRequest(targetURL: String, method: String = "POST", body: String = "", queryStrings: Seq[(String, String)] = Seq.empty[(String, String)]): Boolean = {
     if (method == "POST") {
-      Http(targetURL).header("Content-Type", "application/json").postData(body.replaceAll("""\e\[[\d;]*[^\d;]""","")).asString.isSuccess
+      if (body.isEmpty && queryStrings.nonEmpty) {
+        Http(targetURL)
+          .postForm(queryStrings)
+          .asString
+          .isSuccess
+      } else if (body.nonEmpty && queryStrings.isEmpty) {
+        Http(targetURL)
+          .header("Content-Type", "application/json")
+          .postData(body)
+          .asString
+          .isSuccess
+      } else {
+        throw new IllegalArgumentException(s"body $body, queryStrings $queryStrings, they can not be empty or non-empty at the same time.")
+      }
     } else if (method == "GET") {
-      Http(targetURL).asString.isSuccess
+      Http(targetURL)
+        .asString
+        .isSuccess
     } else {
       throw WrongHttpMethodException(I18N.getRB.getString("sendRequest.wrongHttpMethod").format(method))
     }

@@ -31,11 +31,11 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   it should "initializeDingTalkWebhook(robotsKeysSigns: Array[Array[String]])" in {
-    an [IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook("")
-    an [IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook("123,,abc")
-    an [IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook("123,,abc;123;234")
-    an [IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook(null: Array[String])
-    an [IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook(Array.empty[String])
+    an [IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook("")
+    an [IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook("123,,abc")
+    an [IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook("123,,abc;123;234")
+    an [IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook(null: Array[Array[String]])
+    an [IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook(Array.empty[Array[String]])
   }
 
   "dingtalk webhook logger" should "send a log into dingtalk with correct key and sign" in {

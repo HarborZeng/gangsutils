@@ -18,6 +18,8 @@ trait DingTalkWebhookLogger extends WebhookLogger {
   val dingTalkRobotsToSend: Set[DingTalkRobot] = DingTalkWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
+    val content = buildLogContent(msg)
+    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
     dingTalkRobotsToSend.map(robot => {
       val t = System.currentTimeMillis
       val targetURL = robot.sign match {
@@ -26,15 +28,12 @@ trait DingTalkWebhookLogger extends WebhookLogger {
           val mac = Mac.getInstance("HmacSHA256")
           mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"))
           val signData = mac.doFinal(stringToSign.getBytes("UTF-8"))
-          val sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8")
+          val sign = URLEncoder.encode(Base64.encodeBase64String(signData), "UTF-8")
           s"https://oapi.dingtalk.com/robot/send?access_token=${robot.token.get}&timestamp=$t&sign=$sign"
         case None =>
           s"https://oapi.dingtalk.com/robot/send?access_token=${robot.token.get}"
       }
-      buildLogContent(msg) |> (content => {
-        val fullLog = addLeadingHead(content, level)
-        sendRequest(targetURL, body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")
-      })
+      sendRequest(targetURL, body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")
     }).forall(b => b)
   }
 

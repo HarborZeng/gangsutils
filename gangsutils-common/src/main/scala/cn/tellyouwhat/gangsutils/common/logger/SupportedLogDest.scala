@@ -28,4 +28,19 @@ object SupportedLogDest extends Enumeration {
    * 钉钉机器人通知的日志枚举
    */
   val DINGTALK_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(DingTalkWebhookLogger.DINGTALK_WEBHOOK_LOGGER)
+
+  /**
+   * ServerChan机器人通知的日志枚举
+   */
+  val SERVERCHAN_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(ServerChanWebhookLogger.SERVERCHAN_WEBHOOK_LOGGER)
+
+  /**
+   * 飞书机器人通知的日志枚举
+   */
+  val FEISHU_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(FeishuWebhookLogger.FEISHU_WEBHOOK_LOGGER)
+
+  /**
+   * telegram 机器人通知的日志枚举
+   */
+  val TELEGRAM_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(TelegramWebhookLogger.TELEGRAM_WEBHOOK_LOGGER)
 }

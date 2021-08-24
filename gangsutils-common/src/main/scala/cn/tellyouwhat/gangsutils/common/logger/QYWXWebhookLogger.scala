@@ -15,14 +15,11 @@ trait QYWXWebhookLogger extends WebhookLogger {
   val qywxRobotsToSend: Set[String] = QYWXWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
+    val content = buildLogContent(msg)
+    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
     qywxRobotsToSend.map(key =>
-      buildLogContent(msg) |> (content => {
-        val fullLog = addLeadingHead(content, level)
-        sendRequest(
-          s"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=$key",
-          body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}"""
-        )
-      })
+      sendRequest(s"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=$key",
+        body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")
     ).forall(b => b)
   }
 

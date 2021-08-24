@@ -8,12 +8,10 @@ trait SlackWebhookLogger extends WebhookLogger {
   val slackWebhookURLs: Set[String] = SlackWebhookLogger.slackWebhookURLs.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    slackWebhookURLs.map(url =>
-      buildLogContent(msg) |> (content => {
-        val fullLog = addLeadingHead(content, level)
-        sendRequest(url, body = s"""{"text": "$fullLog"}""")
-      })
-    ).forall(b => b)
+    val content = buildLogContent(msg)
+    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
+    slackWebhookURLs.map(url => sendRequest(url, body = s"""{"text": "$fullLog"}"""))
+      .forall(b => b)
   }
 
   override protected def checkPrerequisite(): Unit = {
