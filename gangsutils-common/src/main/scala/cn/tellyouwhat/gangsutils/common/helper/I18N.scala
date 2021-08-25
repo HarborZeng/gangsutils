@@ -5,7 +5,7 @@ import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
 
 import java.util.{Locale, ResourceBundle}
 
-object I18N {
+private[gangsutils] object I18N {
   private var rbo: Option[ResourceBundle] = None
 
   def getRB: ResourceBundle = {

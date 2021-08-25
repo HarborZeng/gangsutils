@@ -215,7 +215,7 @@ class MyApp {
 
 ## TODO
 
-- [ ] Make I18N private in gangsutils
+- [x] Make I18N private in gangsutils
 - [ ] Change `gangConfig.properties` file name to `gangsutilsConfig.properties` and use yaml instead of properties file
 - [ ] Use system default language and region when `gangsutilsConfig.properties` is overwriten but `default-lang` or `default-region` are missing
 - [ ] Change `sendRequest`  parameter `queryStrings` to `form`
