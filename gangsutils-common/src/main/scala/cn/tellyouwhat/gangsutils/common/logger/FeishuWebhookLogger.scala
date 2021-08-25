@@ -7,6 +7,8 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import org.apache.commons.codec.binary.Base64
 
+import java.time.Duration
+
 trait FeishuWebhookLogger extends WebhookLogger {
 
   /**
@@ -18,10 +20,10 @@ trait FeishuWebhookLogger extends WebhookLogger {
     val content = buildLogContent(msg)
     val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
     feishuRobotsToSend.map(robot => {
-      val t = System.currentTimeMillis
+      // feishu use second as timestamp
+      val t = Duration.ofMillis(System.currentTimeMillis()).getSeconds
       val body = robot.sign match {
         case Some(secret) =>
-          //FIXME: 飞书带 sign webhook 不生效
           val stringToSign = t + "\n" + secret
           val mac = Mac.getInstance("HmacSHA256")
           mac.init(new SecretKeySpec(stringToSign.getBytes(), "HmacSHA256"))
