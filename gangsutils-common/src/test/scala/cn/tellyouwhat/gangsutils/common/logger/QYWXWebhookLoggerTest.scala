@@ -39,7 +39,7 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
   "qywx webhook logger" should "send a log into qywx with correct key" in {
     QYWXWebhookLogger.initializeQYWXWebhook("daf01642-e81a-43a6-a8ec-60967df43578")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.QYWX_WEBHOOK_LOGGER))
-    retry(5)(logger.info("qywx webhook logger send a log into qywx with correct key")) match {
+    retry(2)(logger.info("qywx webhook logger send a log into qywx with correct key")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
     }
@@ -48,8 +48,10 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
   it should "not send a log into qywx with incorrect key" in {
     QYWXWebhookLogger.initializeQYWXWebhook("a3af")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.QYWX_WEBHOOK_LOGGER))
-    // qywx return 200 status regardless it is real status, and the error is in response body. So with wrong key still return true
-    logger.info("qywx webhook logger not send a log into qywx with incorrect key") shouldBe true
+    retry(2)(logger.info("qywx webhook logger not send a log into qywx with incorrect key")) match {
+      case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
+      case Success(v) => v shouldBe true // qywx return 200 status regardless it is real status, and the error is in response body.
+    }
   }
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {

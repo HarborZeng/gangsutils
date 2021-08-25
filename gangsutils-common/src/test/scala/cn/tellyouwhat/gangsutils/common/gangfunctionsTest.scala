@@ -13,7 +13,6 @@ import org.scalatest.matchers.should.Matchers
 
 import java.io.ByteArrayOutputStream
 import java.time.{LocalDateTime, ZoneId}
-import scala.Console.{GREEN, RESET}
 import scala.util.{Failure, Success}
 
 class gangfunctionsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {

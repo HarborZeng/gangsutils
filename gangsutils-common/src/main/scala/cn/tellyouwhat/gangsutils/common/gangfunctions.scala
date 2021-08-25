@@ -4,12 +4,13 @@ import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
 import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
-import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
+import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel, SupportedLogDest}
 import cn.tellyouwhat.gangsutils.common.gangconstants.placeholderHead_unquote
 
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
 import org.apache.hadoop.fs.{FileSystem, Path, PathNotFoundException}
 import org.apache.spark.sql.SparkSession
+
 import scala.language.implicitConversions
 import scala.util._
 
@@ -274,7 +275,7 @@ object gangfunctions {
   def retry[T](n: Int)(fn: => T): Try[T] = {
     Try(fn) match {
       case Failure(e) if n > 1 =>
-        GangLogger.getLogger.error(I18N.getRB.getString("retry.failure").format(n - 1, e))
+        GangLogger.getLogger.error(I18N.getRB.getString("retry.failure").format(n - 1, e))(enabled = SupportedLogDest.PRINTLN_LOGGER :: Nil)
         retry(n - 1)(fn)
       case fn => fn
     }

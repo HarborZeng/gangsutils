@@ -39,7 +39,7 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
   "serverChan webhook logger" should "send a log into serverChan with correct key" in {
     ServerChanWebhookLogger.initializeServerChanWebhook("SCT67129TLSijZn947Hz0s3FtPx6rANpS")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SERVERCHAN_WEBHOOK_LOGGER))
-    retry(5)(logger.info("serverChan webhook logger send a log into serverChan with correct key")) match {
+    retry(2)(logger.info("serverChan webhook logger send a log into serverChan with correct key")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
     }
@@ -48,7 +48,10 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
   it should "not send a log into serverChan with incorrect key" in {
     ServerChanWebhookLogger.initializeServerChanWebhook("a3af")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SERVERCHAN_WEBHOOK_LOGGER))
-    logger.info("serverChan webhook logger not send a log into serverChan with incorrect key") shouldBe false
+    retry(2)(logger.info("serverChan webhook logger not send a log into serverChan with incorrect key")) match {
+      case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
+      case Success(v) => v shouldBe false
+    }
   }
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {

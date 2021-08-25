@@ -6,7 +6,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.net.SocketTimeoutException
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
 
@@ -35,14 +35,11 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     an [IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook(Array.empty[Array[String]])
   }
 
-  // this can only be successfully executed outside of mainland China.
-  // so if you run this test case in mainland China, it will fail the google assertion and ignore testing.
-  // if you run this test outside mainland China, it will success.
   "telegram webhook logger" should "send a log into telegram with correct chat_id and token" in {
     TelegramWebhookLogger.initializeTelegramWebhook("-541655508;1957795670:AAE8KlT0LFdbvgiG1TJlR2kPUKVXLrenDT8")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.TELEGRAM_WEBHOOK_LOGGER))
-    retry(5)(logger.info("telegram webhook logger send a log into telegram with correct chat_id and token")) match {
-      case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
+    retry(2)(logger.info("telegram webhook logger send a log into telegram with correct chat_id and token")) match {
+      case Failure(e) => the [SocketTimeoutException] thrownBy (throw e) should have message "connect timed out"
       case Success(v) => v shouldBe true
     }
   }
@@ -50,7 +47,10 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   it should "not send a log into telegram with incorrect chat_id and token" in {
     TelegramWebhookLogger.initializeTelegramWebhook("123123;1515:a3af")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.TELEGRAM_WEBHOOK_LOGGER))
-    logger.info("telegram webhook logger not send a log into telegram with incorrect key") shouldBe false
+    Try(logger.info("telegram webhook logger not send a log into telegram with incorrect key")) match {
+      case Failure(e) => the [SocketTimeoutException] thrownBy (throw e) should have message "connect timed out"
+      case Success(v) => v shouldBe false
+    }
   }
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {

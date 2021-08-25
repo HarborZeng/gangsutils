@@ -123,7 +123,7 @@ There **6 levels** in this util pack, trace、info、success、warning、error a
 Other than pre-config log destination, you can set the-log-level log destination by `enabled` parameter, like
 
 ```scala
-logger.info("hello world", enabled = Seq(SupportedLogDest.PRINTLN_LOGGER)) // means whatever destination you configured at before, this one log will be sent to parameter enabled specified destination.
+logger.info("hello world")(enabled = Seq(SupportedLogDest.PRINTLN_LOGGER)) // means whatever destination you configured at before, this one log will be sent to parameter enabled specified destination.
 ```
 
 ```scala
@@ -155,9 +155,10 @@ eg:
 ```scala
 SlackWebhookLogger.initializeSlackUrls(slackWebhookURL)
 val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SLACK_WEBHOOK_LOGGER))
-retry(5)(logger.info("slack webhook logger send a log into slack with correct url")) match {
-  case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
+Try(logger.info("slack webhook logger send a log into slack with correct url")) match {
+  case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
   case Success(v) => v shouldBe true
+}
 ```
 
 For more examples, see test <https://github.com/HarborZeng/gangsutils/tree/master/gangsutils-common/src/test/scala/cn/tellyouwhat/gangsutils/common/logger>

@@ -42,7 +42,7 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
     val slackWebhookURL = Base64.decodeString(slackWebhookURLBase64)
     SlackWebhookLogger.initializeSlackUrls(slackWebhookURL)
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SLACK_WEBHOOK_LOGGER))
-    retry(5)(logger.info("slack webhook logger send a log into slack with correct url")) match {
+    retry(2)(logger.info("slack webhook logger send a log into slack with correct url")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
     }
@@ -51,7 +51,10 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
   it should "not send a log into slack with incorrect url" in {
     SlackWebhookLogger.initializeSlackUrls("https://hooks.slack.com/services/T_WRONG/B_WRONG/WRONG")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SLACK_WEBHOOK_LOGGER))
-    logger.info("slack webhook logger not send a log into slack with incorrect url") shouldBe false
+    retry(2)(logger.info("slack webhook logger not send a log into slack with incorrect url")) match {
+      case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
+      case Success(v) => v shouldBe false
+    }
   }
 
   "checkPrerequisite" should "throw an IllegalArgumentException if slackWebhookURLs is empty" in {

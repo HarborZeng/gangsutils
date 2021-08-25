@@ -41,7 +41,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
   "feishu webhook logger" should "send a log into feishu with correct key and sign" in {
     FeishuWebhookLogger.initializeFeishuWebhook("085380aa-4d07-4ecc-b17f-fbb978e1da72;BRH2wOO3SOi64Sw0wiMXtb")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.FEISHU_WEBHOOK_LOGGER))
-    retry(5)(logger.info("feishu webhook logger send a log into feishu with correct key and sign")) match {
+    retry(2)(logger.info("feishu webhook logger send a log into feishu with correct key and sign")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
     }
@@ -50,7 +50,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
   it should "send a log into feishu with correct key" in {
     FeishuWebhookLogger.initializeFeishuWebhook("040117de-7776-444b-ba61-9bbee3ad5e33")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.FEISHU_WEBHOOK_LOGGER))
-    retry(5)(logger.info("feishu webhook logger send a log into feishu with correct key")) match {
+    retry(2)(logger.info("feishu webhook logger send a log into feishu with correct key")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
     }
@@ -59,7 +59,10 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
   it should "not send a log into feishu with incorrect key" in {
     FeishuWebhookLogger.initializeFeishuWebhook("a3af")
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.FEISHU_WEBHOOK_LOGGER))
-    logger.info("feishu webhook logger not send a log into feishu with incorrect key") shouldBe true
+    retry(2)(logger.info("feishu webhook logger not send a log into feishu with incorrect key")) match {
+      case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
+      case Success(v) => v shouldBe true // Feishu api return 200 status code even if it is not an successful respond
+    }
   }
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
