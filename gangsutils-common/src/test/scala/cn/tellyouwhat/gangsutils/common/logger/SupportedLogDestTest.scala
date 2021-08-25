@@ -17,4 +17,9 @@ class SupportedLogDestTest extends AnyFlatSpec with Matchers {
     SupportedLogDest.PRINTLN_LOGGER.toString shouldEqual PrintlnLogger.PRINTLN_LOGGER
   }
 
+  it should "SLACK_WEBHOOK_LOGGER" in {
+    SupportedLogDest.SLACK_WEBHOOK_LOGGER.id shouldEqual 2
+    SupportedLogDest.SLACK_WEBHOOK_LOGGER.toString shouldEqual SlackWebhookLogger.SLACK_WEBHOOK_LOGGER
+  }
+
 }

@@ -1,5 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.gangfunctions.stripANSIColor
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
 
@@ -11,35 +13,19 @@ trait WoaWebhookLogger extends WebhookLogger {
   /**
    * 要发往的机器人的密钥
    */
-  val robotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
+  val woaRobotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
 
-  /**
-   * 执行一条 woa 日志
-   *
-   * @param msg   日志内容
-   * @param level 日志级别
-   */
-  protected def woaWebhookLog(msg: String, level: LogLevel.Value): Boolean = webhookLog(msg, level)
-
-  /**
-   * 检查 woa 的 webhook 机器人的密钥是否已经设置
-   */
-  protected def checkRobotsInitialized(): Unit =
-    if (robotsToSend.isEmpty || robotsToSend.exists(_.isEmpty))
-      throw new IllegalArgumentException("必须要先调用 WoaWebhookLogger.initializeWoaWebhook 初始化机器人的秘钥才能创建 WoaWebhookLogger 实例")
-
-  protected override def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    robotsToSend.map(key =>
-      buildLogContent(msg, level) |> (content => sendRequest(
-        s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
-        body = "{\"msgtype\": \"text\",\"text\": {\"content\": \" " + content + "\"}}"
-      ))
+  override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
+    woaRobotsToSend.map(key =>
+      sendRequest(s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
+        body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")
     ).forall(b => b)
   }
 
-  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = {
-    checkRobotsInitialized()
-    woaWebhookLog(msg, level)
+  override protected def checkPrerequisite(): Unit = {
+    if (woaRobotsToSend.isEmpty || woaRobotsToSend.exists(_.isEmpty))
+      throw new IllegalArgumentException(I18N.getRB.getString("woaWebhookLogger.prerequisite"))
   }
 }
 
@@ -59,6 +45,7 @@ object WoaWebhookLogger {
   private var robotsToSend: Array[String] = Array.empty[String]
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
+
   /**
    * 初始化 woa webhook 的密钥
    *
@@ -75,8 +62,9 @@ object WoaWebhookLogger {
    * @param robotsKeys 密钥数组
    */
   def initializeWoaWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
-    if ((robotsKeys != null && robotsKeys.isEmpty) || robotsKeys == null || robotsKeys.exists(_.isEmpty)) {
-      throw new IllegalArgumentException(s"initializeWoaWebhook 初始化，但 robotsKeys 传入了: ${if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")}")
+    if (robotsKeys == null || robotsKeys.isEmpty || robotsKeys.exists(_.isEmpty)) {
+      throw new IllegalArgumentException(
+        I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format(if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")))
     }
     robotsKeys
   }

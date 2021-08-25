@@ -6,7 +6,7 @@
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 
     <description>scala spark utils pack</description>
 
@@ -53,7 +53,7 @@
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-common</artifactId>
-                <version>0.3.0</version>
+                <version>0.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
@@ -75,6 +75,16 @@
                 <artifactId>hadoop-common</artifactId>
                 <version>3.3.1</version>
             </dependency>
+            <dependency>
+                <groupId>io.circe</groupId>
+                <artifactId>circe-parser_2.12</artifactId>
+                <version>0.14.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.circe</groupId>
+                <artifactId>circe-yaml_2.12</artifactId>
+                <version>0.14.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -83,6 +93,7 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.fullversion}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.scalactic</groupId>

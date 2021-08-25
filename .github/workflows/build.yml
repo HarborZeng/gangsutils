@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  publish:
+  develop-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Git Repo

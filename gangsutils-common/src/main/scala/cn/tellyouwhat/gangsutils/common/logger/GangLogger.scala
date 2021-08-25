@@ -1,8 +1,9 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
 import cn.tellyouwhat.gangsutils.common.exceptions.NoAliveLoggerException
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
+import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.{DINGTALK_WEBHOOK_LOGGER, FEISHU_WEBHOOK_LOGGER, PRINTLN_LOGGER, QYWX_WEBHOOK_LOGGER, SERVERCHAN_WEBHOOK_LOGGER, SLACK_WEBHOOK_LOGGER, TELEGRAM_WEBHOOK_LOGGER, WOA_WEBHOOK_LOGGER}
 
 
 /**
@@ -13,23 +14,85 @@ protected class GangLogger(
                             override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
                             override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
                             override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
-                            override val logPrefix: String = GangLogger.logPrefix,
-                          ) extends PrintlnLogger with WoaWebhookLogger {
+                            override val logPrefix: Option[String] = GangLogger.logPrefix,
+                            override val isHostnameEnabled: Boolean = GangLogger.isHostnameEnabled,
+                          ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger with DingTalkWebhookLogger with ServerChanWebhookLogger with FeishuWebhookLogger with TelegramWebhookLogger {
 
-
-  override def log(msg: String, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
-    val logStatus = Array.newBuilder[Boolean]
-    if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id)) {
-      val status = super[PrintlnLogger].doTheLogAction(msg, level)
-      logStatus += status
+  override def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
+    if (msg == null) false
+    else {
+      val msgStr = msg.toString
+      val logStatus = Array.newBuilder[Boolean]
+      if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id)) {
+        val status = super[PrintlnLogger].doTheLogAction(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4WOA(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(SLACK_WEBHOOK_LOGGER) && level >= logsLevels(SLACK_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4Slack(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(QYWX_WEBHOOK_LOGGER) && level >= logsLevels(QYWX_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4QYWX(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(DINGTALK_WEBHOOK_LOGGER) && level >= logsLevels(DINGTALK_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4DingTalk(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(SERVERCHAN_WEBHOOK_LOGGER) && level >= logsLevels(SERVERCHAN_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4ServerChan(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(FEISHU_WEBHOOK_LOGGER) && level >= logsLevels(FEISHU_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4Feishu(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(TELEGRAM_WEBHOOK_LOGGER) && level >= logsLevels(TELEGRAM_WEBHOOK_LOGGER.id)) {
+        val status = doTheLogAction4Telegram(msgStr, level)
+        logStatus += status
+      }
+      logStatus.result().forall(b => b)
     }
-    if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id)) {
-      val status = super[WoaWebhookLogger].doTheLogAction(msg, level)
-      logStatus += status
-    }
-    logStatus.result().forall(b => b)
   }
 
+  private def doTheLogAction4WOA(msg: String, level: LogLevel.Value): Boolean = {
+    super[WoaWebhookLogger].checkPrerequisite()
+    super[WoaWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4Slack(msg: String, level: LogLevel.Value): Boolean = {
+    super[SlackWebhookLogger].checkPrerequisite()
+    super[SlackWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4QYWX(msg: String, level: LogLevel.Value): Boolean = {
+    super[QYWXWebhookLogger].checkPrerequisite()
+    super[QYWXWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4DingTalk(msg: String, level: LogLevel.Value): Boolean = {
+    super[DingTalkWebhookLogger].checkPrerequisite()
+    super[DingTalkWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4ServerChan(msg: String, level: LogLevel.Value): Boolean = {
+    super[ServerChanWebhookLogger].checkPrerequisite()
+    super[ServerChanWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4Feishu(msg: String, level: LogLevel.Value): Boolean = {
+    super[FeishuWebhookLogger].checkPrerequisite()
+    super[FeishuWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4Telegram(msg: String, level: LogLevel.Value): Boolean = {
+    super[TelegramWebhookLogger].checkPrerequisite()
+    super[TelegramWebhookLogger].webhookLog(msg, level)
+  }
 }
 
 object GangLogger {
@@ -44,11 +107,12 @@ object GangLogger {
   /**
    * 创建一个新的 GangLogger 实例
    *
-   * @param isDTEnabled    是否在日志中启用时间
-   * @param isTraceEnabled 是否在日志中启用跟踪（包名类名方法名行号）字段
-   * @param defaultLogDest 默认的日志输出目的地
-   * @param logsLevels     默认的不同的日志输出目的地的级别
-   * @param logPrefix      每条日志的前缀
+   * @param isDTEnabled       是否在日志中启用时间
+   * @param isTraceEnabled    是否在日志中启用跟踪（包名类名方法名行号）字段
+   * @param defaultLogDest    默认的日志输出目的地
+   * @param logsLevels        默认的不同的日志输出目的地的级别
+   * @param logPrefix         每条日志的前缀
+   * @param isHostnameEnabled 是否在日志中启用主机名字段
    * @return 一个新的 GangLogger 实例
    */
   def apply(
@@ -56,9 +120,10 @@ object GangLogger {
              isTraceEnabled: Boolean = isTraceEnabled,
              defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
              logsLevels: Array[LogLevel.Value] = logsLevels,
-             logPrefix: String = logPrefix
+             logPrefix: Option[String] = logPrefix,
+             isHostnameEnabled: Boolean = isHostnameEnabled
            ): GangLogger =
-    new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix) |! (l => _logger = Some(l))
+    new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix, isHostnameEnabled) |! (l => _logger = Some(l))
 
   /**
    * 获取 BaseLogger 单例对象
@@ -68,7 +133,7 @@ object GangLogger {
   def getLogger: BaseLogger = {
     _logger match {
       case Some(logger) => logger
-      case None => apply() |! (logger => logger.warning(NoAliveLoggerException("logger is not initialized yet, initialize a default GangLogger for you")))
+      case None => apply() |! (logger => logger.warning(NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))))
     }
   }
 
@@ -93,6 +158,11 @@ object GangLogger {
   private var isTraceEnabled: Boolean = false
 
   /**
+   * 是否在日志中启用主机名字段
+   */
+  private var isHostnameEnabled: Boolean = true
+
+  /**
    * 默认的日志输出目的地
    */
   private var defaultLogDest: Seq[SupportedLogDest.Value] = Seq(PRINTLN_LOGGER)
@@ -105,7 +175,7 @@ object GangLogger {
   /**
    * 日志前缀，每条日志前都会被加上的前缀
    */
-  private var logPrefix: String = ""
+  private var logPrefix: Option[String] = None
 
   /**
    * 将 GangLogger 伴生对像变量初始化
@@ -115,7 +185,8 @@ object GangLogger {
     isTraceEnabled = false
     defaultLogDest = Seq(PRINTLN_LOGGER)
     logsLevels = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
-    logPrefix = ""
+    logPrefix = None
+    isHostnameEnabled = true
   }
 
   /**
@@ -145,6 +216,18 @@ object GangLogger {
     isTraceEnabled = true
 
   /**
+   * 关闭日志中的主机名字段
+   */
+  def disableHostname(): Unit =
+    isHostnameEnabled = false
+
+  /**
+   * 启用日志中的主机名字段
+   */
+  def enableHostname(): Unit =
+    isHostnameEnabled = true
+
+  /**
    * 设置默认的日志输出目的地
    *
    * @param destination 日志输出目的地
@@ -159,8 +242,7 @@ object GangLogger {
    */
   def setLogsLevels(levels: Array[LogLevel.Value]): Unit = {
     if (levels.length != SupportedLogDest.values.size) {
-      throw new IllegalArgumentException(s"logsLevels 数量和 SupportedLogDest 所支持的数量不符：" +
-        s"levels.length ${levels.length}, SupportedLogDest.values.size ${SupportedLogDest.values.size}")
+      throw new IllegalArgumentException(I18N.getRB.getString("setLogsLevels.illegalArray").format(levels.length, SupportedLogDest.values.size))
     }
     logsLevels = levels
   }
@@ -172,14 +254,14 @@ object GangLogger {
    */
   def setLogsLevels(levels: Map[SupportedLogDest.Value, LogLevel.Value]): Unit = {
     if (levels == null || levels.isEmpty) {
-      throw new IllegalArgumentException(s"levels map 不合法：$levels")
+      throw new IllegalArgumentException(I18N.getRB.getString("setLogsLevels.IllegalMap").format(levels))
     }
     // ValueSet object is a sorted set by design
     (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |> setLogsLevels
   }
 
-  def setLogPrefix(prefix: String): Unit = logPrefix = prefix
+  def setLogPrefix(prefix: String): Unit = logPrefix = Some(prefix)
 
-  def clearLogPrefix(): Unit = logPrefix = ""
+  def clearLogPrefix(): Unit = logPrefix = None
 
 }

@@ -1,19 +1,33 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.gangconstants.{datetimeRe, infoLog}
+
 import java.io.ByteArrayOutputStream
-import org.scalatest.PrivateMethodTester
+import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester {
+class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
+
+  before {
+    GangLogger.disableDateTime()
+    GangLogger.disableHostname()
+  }
+
+  after {
+    GangLogger.killLogger()
+    GangLogger.resetLoggerConfig()
+  }
 
   behavior of "BaseLoggerTest"
 
-  "buildLogContent" should "build log using basic content and extra information" in {
-    val buildLogContent = PrivateMethod[String]('buildLogContent)
-    val logger: BaseLogger = GangLogger(isTraceEnabled = true, isDTEnabled = false)
-    val logContent = logger invokePrivate buildLogContent("a msg", LogLevel.TRACE)
-    logContent should fullyMatch regex """【跟踪】 - [\w.]+#[\w.]+第\d+行: a msg""".r
+  "buildLog" should "build log using basic msg, level and other members" in {
+    val buildLog = PrivateMethod[OneLog]('buildLog)
+    val logger: BaseLogger = GangLogger(isTraceEnabled = true, isDTEnabled = true, isHostnameEnabled = true, logPrefix = Some("a prefix"))
+    val logContent = logger invokePrivate buildLog("a msg", LogLevel.INFO)
+    logContent.toString + "\n" should fullyMatch regex infoLog.format(
+      """ - \S+ - """ + datetimeRe + """ - \S+#\S+ [^:]+: a prefix - a msg"""
+    )
   }
 
   "log" should "print a log" in {
@@ -22,9 +36,7 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     Console.withOut(stream) {
       logger.log("a info log", LogLevel.INFO)
     }
-    stream.toString() should fullyMatch regex """\u001b\[1m【信息】: a info log\u001b\[0m\s+""".r
-    GangLogger.resetLoggerConfig()
-    GangLogger.killLogger()
+    stream.toString() should fullyMatch regex infoLog.format(": a info log")
   }
 
 }

@@ -2,11 +2,13 @@ package cn.tellyouwhat.gangsutils.common
 
 import cn.tellyouwhat.gangsutils.common.cc.Mappable
 import cn.tellyouwhat.gangsutils.common.exceptions.GangException
+import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
-import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel}
+import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger, LogLevel, SupportedLogDest}
+import cn.tellyouwhat.gangsutils.common.gangconstants.placeholderHead_unquote
 
 import java.time.{Duration, Instant, LocalDate, LocalDateTime, ZoneId}
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{FileSystem, Path, PathNotFoundException}
 import org.apache.spark.sql.SparkSession
 
 import scala.language.implicitConversions
@@ -42,7 +44,7 @@ object gangfunctions {
     if (cc == null)
       return null
     cc.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) {
-      // ignore $ initial member
+      // ignore $ or __ initial member
       case (map, field) if !(field.getName.startsWith("$") || field.getName.startsWith("__")) =>
         field.setAccessible(true)
         val value = field.get(cc) match {
@@ -149,7 +151,7 @@ object gangfunctions {
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
    * @throws GangException if the path does not exists
    */
-  def fileModifiedTime(path: String)(implicit spark: SparkSession): Either[GangException, Long] =
+  def fileModifiedTime(path: String)(implicit spark: SparkSession): Either[PathNotFoundException, Long] =
     fileModifiedTime(new Path(path))
 
   /**
@@ -160,11 +162,11 @@ object gangfunctions {
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
    * @throws GangException if the path does not exists
    */
-  def fileModifiedTime(path: Path)(implicit spark: SparkSession): Either[GangException, Long] = {
+  def fileModifiedTime(path: Path)(implicit spark: SparkSession): Either[PathNotFoundException, Long] = {
     if (isPathExists(path)) {
       getFS.getFileStatus(path).getModificationTime |> Right.apply
     } else {
-      GangException(s"path：$path 不存在") |> Left.apply
+      new PathNotFoundException(path.toString) |> Left.apply
     }
   }
 
@@ -188,7 +190,7 @@ object gangfunctions {
    */
   def isSparkSaveDirModifiedToday(path: String)(implicit spark: SparkSession): Boolean =
     fileModifiedTime(new Path(path, "_SUCCESS")) match {
-      case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
+      case Left(e) => throw GangException(s"error looking $path mtime", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDate
         .isEqual(LocalDate.now())
@@ -206,7 +208,7 @@ object gangfunctions {
    */
   def isSparkSaveDirModifiedWithinNHours(path: String)(n: Int)(implicit spark: SparkSession): Boolean =
     fileModifiedTime(new Path(path, "_SUCCESS")) match {
-      case Left(e) => throw GangException(s"获取 $path mtime 失败", e)
+      case Left(e) => throw GangException(s"error looking $path mtime", e)
       case Right(mtime) => Instant.ofEpochMilli(mtime)
         .atZone(ZoneId.systemDefault()).toLocalDateTime
         .isAfter(LocalDateTime.now().minusHours(n))
@@ -221,7 +223,7 @@ object gangfunctions {
    */
   def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: BaseLogger = null): Unit =
     if (logger == null) {
-      println(s"【$level】: $content")
+      println(s"${placeholderHead_unquote.format(level)}: $content")
     } else {
       logger.log(content, level)
     }
@@ -229,24 +231,24 @@ object gangfunctions {
   /**
    * 计时 + 切面日志
    *
-   * @param block  要执行的方法
-   * @param desc   描述，将作用于切面日志
+   * @param block 要执行的方法
+   * @param desc  描述，将作用于切面日志
    * @tparam R 返回值 Type
    * @return block 的执行结果
    */
-  def timeit[R](block: => R, desc: String = "任务"): R = {
+  def timeit[R](block: => R, desc: String = I18N.getRB.getString("task")): R = {
     implicit val logger: BaseLogger = GangLogger.getLogger
-    printOrLog(s"开始$desc")
+    printOrLog(I18N.getRB.getString("timeit.start").format(desc))
     val t0 = System.currentTimeMillis()
     val result = Try(block) match {
       case Failure(e) =>
         val t1 = System.currentTimeMillis()
-        printOrLog(s"执行${desc}失败，耗时${calcExecDuration(t0, t1)}", level = LogLevel.CRITICAL)
+        printOrLog(I18N.getRB.getString("timeit.failed").format(desc, calcExecDuration(t0, t1)), level = LogLevel.CRITICAL)
         throw e
       case Success(v) => v
     }
     val t1 = System.currentTimeMillis()
-    printOrLog(s"完成$desc，耗时${calcExecDuration(t0, t1)}", level = LogLevel.SUCCESS)
+    printOrLog(I18N.getRB.getString("timeit.finished").format(desc, calcExecDuration(t0, t1)), level = LogLevel.SUCCESS)
     result
   }
 
@@ -270,13 +272,14 @@ object gangfunctions {
    * @return 尝试的函数的结果
    */
   @annotation.tailrec
-  def retry[T](n: Int)(fn: => T)(implicit logger: BaseLogger = null): Try[T] = {
+  def retry[T](n: Int)(fn: => T): Try[T] = {
     Try(fn) match {
       case Failure(e) if n > 1 =>
-        printOrLog(s"执行失败，重试最后${n - 1}次，error: $e", level = LogLevel.ERROR)
+        GangLogger.getLogger.error(I18N.getRB.getString("retry.failure").format(n - 1, e))(enabled = SupportedLogDest.PRINTLN_LOGGER :: Nil)
         retry(n - 1)(fn)
       case fn => fn
     }
   }
 
+  def stripANSIColor(s: String): String = s.replaceAll("""\e\[[\d;]*[^\d;]""", "")
 }

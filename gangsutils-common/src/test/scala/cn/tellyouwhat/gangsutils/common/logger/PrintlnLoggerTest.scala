@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.exceptions.GangException
+import cn.tellyouwhat.gangsutils.common.exceptions.WrongLogLevelException
 import org.scalatest.PrivateMethodTester
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -12,7 +12,7 @@ class PrintlnLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTest
   it should "printlnLog" in {
     val printlnLog = PrivateMethod[String]('printlnLog)
     val logger: BaseLogger = GangLogger(isDTEnabled = false)
-    a [GangException] should be thrownBy {
+    a [WrongLogLevelException] should be thrownBy {
       logger invokePrivate printlnLog("a msg", null)
     }
   }
