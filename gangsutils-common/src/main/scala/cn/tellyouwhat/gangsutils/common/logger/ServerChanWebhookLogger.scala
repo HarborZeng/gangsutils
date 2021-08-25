@@ -59,7 +59,7 @@ object ServerChanWebhookLogger {
    * @param robotsKeys 密钥数组
    */
   def initializeServerChanWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
-    if ((robotsKeys != null && robotsKeys.isEmpty) || robotsKeys == null || robotsKeys.exists(_.isEmpty)) {
+    if (robotsKeys == null || robotsKeys.isEmpty || robotsKeys.exists(_.isEmpty)) {
       throw new IllegalArgumentException(
         I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format(if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")))
     }

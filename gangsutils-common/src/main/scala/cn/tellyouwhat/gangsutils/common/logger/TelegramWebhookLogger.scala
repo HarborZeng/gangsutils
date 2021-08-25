@@ -57,8 +57,8 @@ object TelegramWebhookLogger {
    * @param robotsChatIdsTokens 密钥数组
    */
   def initializeTelegramWebhook(robotsChatIdsTokens: Array[Array[String]]): Unit = robotsToSend = {
-    if ((robotsChatIdsTokens != null && robotsChatIdsTokens.isEmpty) ||
-      robotsChatIdsTokens == null ||
+    if (robotsChatIdsTokens == null ||
+      robotsChatIdsTokens.isEmpty ||
       robotsChatIdsTokens.exists(_.isEmpty) ||
       robotsChatIdsTokens.exists(_.exists(_.isEmpty)) ||
       robotsChatIdsTokens.exists(p => p.length != 2)

@@ -50,7 +50,7 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.QYWX_WEBHOOK_LOGGER))
     retry(2)(logger.info("qywx webhook logger not send a log into qywx with incorrect key")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
-      case Success(v) => v shouldBe true // qywx return 200 status regardless it is real status, and the error is in response body.
+      case Success(v) => v shouldBe false
     }
   }
 

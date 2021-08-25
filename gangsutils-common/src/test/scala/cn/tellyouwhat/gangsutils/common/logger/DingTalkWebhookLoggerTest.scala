@@ -61,7 +61,7 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.DINGTALK_WEBHOOK_LOGGER))
     retry(2)(logger.info("dingtalk webhook logger not send a log into dingtalk with incorrect key")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
-      case Success(v) => v shouldBe true // DingTalk api return 200 status code even if it is not an successful respond
+      case Success(v) => v shouldBe false
     }
   }
 

@@ -61,7 +61,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
     val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.FEISHU_WEBHOOK_LOGGER))
     retry(2)(logger.info("feishu webhook logger not send a log into feishu with incorrect key")) match {
       case Failure(e) => a [SocketTimeoutException] should be thrownBy (throw e)
-      case Success(v) => v shouldBe true // Feishu api return 200 status code even if it is not an successful respond
+      case Success(v) => v shouldBe false
     }
   }
 

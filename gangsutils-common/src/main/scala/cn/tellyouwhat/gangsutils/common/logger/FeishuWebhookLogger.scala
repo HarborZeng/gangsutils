@@ -72,8 +72,8 @@ object FeishuWebhookLogger {
    * @param robotsKeysSigns 密钥数组
    */
   def initializeFeishuWebhook(robotsKeysSigns: Array[Array[String]]): Unit = robotsToSend = {
-    if ((robotsKeysSigns != null && robotsKeysSigns.isEmpty) ||
-      robotsKeysSigns == null ||
+    if (robotsKeysSigns == null ||
+      robotsKeysSigns.isEmpty ||
       robotsKeysSigns.exists(_.isEmpty) ||
       robotsKeysSigns.exists(_.exists(_.isEmpty)) ||
       robotsKeysSigns.exists(p => p.length > 2 || p.length == 0)

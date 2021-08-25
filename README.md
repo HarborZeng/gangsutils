@@ -14,6 +14,8 @@ To use this utils pack right away, add the following dependency to pom.xml or wh
 
 Replace `${gangsutils.version}` to the latest stable version showed above in the Maven Central badge
 
+mavem
+
 ```xml
 <dependency>
   <groupId>cn.tellyouwhat</groupId>
@@ -22,9 +24,13 @@ Replace `${gangsutils.version}` to the latest stable version showed above in the
 </dependency>
 ```
 
-```sbt
+sbt
+
+```scala
 libraryDependencies += "cn.tellyouwhat" % "gangsutils-common" % "${gangsutils.version}"
 ```
+
+gradle
 
 ```groovy
 implementation 'cn.tellyouwhat:gangsutils-common:${gangsutils.version}'
@@ -55,7 +61,7 @@ in Chinese
 【信息】 - hostname - 2021-07-20T14:45:20.425 - some.package.name.ClassName$#main第20行: hello world
 ```
 
-Language is based on your system, retrived by `Locale` default.
+Language is based on your system, retrieved by `Locale` default.
 
 #### Change logger style
 
@@ -118,7 +124,7 @@ To config a logger, you can:
 
 #### log levels
 
-There **6 levels** in this util pack, trace、info、success、warning、error and critical. None of them throw exceptions, you should throw it manually.
+There are **6 levels** in this util pack, trace、info、success、warning、error and critical. None of them throw exceptions, you should throw it manually.
 
 Other than pre-config log destination, you can set the-log-level log destination by `enabled` parameter, like
 

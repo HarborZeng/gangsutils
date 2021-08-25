@@ -34,7 +34,7 @@ object SlackWebhookLogger {
 
 
   def initializeSlackUrls(slackUrls: Array[String]): Unit = slackWebhookURLs = {
-    if ((slackUrls != null && slackUrls.isEmpty) || slackUrls == null || slackUrls.exists(_.isEmpty)) {
+    if (slackUrls == null || slackUrls.isEmpty || slackUrls.exists(_.isEmpty)) {
       throw new IllegalArgumentException(
         I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format(if (slackUrls == null) null else slackUrls.mkString("Array(", ", ", ")")))
     }
