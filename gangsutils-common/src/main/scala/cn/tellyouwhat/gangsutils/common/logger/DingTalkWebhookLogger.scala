@@ -19,8 +19,7 @@ trait DingTalkWebhookLogger extends WebhookLogger {
   val dingTalkRobotsToSend: Set[DingTalkRobot] = DingTalkWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level) |> stripANSIColor
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
     dingTalkRobotsToSend.map(robot => {
       val t = System.currentTimeMillis
       val targetURL = robot.sign match {

@@ -13,12 +13,11 @@ trait ServerChanWebhookLogger extends WebhookLogger {
   val serverChanRobotsToSend: Set[String] = ServerChanWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level) |> stripANSIColor
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
     serverChanRobotsToSend.map(key =>
       sendRequest(s"https://sctapi.ftqq.com/$key.send",
         form = Seq(
-          ("title", URLEncoder.encode(content.stripPrefix(" - "), "UTF-8")),
+          ("title", URLEncoder.encode(msg, "UTF-8")),
           ("desp", URLEncoder.encode(fullLog, "UTF-8")),
         ))
     ).forall(b => b)

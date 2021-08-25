@@ -18,8 +18,7 @@ trait FeishuWebhookLogger extends WebhookLogger {
   val feishuRobotsToSend: Set[FeishuRobot] = FeishuWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level) |> stripANSIColor
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
     feishuRobotsToSend.map(robot => {
       // feishu use second as timestamp
       val t = Duration.ofMillis(System.currentTimeMillis()).getSeconds

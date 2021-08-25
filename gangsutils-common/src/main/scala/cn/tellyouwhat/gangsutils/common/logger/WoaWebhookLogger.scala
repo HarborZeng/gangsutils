@@ -16,8 +16,7 @@ trait WoaWebhookLogger extends WebhookLogger {
   val woaRobotsToSend: Set[String] = WoaWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level) |> stripANSIColor
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
     woaRobotsToSend.map(key =>
       sendRequest(s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
         body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")

@@ -13,11 +13,10 @@ trait PrintlnLogger extends BaseLogger {
    * @param msg   日志内容
    * @param level 日志级别
    */
-  protected def printlnLog(msg: String, level: LogLevel.Value): Boolean =
-    buildLogContent(msg) |> { content =>
-      addLeadingHead(content, level) |> println
-      true
-    }
+  protected def printlnLog(msg: String, level: LogLevel.Value): Boolean = {
+    buildLog(msg, level).toString |> println
+    true
+  }
 
   override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean =
     printlnLog(msg, level)

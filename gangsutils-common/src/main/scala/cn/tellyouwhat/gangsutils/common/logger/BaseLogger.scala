@@ -1,7 +1,5 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.exceptions.WrongLogLevelException
-import cn.tellyouwhat.gangsutils.common.gangconstants.{criticalLog_unquote, errorLog_unquote, infoLog_unquote, successLog_unquote, traceLog_unquote, warningLog_unquote}
 import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
@@ -37,7 +35,7 @@ trait BaseLogger {
   /**
    * 每条日志的前缀
    */
-  private[logger] val logPrefix: String = ""
+  private[logger] val logPrefix: Option[String] = None
 
   private[logger] lazy val hostname: String = InetAddress.getLocalHost.getHostName
 
@@ -50,8 +48,8 @@ trait BaseLogger {
    * @param msg 日志内容
    * @return
    */
-  protected def buildLogContent(msg: String): String =
-    (if (isTraceEnabled) {
+  protected def buildLog(msg: String, level: LogLevel.Value): OneLog = {
+    val (className, methodName, lineNumber) = if (isTraceEnabled) {
       val stackTraceElements = Thread.currentThread().getStackTrace
       val slicedElements = stackTraceElements.drop(stackTraceElements
         .lastIndexWhere(_.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.logger")) + 1
@@ -60,21 +58,25 @@ trait BaseLogger {
         e.getClassName.startsWith("scala.") ||
         e.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.gangfunctions"))
       val theTrace = slicedElements(0)
-      s" - ${theTrace.getClassName}#${theTrace.getMethodName} ${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
+      val className = theTrace.getClassName
+      val methodName = theTrace.getMethodName
+      val lineNumber = s"${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
+      (Some(className), Some(methodName), Some(lineNumber))
     } else {
-      ""
-    }) |> (traceStr => s"${if (isHostnameEnabled) s" - $hostname" else ""}${if (isDTEnabled) s" - ${LocalDateTime.now().toString}" else ""}$traceStr: ${if (logPrefix.nonEmpty) s"$logPrefix - " else ""}$msg")
-
-  protected def addLeadingHead(content: String, level: LogLevel.Value): String =
-    level match {
-      case LogLevel.TRACE => traceLog_unquote.format(content)
-      case LogLevel.INFO => infoLog_unquote.format(content)
-      case LogLevel.SUCCESS => successLog_unquote.format(content)
-      case LogLevel.WARNING => warningLog_unquote.format(content)
-      case LogLevel.ERROR => errorLog_unquote.format(content)
-      case LogLevel.CRITICAL => criticalLog_unquote.format(content)
-      case _ => throw WrongLogLevelException(s"Unknown log level: $level")
+      (None, None, None)
     }
+    OneLog(
+      level = Some(level),
+      hostname = if (isHostnameEnabled) Some(hostname) else None,
+      datetime = if (isDTEnabled) Some(LocalDateTime.now()) else None,
+      className = className,
+      methodName = methodName,
+      lineNumber = lineNumber,
+      prefix = logPrefix,
+      msg = Some(msg)
+    )
+  }
+
 
   /**
    * 真正去输出一条日志

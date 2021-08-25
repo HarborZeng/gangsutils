@@ -14,8 +14,7 @@ trait TelegramWebhookLogger extends WebhookLogger {
   val telegramRobotsToSend: Set[TelegramRobot] = TelegramWebhookLogger.robotsToSend.toSet
   
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level) |> stripANSIColor
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
     telegramRobotsToSend.map(robot => {
       val targetURL = s"https://api.telegram.org/bot${robot.token.get}/sendMessage"
       sendRequest(targetURL, body = s"""{"chat_id": "${robot.chatID.get}", "text": "$fullLog"}""")

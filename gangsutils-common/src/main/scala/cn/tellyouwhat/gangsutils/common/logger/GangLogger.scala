@@ -14,7 +14,7 @@ protected class GangLogger(
                             override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
                             override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
                             override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
-                            override val logPrefix: String = GangLogger.logPrefix,
+                            override val logPrefix: Option[String] = GangLogger.logPrefix,
                             override val isHostnameEnabled: Boolean = GangLogger.isHostnameEnabled,
                           ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger with DingTalkWebhookLogger with ServerChanWebhookLogger with FeishuWebhookLogger with TelegramWebhookLogger {
 
@@ -120,7 +120,7 @@ object GangLogger {
              isTraceEnabled: Boolean = isTraceEnabled,
              defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
              logsLevels: Array[LogLevel.Value] = logsLevels,
-             logPrefix: String = logPrefix,
+             logPrefix: Option[String] = logPrefix,
              isHostnameEnabled: Boolean = isHostnameEnabled
            ): GangLogger =
     new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix, isHostnameEnabled) |! (l => _logger = Some(l))
@@ -175,7 +175,7 @@ object GangLogger {
   /**
    * 日志前缀，每条日志前都会被加上的前缀
    */
-  private var logPrefix: String = ""
+  private var logPrefix: Option[String] = None
 
   /**
    * 将 GangLogger 伴生对像变量初始化
@@ -185,7 +185,7 @@ object GangLogger {
     isTraceEnabled = false
     defaultLogDest = Seq(PRINTLN_LOGGER)
     logsLevels = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
-    logPrefix = ""
+    logPrefix = None
     isHostnameEnabled = true
   }
 
@@ -260,8 +260,8 @@ object GangLogger {
     (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |> setLogsLevels
   }
 
-  def setLogPrefix(prefix: String): Unit = logPrefix = prefix
+  def setLogPrefix(prefix: String): Unit = logPrefix = Some(prefix)
 
-  def clearLogPrefix(): Unit = logPrefix = ""
+  def clearLogPrefix(): Unit = logPrefix = None
 
 }

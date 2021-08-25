@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.helper
 
-import cn.tellyouwhat.gangsutils.common.gangconstants.{successLog, traceLog}
+import cn.tellyouwhat.gangsutils.common.gangconstants.{datetimeRe, successLog, traceLog}
 import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.common.logger.{BaseLogger, GangLogger}
 import org.scalatest.BeforeAndAfter
@@ -32,8 +32,8 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
       TL.tl()
     }
     stream.toString should fullyMatch regex
-      traceLog.format(""" - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+: """ + getRB.getString("timeit.start").format(getRB.getString("task"))) +
-        successLog.format(""" - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+: """ + getRB.getString("timeit.finished").format(getRB.getString("task"), """\d*\.*\d*s"""))
+      traceLog.format(s""" - $datetimeRe: """ + getRB.getString("timeit.start").format(getRB.getString("task"))) +
+        successLog.format(s""" - $datetimeRe: """ + getRB.getString("timeit.finished").format(getRB.getString("task"), """\d*\.*\d*s"""))
   }
 
   "timeit logger run with logger instance" should "run a method and log the start, end and time duration to invoke that method" in {
@@ -54,8 +54,8 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
       TL.tl()
     }
     stream.toString should fullyMatch regex
-      traceLog.format(""" - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+: """ + getRB.getString("timeit.start").format(getRB.getString("task"))) +
-        successLog.format(""" - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+: """ + getRB.getString("timeit.finished").format(getRB.getString("task"), """\d*\.*\d*s"""))
+      traceLog.format(s""" - $datetimeRe: """ + getRB.getString("timeit.start").format(getRB.getString("task"))) +
+        successLog.format(s""" - $datetimeRe: """ + getRB.getString("timeit.finished").format(getRB.getString("task"), """\d*\.*\d*s"""))
   }
 
 

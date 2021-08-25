@@ -16,8 +16,7 @@ trait QYWXWebhookLogger extends WebhookLogger {
   val qywxRobotsToSend: Set[String] = QYWXWebhookLogger.robotsToSend.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level) |> stripANSIColor
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
     qywxRobotsToSend.map(key =>
       sendRequest(s"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=$key",
         body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")

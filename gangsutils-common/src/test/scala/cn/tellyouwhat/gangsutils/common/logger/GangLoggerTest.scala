@@ -163,7 +163,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "apply with logPrefix" in {
-    val logger2 = GangLogger(isDTEnabled = false, logPrefix = "a prefix")
+    val logger2 = GangLogger(isDTEnabled = false, logPrefix = Some("a prefix"))
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger2.trace("a log with prefix")
@@ -175,7 +175,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     GangLogger.setLogPrefix("another prefix")
     val logger1 = GangLogger(isDTEnabled = false)
 
-    logger1.logPrefix shouldBe "another prefix"
+    logger1.logPrefix shouldBe Some("another prefix")
 
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
@@ -191,12 +191,12 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     GangLogger.clearLogPrefix()
     val logger2 = GangLogger()
 
-    logger1.logPrefix shouldBe "another prefix"
-    logger2.logPrefix shouldBe ""
+    logger1.logPrefix shouldBe Some("another prefix")
+    logger2.logPrefix shouldBe None
   }
 
   "getLogger" should "return an existing GangLogger or a new GangLogger()" in {
-    val newLogger = GangLogger(logPrefix = "123")
+    val newLogger = GangLogger(logPrefix = Some("123"))
     val logger1 = GangLogger.getLogger
     logger1 shouldEqual newLogger
 

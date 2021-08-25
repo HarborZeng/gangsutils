@@ -1,5 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.gangfunctions.stripANSIColor
 import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
@@ -8,8 +9,7 @@ trait SlackWebhookLogger extends WebhookLogger {
   val slackWebhookURLs: Set[String] = SlackWebhookLogger.slackWebhookURLs.toSet
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
+    val fullLog = buildLog(msg, level).toString |> stripANSIColor
     slackWebhookURLs.map(url => sendRequest(url, body = s"""{"text": "$fullLog"}"""))
       .forall(b => b)
   }

@@ -1,12 +1,13 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.gangconstants.infoLog
-import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
+import cn.tellyouwhat.gangsutils.common.gangconstants.{datetimeRe, infoLog}
 
 import java.io.ByteArrayOutputStream
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+
+import java.util.regex.Pattern
 
 class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
 
@@ -22,11 +23,13 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   behavior of "BaseLoggerTest"
 
-  "buildLogContent" should "build log using basic content and extra information" in {
-    val buildLogContent = PrivateMethod[String]('buildLogContent)
-    val logger: BaseLogger = GangLogger(isTraceEnabled = true, isDTEnabled = false)
-    val logContent = logger invokePrivate buildLogContent("a msg")
-    logContent should fullyMatch regex """ - [\w._$]+#[\w._$]+ """ + getRB.getString("nth_line").format("""\d+""") + ": a msg"
+  "buildLog" should "build log using basic msg, level and other members" in {
+    val buildLog = PrivateMethod[OneLog]('buildLog)
+    val logger: BaseLogger = GangLogger(isTraceEnabled = true, isDTEnabled = true, isHostnameEnabled = true, logPrefix = Some("a prefix"))
+    val logContent = logger invokePrivate buildLog("a msg", LogLevel.INFO)
+    logContent.toString + "\n" should fullyMatch regex infoLog.format(
+      """ - \S+ - """ + datetimeRe + """ - \S+#\S+ \S+: a prefix - a msg"""
+    )
   }
 
   "log" should "print a log" in {
