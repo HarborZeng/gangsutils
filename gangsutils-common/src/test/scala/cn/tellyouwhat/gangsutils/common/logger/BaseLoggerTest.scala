@@ -7,8 +7,6 @@ import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import java.util.regex.Pattern
-
 class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
 
   before {
@@ -28,7 +26,7 @@ class BaseLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     val logger: BaseLogger = GangLogger(isTraceEnabled = true, isDTEnabled = true, isHostnameEnabled = true, logPrefix = Some("a prefix"))
     val logContent = logger invokePrivate buildLog("a msg", LogLevel.INFO)
     logContent.toString + "\n" should fullyMatch regex infoLog.format(
-      """ - \S+ - """ + datetimeRe + """ - \S+#\S+ \S+: a prefix - a msg"""
+      """ - \S+ - """ + datetimeRe + """ - \S+#\S+ [^:]+: a prefix - a msg"""
     )
   }
 
