@@ -4,6 +4,7 @@ import cn.tellyouwhat.gangsutils.common.exceptions.WrongLogLevelException
 import cn.tellyouwhat.gangsutils.common.gangconstants.{criticalLog_unquote, errorLog_unquote, infoLog_unquote, successLog_unquote, traceLog_unquote, warningLog_unquote}
 import cn.tellyouwhat.gangsutils.common.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.common.helper.chaining.PipeIt
+import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
 
 import java.net.InetAddress
 import java.time.LocalDateTime
@@ -26,7 +27,7 @@ trait BaseLogger {
   /**
    * 默认的日志输出目的地
    */
-  private[logger] implicit val defaultLogDest: Seq[SupportedLogDest.Value] = null
+  private[logger] implicit val defaultLogDest: Seq[SupportedLogDest.Value] = Seq(PRINTLN_LOGGER)
 
   /**
    * 默认的不同的日志输出目的地的级别
