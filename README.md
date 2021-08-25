@@ -1,20 +1,20 @@
 # gangsutils
 
-| __Goal__ | Badges |
-| :--- | :--- |
+| __Goal__                  | Badges                                                       |
+| :------------------------ | :----------------------------------------------------------- |
 | __Packages and Releases__ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils) [![Sonatype Nexus](https://img.shields.io/nexus/r/cn.tellyouwhat/gangsutils?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/releases/cn/tellyouwhat/gangsutils/) |
-| __Java Documentation__ | [![javadoc](https://javadoc.io/badge2/cn.tellyouwhat/gangsutils-common/javadoc.svg)](https://javadoc.io/doc/cn.tellyouwhat/gangsutils-common) |
-| __Build Status__ | [![develop build](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml/badge.svg)](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml) [![master build](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml/badge.svg?branch=master)](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml) |
-| __JaCoCo Test Coverage__ | [![codecov](https://codecov.io/gh/HarborZeng/gangsutils/branch/master/graph/badge.svg?token=MUYXET5V4O)](https://codecov.io/gh/HarborZeng/gangsutils) |
-| __License__ | [![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils?ref=badge_shield) |
+| __Java Documentation__    | [![javadoc](https://javadoc.io/badge2/cn.tellyouwhat/gangsutils-common/javadoc.svg)](https://javadoc.io/doc/cn.tellyouwhat/gangsutils-common) |
+| __Build Status__          | [![develop build](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml/badge.svg)](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml) [![master build](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml/badge.svg?branch=master)](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml) |
+| __JaCoCo Test Coverage__  | [![codecov](https://codecov.io/gh/HarborZeng/gangsutils/branch/master/graph/badge.svg?token=MUYXET5V4O)](https://codecov.io/gh/HarborZeng/gangsutils) |
+| __License__               | [![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils?ref=badge_shield) |
 
 ## Utilities
 
-To use this utils pack right away, add the following dependency to pom.xml or whatever.
+To use this utils pack right away, add the following dependency to pom.xml or other dependencies management tools.
 
-Replace `${gangsutils.version}` to the latest stable version showed above in the Maven Central badge
+Replace `${gangsutils.version}` to the latest stable version showed in the Maven Central badge [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils)
 
-mavem
+maven
 
 ```xml
 <dependency>
@@ -61,7 +61,7 @@ in Chinese
 【信息】 - hostname - 2021-07-20T14:45:20.425 - some.package.name.ClassName$#main第20行: hello world
 ```
 
-Language is based on your system, retrieved by `Locale` default.
+Language is based on your system, retrieved by `Locale` default or you can set
 
 #### Change logger style
 
@@ -115,9 +115,9 @@ To config a logger, you can:
   //set stored logger variable to None
   GangLogger.killLogger()
   ```
-  
+
 2. config when invoking apply
-  
+
   ```scala
   val logger = GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix, isHostnameEnabled)
   ```
@@ -212,6 +212,23 @@ class MyApp {
 ### Helpers
 
 //TODO
+
+## TODO
+
+- [ ] Make I18N private in gangsutils
+- [ ] Change `gangConfig.properties` file name to `gangsutilsConfig.properties` and use yaml instead of properties file
+- [ ] Use system default language and region when `gangsutilsConfig.properties` is overwriten but `default-lang` or `default-region` are missing
+- [ ] Change `sendRequest`  parameter `queryStrings` to `form`
+- [ ] Extract `.replaceAll("""\e\[[\d;]*[^\d;]""", "")` to a method `stripANSIColor`
+- [ ] Change `BaseLogger` `defaultLogDest` to `PRINTLN_LOGGER` to test whether `enabled` parameter works when logger is got by `GangLogger.getLogger`
+- [ ] Separate spark and hadoop tools into separate modules
+- [ ] Extract logger module from common mudule
+- [ ] Use `https://github.com/scoverage/scalac-scoverage-plugin` to increate coverage rate to 100%
+- [ ] Add FileLogger (by date)
+- [ ] Add LogStash(Stream)Logger
+- [ ] Make hostname lazy
+- [ ] Make log a case class containing hostname, datetime, trace, content and etc, serialize it when using(println or send to webhook)
+- [ ] Different log configurations for different logs by default value and config file
 
 ## License
 
