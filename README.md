@@ -220,7 +220,7 @@ class MyApp {
 - [ ] Use yaml instead of properties file for configuration
 - [x] Use system default language and region when `gangsutilsConfig.properties` is overwriten but `default-lang` or `default-region` are missing
 - [x] Change `sendRequest`  parameter `queryStrings` to `form`
-- [ ] Extract `.replaceAll("""\e\[[\d;]*[^\d;]""", "")` to a method `stripANSIColor`
+- [x] Extract `.replaceAll("""\e\[[\d;]*[^\d;]""", "")` to a method `stripANSIColor`
 - [ ] Change `BaseLogger` `defaultLogDest` to `PRINTLN_LOGGER` to test whether `enabled` parameter works when logger is got by `GangLogger.getLogger`
 - [ ] Separate spark and hadoop tools into separate modules
 - [ ] Extract logger module from common mudule

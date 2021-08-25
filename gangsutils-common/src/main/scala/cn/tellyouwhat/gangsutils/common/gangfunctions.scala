@@ -281,4 +281,5 @@ object gangfunctions {
     }
   }
 
+  def stripANSIColor(s: String): String = s.replaceAll("""\e\[[\d;]*[^\d;]""", "")
 }

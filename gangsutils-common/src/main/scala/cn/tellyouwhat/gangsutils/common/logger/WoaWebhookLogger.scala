@@ -1,5 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.gangfunctions.stripANSIColor
 import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
@@ -16,7 +17,7 @@ trait WoaWebhookLogger extends WebhookLogger {
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
     val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
+    val fullLog = addLeadingHead(content, level) |> stripANSIColor
     woaRobotsToSend.map(key =>
       sendRequest(s"https://woa.wps.cn/api/v1/webhook/send?key=$key",
         body = s"""{"msgtype": "text","text": {"content": "$fullLog"}}""")

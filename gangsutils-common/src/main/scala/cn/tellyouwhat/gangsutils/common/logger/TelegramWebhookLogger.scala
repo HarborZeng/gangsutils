@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
+import cn.tellyouwhat.gangsutils.common.gangfunctions.stripANSIColor
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.common.helper.I18N
 
 case class TelegramRobot(chatID: Option[String], token: Option[String])
@@ -14,7 +15,7 @@ trait TelegramWebhookLogger extends WebhookLogger {
   
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
     val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
+    val fullLog = addLeadingHead(content, level) |> stripANSIColor
     telegramRobotsToSend.map(robot => {
       val targetURL = s"https://api.telegram.org/bot${robot.token.get}/sendMessage"
       sendRequest(targetURL, body = s"""{"chat_id": "${robot.chatID.get}", "text": "$fullLog"}""")

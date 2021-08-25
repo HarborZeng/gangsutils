@@ -1,7 +1,8 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
+import cn.tellyouwhat.gangsutils.common.gangfunctions.stripANSIColor
 import cn.tellyouwhat.gangsutils.common.helper.I18N
-import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
+import cn.tellyouwhat.gangsutils.common.helper.chaining.{PipeIt, TapIt}
 
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -18,7 +19,7 @@ trait FeishuWebhookLogger extends WebhookLogger {
 
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
     val content = buildLogContent(msg)
-    val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
+    val fullLog = addLeadingHead(content, level) |> stripANSIColor
     feishuRobotsToSend.map(robot => {
       // feishu use second as timestamp
       val t = Duration.ofMillis(System.currentTimeMillis()).getSeconds
