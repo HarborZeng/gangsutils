@@ -153,7 +153,7 @@ We support
 - [DingTalk(钉钉)](https://www.dingtalk.com/) webhook logger
 - [Slack](https://slack.com/) webhook logger
 - [Telegram](https://telegram.org/) webhook logger
-- [feishu(飞书)](https://www.feishu.cn/) webhook logger
+- [Feishu(飞书)](https://www.feishu.cn/) webhook logger
 - [ServerChan(方糖Server酱)](https://sct.ftqq.com/) webhook logger
 
 It is very simple to use, bear in mind to invoke `XXWebhookLogger.initializeXXWebhook(...)` before you create a new GangLogger instance.
@@ -218,13 +218,13 @@ class MyApp {
 
 - [x] Make I18N private in gangsutils
 - [x] Change `gangConfig.properties` file name to `gangsutilsConfig.properties` 
-- [ ] Use yaml instead of properties file for configuration
-- [x] Use system default language and region when `gangsutilsConfig.properties` is overwriten but `default-lang` or `default-region` are missing
+- [x] Use yaml instead of properties file for configuration
+- [x] Use system default language and region when `gangsutilsConfig.properties` is overwritten but `default-lang` or `default-region` are missing
 - [x] Change `sendRequest`  parameter `queryStrings` to `form`
 - [x] Extract `.replaceAll("""\e\[[\d;]*[^\d;]""", "")` to a method `stripANSIColor`
 - [x] Change `BaseLogger` `defaultLogDest` to `PRINTLN_LOGGER` to test whether `enabled` parameter works when logger is got by `GangLogger.getLogger`
 - [ ] Separate spark and hadoop tools into separate modules
-- [ ] Extract logger module from common mudule
+- [ ] Extract logger module from common module
 - [ ] Use `https://github.com/scoverage/scalac-scoverage-plugin` to increate coverage rate to 100%
 - [ ] Add FileLogger (by date)
 - [ ] Add LogStash(Stream)Logger
