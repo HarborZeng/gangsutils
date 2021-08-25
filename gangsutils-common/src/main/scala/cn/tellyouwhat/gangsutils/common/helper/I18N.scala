@@ -1,7 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.helper
 
 import cn.tellyouwhat.gangsutils.common.helper.ConfigReader.getGangConfig
-import cn.tellyouwhat.gangsutils.common.helper.chaining.TapIt
 
 import java.util.{Locale, ResourceBundle}
 
@@ -11,8 +10,16 @@ private[gangsutils] object I18N {
   def getRB: ResourceBundle = {
     rbo match {
       case Some(rb) => rb
-      case None => ResourceBundle.getBundle("gangsutils",
-        new Locale(getGangConfig("default-lang"), getGangConfig("default-region"))) |! (rb => rbo = Some(rb))
+      case None =>
+        val rb = if (getGangConfig.contains("default-lang") && getGangConfig.contains("default-region")) {
+          val defaultLang = getGangConfig("default-lang")
+          val defaultRegion = getGangConfig("default-region")
+          ResourceBundle.getBundle("gangsutils", new Locale(defaultLang, defaultRegion))
+        } else {
+          ResourceBundle.getBundle("gangsutils")
+        }
+        rbo = Some(rb)
+        rb
     }
   }
 }
