@@ -12,7 +12,7 @@ object ConfigReader {
     gangConfig match {
       case Some(m) => m
       case None =>
-        val stream = getClass.getResourceAsStream("/gangConfig.properties")
+        val stream = getClass.getResourceAsStream("/gangsutilsConfig.properties")
         val properties = new Properties() |! (_.load(stream))
         stream.close()
         properties.asScala.toMap |! (p => gangConfig = Some(p))
