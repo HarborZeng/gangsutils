@@ -227,7 +227,7 @@ class MyApp {
 - [ ] Use `https://github.com/scoverage/scalac-scoverage-plugin` to increate coverage rate to 100%
 - [ ] Add FileLogger (by date)
 - [ ] Add LogStash(Stream)Logger
-- [ ] Make hostname lazy
+- [x] Make hostname lazy
 - [ ] Make log a case class containing hostname, datetime, trace, content and etc, serialize it when using(println or send to webhook)
 - [ ] Different log configurations for different logs by default value and config file
 

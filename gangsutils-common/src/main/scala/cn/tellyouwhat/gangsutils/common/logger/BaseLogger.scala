@@ -39,7 +39,7 @@ trait BaseLogger {
    */
   private[logger] val logPrefix: String = ""
 
-  private[logger] val hostname: String = InetAddress.getLocalHost.getHostName
+  private[logger] lazy val hostname: String = InetAddress.getLocalHost.getHostName
 
   private[logger] val isHostnameEnabled: Boolean = true
 
