@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.common.logger
 
-import cn.tellyouwhat.gangsutils.common.exceptions.WrongHttpMethodException
+import cn.tellyouwhat.gangsutils.common.exceptions.{GangException, WrongHttpMethodException}
 import cn.tellyouwhat.gangsutils.common.helper.I18N
 import cn.tellyouwhat.gangsutils.common.logger.SupportedLogDest.PRINTLN_LOGGER
 import scalaj.http.Http
@@ -53,6 +53,9 @@ trait WebhookLogger extends BaseLogger {
     ).exists(response.body.contains)) {
       GangLogger.getLogger.critical(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))(enabled = Seq(PRINTLN_LOGGER))
       return false
+    }
+    if (response.isError) {
+      GangLogger.getLogger.critical(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}"))(enabled = Seq(PRINTLN_LOGGER))
     }
     response.isSuccess
   }
