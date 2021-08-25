@@ -129,7 +129,8 @@ There are **6 levels** in this util pack, trace、info、success、warning、err
 Other than pre-config log destination, you can set the-log-level log destination by `enabled` parameter, like
 
 ```scala
-logger.info("hello world")(enabled = Seq(SupportedLogDest.PRINTLN_LOGGER)) // means whatever destination you configured at before, this one log will be sent to parameter enabled specified destination.
+// means whatever destination you configured at before, this one log will be sent to parameter enabled specified destination.
+logger.info("hello world")(enabled = Seq(SupportedLogDest.PRINTLN_LOGGER))
 ```
 
 ```scala
