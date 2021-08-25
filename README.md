@@ -155,7 +155,7 @@ eg:
 ```scala
 SlackWebhookLogger.initializeSlackUrls(slackWebhookURL)
 val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SLACK_WEBHOOK_LOGGER))
-Try(logger.info("slack webhook logger send a log into slack with correct url")) match {
+retry(2)(logger.info("slack webhook logger send a log into slack with correct url")) match {
   case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
   case Success(v) => v shouldBe true
 }
