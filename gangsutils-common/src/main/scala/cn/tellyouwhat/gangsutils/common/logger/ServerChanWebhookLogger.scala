@@ -16,7 +16,7 @@ trait ServerChanWebhookLogger extends WebhookLogger {
     val fullLog = addLeadingHead(content, level).replaceAll("""\e\[[\d;]*[^\d;]""", "")
     serverChanRobotsToSend.map(key =>
       sendRequest(s"https://sctapi.ftqq.com/$key.send",
-        queryStrings = Seq(
+        form = Seq(
           ("title", URLEncoder.encode(content.stripPrefix(" - "), "UTF-8")),
           ("desp", URLEncoder.encode(fullLog, "UTF-8")),
         ))

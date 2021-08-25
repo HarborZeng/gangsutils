@@ -25,19 +25,19 @@ trait WebhookLogger extends BaseLogger {
    * @param method    请求的动词
    * @param body      请求带上的内容
    */
-  protected def sendRequest(targetURL: String, method: String = "POST", body: String = "", queryStrings: Seq[(String, String)] = Seq.empty[(String, String)]): Boolean = {
+  protected def sendRequest(targetURL: String, method: String = "POST", body: String = "", form: Seq[(String, String)] = Seq.empty[(String, String)]): Boolean = {
     val response = if (method == "POST") {
-      if (body.isEmpty && queryStrings.nonEmpty) {
+      if (body.isEmpty && form.nonEmpty) {
         Http(targetURL)
-          .postForm(queryStrings)
+          .postForm(form)
           .asString
-      } else if (body.nonEmpty && queryStrings.isEmpty) {
+      } else if (body.nonEmpty && form.isEmpty) {
         Http(targetURL)
           .header("Content-Type", "application/json")
           .postData(body)
           .asString
       } else {
-        throw new IllegalArgumentException(s"body $body, queryStrings $queryStrings, they can not be empty or non-empty at the same time.")
+        throw new IllegalArgumentException(s"body $body, queryStrings $form, they can not be empty or non-empty at the same time.")
       }
     } else if (method == "GET") {
       Http(targetURL)
