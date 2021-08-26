@@ -18,6 +18,8 @@ private[gangsutils] object I18N {
             val locale = Locale.getDefault()
             if (locale.getCountry == "TW" || locale.getCountry == "HK" || locale.getCountry == "MO") {
               "zh-hant"
+            } else if (locale.getCountry == "CN" || locale.getCountry == "SG" || locale.getCountry == "MY") {
+              "zh-hans"
             } else {
               locale.getLanguage
             }
