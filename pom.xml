@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 
     <description>scala spark utils pack</description>
 
@@ -32,10 +32,12 @@
         </license>
     </licenses>
 
-
     <modules>
-        <module>gangsutils-common</module>
-        <module>gangsutils-useless</module>
+        <module>gangsutils-all</module>
+        <module>gangsutils-core</module>
+        <module>gangsutils-spark</module>
+        <module>gangsutils-hadoop</module>
+        <module>gangsutils-logger</module>
     </modules>
 
     <properties>
@@ -44,30 +46,50 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spark.version>3.1.2</spark.version>
-        <scala.version>2.12</scala.version>
-        <scala.fullversion>2.12.14</scala.fullversion>
+        <scala.minorVersion>2.12</scala.minorVersion>
+        <scala.version>2.12.14</scala.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
-                <artifactId>gangsutils-common</artifactId>
-                <version>0.4.1</version>
+                <artifactId>gangsutils-core</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.tellyouwhat</groupId>
+                <artifactId>gangsutils-logger</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.tellyouwhat</groupId>
+                <artifactId>gangsutils-spark</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.tellyouwhat</groupId>
+                <artifactId>gangsutils-hadoop</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.tellyouwhat</groupId>
+                <artifactId>gangsutils-all</artifactId>
+                <version>0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_${scala.version}</artifactId>
+                <artifactId>spark-core_${scala.minorVersion}</artifactId>
                 <version>3.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_${scala.version}</artifactId>
+                <artifactId>spark-sql_${scala.minorVersion}</artifactId>
                 <version>3.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.scalaj</groupId>
-                <artifactId>scalaj-http_${scala.version}</artifactId>
+                <artifactId>scalaj-http_${scala.minorVersion}</artifactId>
                 <version>2.4.2</version>
             </dependency>
             <dependency>
@@ -77,13 +99,18 @@
             </dependency>
             <dependency>
                 <groupId>io.circe</groupId>
-                <artifactId>circe-parser_2.12</artifactId>
+                <artifactId>circe-parser_${scala.minorVersion}</artifactId>
                 <version>0.14.1</version>
             </dependency>
             <dependency>
                 <groupId>io.circe</groupId>
-                <artifactId>circe-yaml_2.12</artifactId>
+                <artifactId>circe-yaml_${scala.minorVersion}</artifactId>
                 <version>0.14.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.15</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -92,25 +119,30 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>${scala.fullversion}</version>
+            <version>${scala.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.version}</artifactId>
+            <artifactId>scalactic_${scala.minorVersion}</artifactId>
             <version>3.2.9</version>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.version}</artifactId>
+            <artifactId>scalatest_${scala.minorVersion}</artifactId>
             <version>3.2.9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest-flatspec_${scala.version}</artifactId>
+            <artifactId>scalatest-flatspec_${scala.minorVersion}</artifactId>
             <version>3.2.9</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-scala-scalatest_${scala.minorVersion}</artifactId>
+            <version>1.16.37</version>
         </dependency>
     </dependencies>
 
@@ -185,7 +217,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scalaVersion>${scala.fullversion}</scalaVersion>
+                    <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>
             <plugin>
@@ -234,6 +266,7 @@
                 <configuration>
                     <excludes>
                         <exclude>cn/tellyouwhat/gangsutils/useless/**/*</exclude>
+                        <exclude>cn/tellyouwhat/gangsutils/core/constants?.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
