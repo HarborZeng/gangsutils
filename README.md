@@ -82,6 +82,8 @@ implementation 'cn.tellyouwhat:gangsutils-all:${gangsutils.version}'
 
 ### logger
 
+If you just want logger, add only `gangsutils-logger` dependency.
+
 #### Quick Start
 
 ```scala
@@ -258,17 +260,46 @@ object MyApp {
 【信息】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 123
 【成功】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 完成任务，耗时0s
 ```
-![](https://tellyouwhat-static-1251995834.cos.ap-chongqing.myqcloud.com/images/1626764634649.png)
 
-![](https://tellyouwhat-static-1251995834.cos.ap-chongqing.myqcloud.com/images/1626764641914.png)
+In this example, we used `cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}` to implement an AOP logger to calculate the start and end(success or failure) of a function. You can use it too.
 
-### GangFunctions
+Just extends your class from `Timeit` and implement `run` method, and new your class with `TimeitLogger` to get aspect delegated.
 
-//TODO
+### functions and helpers
 
-### Helpers
+If you just want functions and helpers which do not involve spark and hadoop, add only `gangsutils-core` dependency.
 
-//TODO
+#### constants
+
+There are a lot of strings, used to build log content and test.
+
+#### functions
+
+These functions could be useful in you are coding in Scala, see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-core/src/test/scala/cn/tellyouwhat/gangsutils/core/funcsTest.scala> test case for use case.
+
+#### helpers
+
+There are a few helpers, like `ConfigReader`, `I18N`(internal use only) and `chaining`.
+
+`chaining` is a good implicit object that can help you write scala code with less `val`s and `var`s.
+
+It implements `tap` and `pipe` like in unix terminal system.
+
+You can refer to <https://alvinalexander.com/scala/scala-2.13-pipe-tap-chaining-operations/> for example.
+
+PS: Implementation in `chaining` is `|!` for `tap` and `|>` for `pipe`
+
+eg,
+
+<https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-core/src/main/scala/cn/tellyouwhat/gangsutils/core/helper/chaining.scala>
+
+### spark functions
+
+If you just want functions and helpers which is spark related, add only `gangsutils-spark` dependency.
+
+Spark function.
+
+see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-spark/src/test/scala/cn/tellyouwhat/gangsutils/spark/funcsTest.scala> for use cases.
 
 ## TODO
 
@@ -283,7 +314,6 @@ object MyApp {
   got by `GangLogger.getLogger`
 - [x] Separate spark and hadoop tools into separate modules
 - [x] Extract logger module from common module
-- [ ] Use <https://github.com/scoverage/scalac-scoverage-plugin> to increate coverage rate to 100%
 - [ ] Add FileLogger (by date)
 - [ ] Add LogStash(Stream)Logger
 - [x] Make hostname lazy
