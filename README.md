@@ -15,27 +15,69 @@ To use this utils pack right away, add the following dependency to pom.xml or ot
 Replace `${gangsutils.version}` to the latest stable version showed in the Maven Central
 badge [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils)
 
-maven
+**Maven**
 
 ```xml
-
 <dependency>
     <groupId>cn.tellyouwhat</groupId>
-    <artifactId>gangsutils-common</artifactId>
+    <artifactId>gangsutils-logger</artifactId>
+    <version>${gangsutils.version}</version>
+</dependency>
+<dependency>
+    <groupId>cn.tellyouwhat</groupId>
+    <artifactId>gangsutils-spark</artifactId>
+    <version>${gangsutils.version}</version>
+</dependency>
+<dependency>
+    <groupId>cn.tellyouwhat</groupId>
+    <artifactId>gangsutils-hadoop</artifactId>
+    <version>${gangsutils.version}</version>
+</dependency>
+<dependency>
+    <groupId>cn.tellyouwhat</groupId>
+    <artifactId>gangsutils-core</artifactId>
     <version>${gangsutils.version}</version>
 </dependency>
 ```
 
-sbt
+or import all by
 
-```scala
-libraryDependencies += "cn.tellyouwhat" % "gangsutils-common" % "${gangsutils.version}"
+```xml
+<dependency>
+    <groupId>cn.tellyouwhat</groupId>
+    <artifactId>gangsutils-all</artifactId>
+    <version>${gangsutils.version}</version>
+</dependency>
 ```
 
-gradle
+**SBT**
+
+```scala
+libraryDependencies += "cn.tellyouwhat" % "gangsutils-logger" % "${gangsutils.version}"
+libraryDependencies += "cn.tellyouwhat" % "gangsutils-spark" % "${gangsutils.version}"
+libraryDependencies += "cn.tellyouwhat" % "gangsutils-hadoop" % "${gangsutils.version}"
+libraryDependencies += "cn.tellyouwhat" % "gangsutils-core" % "${gangsutils.version}"
+```
+
+or import all by
+
+```scala
+libraryDependencies += "cn.tellyouwhat" % "gangsutils-all" % "${gangsutils.version}"
+```
+
+**Gradle**
 
 ```groovy
-implementation 'cn.tellyouwhat:gangsutils-common:${gangsutils.version}'
+implementation 'cn.tellyouwhat:gangsutils-logger:${gangsutils.version}'
+implementation 'cn.tellyouwhat:gangsutils-spark:${gangsutils.version}'
+implementation 'cn.tellyouwhat:gangsutils-hadoop:${gangsutils.version}'
+implementation 'cn.tellyouwhat:gangsutils-core:${gangsutils.version}'
+```
+
+or import all by
+
+```groovy
+implementation 'cn.tellyouwhat:gangsutils-all:${gangsutils.version}'
 ```
 
 ### logger
@@ -57,13 +99,13 @@ in English
 
 or
 
-in Chinese
-
 ```
 【信息】 - hostname - 2021-07-20T14:45:20.425 - some.package.name.ClassName$#main第20行: hello world
 ```
 
-Language is based on your system, retrieved by `Locale` default or you can set
+in Chinese
+
+Language is based on your system, retrieved by `Locale` default or you can set in the configuration file
 
 #### Change logger style
 
@@ -179,34 +221,43 @@ test <https://github.com/HarborZeng/gangsutils/tree/master/gangsutils-common/src
 #### Full example
 
 ```scala
-object MyApp {
-  private var logger: GeneLogger = _
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.PRINTLN_LOGGER
+import cn.tellyouwhat.gangsutils.logger.{GangLogger, LogLevel, Logger}
+import cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}
 
-  private def apply() = new MyApp
+class MyApp extends Timeit {
+
+  private val logger: Logger = MyApp.logger
+
+  override def run(desc: String): Unit = {
+    logger.info("123")
+  }
+
+}
+
+object MyApp {
+
+  private implicit var logger: Logger = _
 
   def main(args: Array[String]): Unit = {
-    WoaWebhookLogger.initializeWoaWebhook("6260xxxxxxxxxxxxxxxe1")
-    GeneLogger.enableTrace()
-    GeneLogger.disableDateTime()
-    GeneLogger.enableHostname()
-    GeneLogger.setDefaultLogDest(Seq(SupportedLogDest.PRINTLN_LOGGER, SupportedLogDest.WOA_WEBHOOK_LOGGER))
-    logger = GeneLogger()
+    GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE))
+    GangLogger.disableTrace()
+    logger = GangLogger(isTraceEnabled = true)
+    logger.trace("tracing")
 
     MyApp().run()
   }
-}
 
-class MyApp {
-  private val logger: GeneLogger = MyApp.logger
-
-  def run(): Unit = {
-    logger.info("hello woa webhook", Seq(SupportedLogDest.WOA_WEBHOOK_LOGGER))
-    logger.info("hello println", Seq(SupportedLogDest.PRINTLN_LOGGER))
-    logger.error("hello default")
-  }
+  def apply(): MyApp = new MyApp() with TimeitLogger
 }
 ```
 
+```
+【跟踪】 - GANG-PC - 2021-08-27T13:11:19.549114400 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: tracing
+【跟踪】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 开始任务
+【信息】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 123
+【成功】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 完成任务，耗时0s
+```
 ![](https://tellyouwhat-static-1251995834.cos.ap-chongqing.myqcloud.com/images/1626764634649.png)
 
 ![](https://tellyouwhat-static-1251995834.cos.ap-chongqing.myqcloud.com/images/1626764641914.png)
