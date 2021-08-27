@@ -266,7 +266,7 @@
                 <configuration>
                     <excludes>
                         <exclude>cn/tellyouwhat/gangsutils/useless/**/*</exclude>
-                        <exclude>cn/tellyouwhat/gangsutils/core/constants.scala</exclude>
+                        <exclude>cn/tellyouwhat/gangsutils/core/constants?.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
