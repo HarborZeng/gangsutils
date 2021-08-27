@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.logger.cc.TelegramRobot
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
@@ -26,6 +27,8 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("abc,def")
     an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("abc;123,def")
     an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("abc")
+    TelegramWebhookLogger.initializeTelegramWebhook("abc;123,def;234")
+    GangLogger().telegramRobotsToSend should contain theSameElementsAs Seq(TelegramRobot(Some("abc"), Some("123")), TelegramRobot(Some("def"), Some("234")))
   }
 
   it should "initializeTelegramWebhook(robotsChatIdsTokens: Array[Array[String]])" in {

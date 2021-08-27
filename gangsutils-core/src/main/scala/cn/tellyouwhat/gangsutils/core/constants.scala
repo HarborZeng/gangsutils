@@ -10,13 +10,13 @@ object constants {
   /**
    * unquote square brackets for println
    */
-  private val leftSB_unquote: String = getRB.getString("left_square_bracket")
-  private val rightSB_unquote: String = getRB.getString("right_square_bracket")
+  val leftSB_unquote: String = getRB.getString("left_square_bracket")
+  val rightSB_unquote: String = getRB.getString("right_square_bracket")
   /**
    * quoted square brackets for regex match
    */
-  private val leftSB: String = Pattern.quote(leftSB_unquote)
-  private val rightSB: String = Pattern.quote(rightSB_unquote)
+  val leftSB: String = Pattern.quote(leftSB_unquote)
+  val rightSB: String = Pattern.quote(rightSB_unquote)
 
   /**
    * heads with quote square bracket for regex match

@@ -1,13 +1,14 @@
 package cn.tellyouwhat.gangsutils.core
 
 import cn.tellyouwhat.gangsutils.core.cc.Mappable
-import cn.tellyouwhat.gangsutils.core.constants.errorLog
 import cn.tellyouwhat.gangsutils.core.helper.I18N.getRB
+import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 
 import java.io.ByteArrayOutputStream
+import scala.Console.RED
 import scala.util.{Failure, Success}
 
 class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
@@ -89,6 +90,7 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
                          v: Option[BigInt],
                          map: Map[String, Double],
                        ) extends Mappable
+    case class EntitySimple(v: String) extends Mappable
     case class EntityOut(
                           str: String,
                           bool: Boolean,
@@ -104,7 +106,11 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
                           ssa: Array[String],
                           sm: Seq[Map[String, Int]],
                           v: Option[BigInt],
+                          v2: Option[EntitySimple],
                           map: Map[String, Double],
+                          ssm: List[EntitySimple],
+                          sse: List[String],
+                          om: Option[EntitySimple],
                           cc: EntityIn,
                         ) extends Mappable
     val in: EntityIn = EntityIn(
@@ -139,11 +145,15 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
       ssa = Array("c", "d"),
       sm = Seq(Map("a" -> 2, "b" -> 3)),
       v = Some(10),
+      v2 = None,
       map = Map("c" -> 0.4d, "d" -> 0.5d),
+      ssm = List(EntitySimple("simple1"), EntitySimple("simple2")),
+      sse = List.empty[String],
+      om = Some(EntitySimple("oooommmm")),
       cc = in
     )
     val map = funcs.ccToMap(out)
-    map should have size 16
+    map should have size 20
     map("str") shouldBe "some string"
     map("bool") shouldBe true
     map("int") shouldBe 2
@@ -162,9 +172,13 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
     stringToInt should have size 2
     stringToInt should contain allOf("a" -> 2, "b" -> 3)
     map("v") shouldBe 10
+    map("v2").asInstanceOf[EntitySimple] should be (null)
     val stringToDouble = map("map").asInstanceOf[Map[String, Double]]
     stringToDouble should have size 2
     stringToDouble should contain allOf("c" -> 0.4d, "d" -> 0.5d)
+    map("ssm").asInstanceOf[List[EntitySimple]] should contain theSameElementsAs List(EntitySimple("simple1"), EntitySimple("simple2"))
+    map("sse").asInstanceOf[List[String]] should have size 0
+    map("om").asInstanceOf[Map[String, String]].toSeq should contain theSameElementsAs Seq("v" -> "oooommmm")
     val inMap = map("cc").asInstanceOf[Map[String, Any]]
     inMap should have size 15
     inMap("str") shouldBe "some string"
@@ -207,5 +221,15 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
     stream.toString() should fullyMatch regex
       getRB.getString("retry.failure").format(2, "java.lang.ArithmeticException: / by zero") + """\s+""" +
         getRB.getString("retry.failure").format(1, "java.lang.ArithmeticException: / by zero") + """\s+"""
+  }
+
+  "stripANSIColor" should "strip ANSI characters from a string" in {
+    RED |> funcs.stripANSIColor shouldBe ""
+  }
+
+  "calcExecDuration" should "calculate the duration between two millis timestamp" in {
+    val t0 = 1630078401328L
+    val t1 = 1630078402328L
+    funcs.calcExecDuration(t0, t1) shouldBe "1s"
   }
 }

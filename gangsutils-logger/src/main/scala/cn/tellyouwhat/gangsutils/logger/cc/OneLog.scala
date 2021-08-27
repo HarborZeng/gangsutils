@@ -72,7 +72,7 @@ case class OneLog(
         case LogLevel.CRITICAL => criticalLog_unquote.format(content)
         case _ => throw WrongLogLevelException(s"Unknown log level: $value")
       }
-      case None => throw WrongLogLevelException(s"Empty log level")
+      case None => throw WrongLogLevelException("Empty log level")
     }
   }
 }

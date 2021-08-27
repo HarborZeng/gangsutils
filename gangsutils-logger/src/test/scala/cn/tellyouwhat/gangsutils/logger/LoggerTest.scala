@@ -2,6 +2,7 @@ package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.core.constants.{datetimeRe, infoLog}
 import cn.tellyouwhat.gangsutils.logger.cc.OneLog
+import cn.tellyouwhat.gangsutils.logger.exceptions.WrongLogLevelException
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
@@ -29,6 +30,17 @@ class LoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with
     logContent.toString + "\n" should fullyMatch regex infoLog.format(
       """ - \S+ - """ + datetimeRe + """ - \S+#\S+ [^:]+: a prefix - a msg"""
     )
+  }
+
+  it should "not build log using None level" in {
+    the[WrongLogLevelException] thrownBy {
+      OneLog(level = None, hostname = None, datetime = None, className = None, methodName = None, lineNumber = None, prefix = None, msg = Some("msg")).toString
+    } should have message "Empty log level"
+  }
+
+  it should "build a log with no msg" in {
+    val logContent = OneLog(level = Some(LogLevel.INFO), hostname = None, datetime = None, className = None, methodName = None, lineNumber = None, prefix = None, msg = None).toString
+    logContent + "\n" should fullyMatch regex infoLog.format(": ")
   }
 
   "log" should "print a log" in {

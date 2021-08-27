@@ -16,7 +16,8 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
   val workingDirectory: Path = {
     val getFS = PrivateMethod[FileSystem]('getFS)
     val fs = funcs invokePrivate getFS(spark)
-    fs.getWorkingDirectory
+    val wd = fs.getWorkingDirectory
+    if (wd.toString.endsWith("-spark")) wd else wd.suffix("/gangsutils-spark")
   }
 
   val sparkJobDirPath = new Path(workingDirectory, "src/test/resources/spark_job_dir")

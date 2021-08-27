@@ -17,16 +17,17 @@ private[gangsutils] object I18N {
           case Left(e) =>
             println(s"key logger.lang was not found in config file: $e")
             val locale = Locale.getDefault()
-            if (locale.getCountry == "TW" || locale.getCountry == "HK" || locale.getCountry == "MO") {
+            if (locale.getCountry == "TW" || locale.getCountry == "HK" || locale.getCountry == "MO")
               "zh-hant"
-            } else if (locale.getCountry == "CN" || locale.getCountry == "SG" || locale.getCountry == "MY") {
+            else if (locale.getCountry == "CN" || locale.getCountry == "SG" || locale.getCountry == "MY")
               "zh-hans"
-            } else {
+            else
               locale.getLanguage
-            }
           case Right(value) => value
         }
         ResourceBundle.getBundle("gangsutils", new Locale(lang)) |! (rb => rbo = Some(rb))
     }
   }
+
+  def clearRB(): Unit = rbo = None
 }
