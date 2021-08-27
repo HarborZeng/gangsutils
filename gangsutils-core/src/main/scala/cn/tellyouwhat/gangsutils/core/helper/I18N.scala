@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.core.helper
 
 import cn.tellyouwhat.gangsutils.core.helper.ConfigReader.getGangYamlConfig
+import cn.tellyouwhat.gangsutils.core.helper.chaining.TapIt
 
 import java.util.{Locale, ResourceBundle}
 
@@ -25,9 +26,7 @@ private[gangsutils] object I18N {
             }
           case Right(value) => value
         }
-        val rb = ResourceBundle.getBundle("gangsutils", new Locale(lang))
-        rbo = Some(rb)
-        rb
+        ResourceBundle.getBundle("gangsutils", new Locale(lang)) |! (rb => rbo = Some(rb))
     }
   }
 }
