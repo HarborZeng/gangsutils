@@ -20,8 +20,7 @@ object ConfigReader {
       case Some(m) => m
       case None =>
         val stream = getClass.getResourceAsStream("/gangsutilsConfig.properties")
-        val properties = new Properties() |! (_.load(stream))
-        stream.close()
+        val properties = new Properties() |! (_.load(stream)) |! (_ => stream.close())
         properties.asScala.toMap |! (p => gangPropertiesConfig = Some(p))
     }
   }
@@ -31,7 +30,7 @@ object ConfigReader {
       case Some(m) => m
       case None =>
         val stream = getClass.getResourceAsStream("/gangsutilsConfig.yaml")
-        new InputStreamReader(stream) |> yamlParse match {
+        new InputStreamReader(stream) |> yamlParse |! (_ => stream.close()) match {
           case Left(e) => throw e
           case Right(value) => value |! (p => gangYamlConfig = Some(p))
         }
@@ -44,7 +43,7 @@ object ConfigReader {
       case Some(m) => m
       case None =>
         val stream = getClass.getResourceAsStream("/gangsutilsConfig.json")
-        new String(stream.readAllBytes()) |> jsonParse match {
+        new String(stream.readAllBytes()) |> jsonParse |! (_ => stream.close()) match {
           case Left(e) => throw e
           case Right(value) => value |! (p => gangJsonConfig = Some(p))
         }
