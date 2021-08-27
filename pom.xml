@@ -46,8 +46,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spark.version>3.1.2</spark.version>
-        <scala.version>2.12</scala.version>
-        <scala.fullversion>2.12.14</scala.fullversion>
+        <scala.minorVersion>2.12</scala.minorVersion>
+        <scala.version>2.12.14</scala.version>
     </properties>
 
     <dependencyManagement>
@@ -79,17 +79,17 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_${scala.version}</artifactId>
+                <artifactId>spark-core_${scala.minorVersion}</artifactId>
                 <version>3.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_${scala.version}</artifactId>
+                <artifactId>spark-sql_${scala.minorVersion}</artifactId>
                 <version>3.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.scalaj</groupId>
-                <artifactId>scalaj-http_${scala.version}</artifactId>
+                <artifactId>scalaj-http_${scala.minorVersion}</artifactId>
                 <version>2.4.2</version>
             </dependency>
             <dependency>
@@ -99,12 +99,12 @@
             </dependency>
             <dependency>
                 <groupId>io.circe</groupId>
-                <artifactId>circe-parser_2.12</artifactId>
+                <artifactId>circe-parser_${scala.minorVersion}</artifactId>
                 <version>0.14.1</version>
             </dependency>
             <dependency>
                 <groupId>io.circe</groupId>
-                <artifactId>circe-yaml_2.12</artifactId>
+                <artifactId>circe-yaml_${scala.minorVersion}</artifactId>
                 <version>0.14.1</version>
             </dependency>
             <dependency>
@@ -119,23 +119,23 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>${scala.fullversion}</version>
+            <version>${scala.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.version}</artifactId>
+            <artifactId>scalactic_${scala.minorVersion}</artifactId>
             <version>3.2.9</version>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.version}</artifactId>
+            <artifactId>scalatest_${scala.minorVersion}</artifactId>
             <version>3.2.9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest-flatspec_${scala.version}</artifactId>
+            <artifactId>scalatest-flatspec_${scala.minorVersion}</artifactId>
             <version>3.2.9</version>
             <scope>test</scope>
         </dependency>
@@ -212,7 +212,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scalaVersion>${scala.fullversion}</scalaVersion>
+                    <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>
             <plugin>

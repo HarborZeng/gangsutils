@@ -14,11 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-parser_2.12</artifactId>
+            <artifactId>circe-parser_${scala.minorVersion}</artifactId>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-yaml_2.12</artifactId>
+            <artifactId>circe-yaml_${scala.minorVersion}</artifactId>
         </dependency>
     </dependencies>
 </project>

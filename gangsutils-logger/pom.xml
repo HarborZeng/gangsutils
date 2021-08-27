@@ -14,7 +14,7 @@
 
         <dependency>
             <groupId>org.scalaj</groupId>
-            <artifactId>scalaj-http_${scala.version}</artifactId>
+            <artifactId>scalaj-http_${scala.minorVersion}</artifactId>
         </dependency>
         <dependency>
             <groupId>cn.tellyouwhat</groupId>
