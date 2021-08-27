@@ -11,9 +11,9 @@ import scala.collection.JavaConverters._
 
 object ConfigReader {
 
-  private var gangPropertiesConfig: Option[Map[String, String]] = None
-  private var gangYamlConfig: Option[Json] = None
-  private var gangJsonConfig: Option[Json] = None
+  private[helper] var gangPropertiesConfig: Option[Map[String, String]] = None
+  private[helper] var gangYamlConfig: Option[Json] = None
+  private[helper] var gangJsonConfig: Option[Json] = None
 
   def getGangPropertiesConfig: Map[String, String] = {
     gangPropertiesConfig match {
