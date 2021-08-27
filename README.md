@@ -85,7 +85,7 @@ implementation 'cn.tellyouwhat:gangsutils-all:${gangsutils.version}'
 #### Quick Start
 
 ```scala
-val logger = GeneLogger()
+val logger = GangLogger()
 logger.info("hello world")
 ```
 
@@ -179,7 +179,7 @@ logger.info("hello world")(enabled = Seq(SupportedLogDest.PRINTLN_LOGGER))
 ```
 
 ```scala
-logger = GeneLogger()
+logger = GangLogger()
 logger.trace("012")
 logger.success("012")
 logger.info("123")
