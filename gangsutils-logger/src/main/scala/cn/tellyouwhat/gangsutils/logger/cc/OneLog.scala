@@ -16,7 +16,8 @@ case class OneLog(
                    prefix: Option[String],
                    msg: Option[String],
                  ) {
-  override def toString: String = {
+
+  def toStandardLogString: String = {
     val sb = StringBuilder.newBuilder
     hostname match {
       case Some(value) =>
@@ -75,4 +76,6 @@ case class OneLog(
       case None => throw WrongLogLevelException("Empty log level")
     }
   }
+
+  override def toString: String = toStandardLogString
 }
