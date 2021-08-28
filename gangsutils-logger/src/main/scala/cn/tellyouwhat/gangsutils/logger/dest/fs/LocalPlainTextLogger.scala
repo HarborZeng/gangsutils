@@ -5,8 +5,9 @@ import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.logger.LogLevel
 
 trait LocalPlainTextLogger extends LocalFileLogger{
-  override protected def fileLog(msg: String, level: LogLevel.Value): Boolean =
+  override protected def fileLog(msg: String, level: LogLevel.Value): Boolean = {
     buildLog(msg, level).toStandardLogString |> stripANSIColor |> writeString
+  }
 }
 
 object LocalPlainTextLogger {

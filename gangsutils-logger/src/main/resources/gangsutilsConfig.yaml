@@ -3,4 +3,4 @@ logger:
   timeZone: "+8"
   fs:
     localFile:
-      blockSize: 8388 # 8M
+      blockSize: 8388608 # 8M

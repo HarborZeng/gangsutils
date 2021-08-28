@@ -14,7 +14,7 @@ class LocalPlainTextLoggerTest extends AnyFlatSpec with Matchers {
   behavior of "LocalPlainTextLoggerTest"
 
   "setLogSavePath" should "set log save path" in {
-    val path = "path/to/log.txt"
+    val path = "/path/to/log.txt"
     LocalPlainTextLogger.setLogSavePath(path)
     GangLogger().logSavePath shouldBe Paths.get(path)
   }
@@ -23,16 +23,15 @@ class LocalPlainTextLoggerTest extends AnyFlatSpec with Matchers {
     val path = "loglog/1.txt"
     LocalPlainTextLogger.setLogSavePath(path)
     GangLogger.setDefaultLogDest(SupportedLogDest.LOCAL_PLAIN_TEXT_LOGGER :: Nil)
-    GangLogger.enableTrace()
-    GangLogger.enableDateTime()
-    GangLogger.enableHostname()
+    GangLogger.disableDateTime()
+    GangLogger.disableHostname()
     val logger = GangLogger()
-    200000 times logger.info("hello fs")
-//    val source = Source.fromFile(path, "UTF-8")
-//    source.mkString should fullyMatch regex (infoHead_unquote + ": hello fs\\s+") * 20
-//    source.close()
-//    Files.delete(Paths.get(path))
-//    Files.delete(Paths.get(path).getParent)
+    20 times logger.info("hello fs")
+    val source = Source.fromFile(path, "UTF-8")
+    source.mkString should fullyMatch regex (infoHead_unquote + ": hello fs\\s+") * 20
+    source.close()
+    Files.delete(Paths.get(path))
+    Files.delete(Paths.get(path).getParent)
   }
 
 }
