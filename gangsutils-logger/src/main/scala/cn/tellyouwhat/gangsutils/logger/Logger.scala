@@ -140,4 +140,6 @@ trait Logger {
    */
   protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean
 
+  protected def checkPrerequisite(): Unit
+
 }

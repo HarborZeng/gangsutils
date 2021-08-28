@@ -62,6 +62,4 @@ trait WebhookLogger extends Logger {
     response.isSuccess
   }
 
-  protected def checkPrerequisite(): Unit
-
 }

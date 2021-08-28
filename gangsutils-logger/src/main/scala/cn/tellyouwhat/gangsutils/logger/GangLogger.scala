@@ -4,6 +4,7 @@ import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.SupportedLogDest._
 import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
+import cn.tellyouwhat.gangsutils.logger.dest.fs.LocalPlainTextLogger
 import cn.tellyouwhat.gangsutils.logger.dest.webhook._
 import cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException
 
@@ -18,7 +19,7 @@ protected class GangLogger(
                             override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
                             override val logPrefix: Option[String] = GangLogger.logPrefix,
                             override val isHostnameEnabled: Boolean = GangLogger.isHostnameEnabled,
-                          ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger with DingTalkWebhookLogger with ServerChanWebhookLogger with FeishuWebhookLogger with TelegramWebhookLogger {
+                          ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger with DingTalkWebhookLogger with ServerChanWebhookLogger with FeishuWebhookLogger with TelegramWebhookLogger with LocalPlainTextLogger {
 
   override def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
     if (msg == null) false
@@ -55,6 +56,14 @@ protected class GangLogger(
       }
       if (enabled.contains(TELEGRAM_WEBHOOK_LOGGER) && level >= logsLevels(TELEGRAM_WEBHOOK_LOGGER.id)) {
         val status = doTheLogAction4Telegram(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(LOCAL_PLAIN_TEXT_LOGGER) && level >= logsLevels(LOCAL_PLAIN_TEXT_LOGGER.id)) {
+        val status = doTheLogAction4LocalPlainText(msgStr, level)
+        logStatus += status
+      }
+      if (enabled.contains(LOCAL_HTML_LOGGER) && level >= logsLevels(LOCAL_HTML_LOGGER.id)) {
+        val status = doTheLogAction4LocalPlainText(msgStr, level)
         logStatus += status
       }
       logStatus.result().forall(b => b)
@@ -94,6 +103,11 @@ protected class GangLogger(
   private def doTheLogAction4Telegram(msg: String, level: LogLevel.Value): Boolean = {
     super[TelegramWebhookLogger].checkPrerequisite()
     super[TelegramWebhookLogger].webhookLog(msg, level)
+  }
+
+  private def doTheLogAction4LocalPlainText(msg: String, level: LogLevel.Value): Boolean = {
+    super[LocalPlainTextLogger].checkPrerequisite()
+    super[LocalPlainTextLogger].fileLog(msg, level)
   }
 }
 
