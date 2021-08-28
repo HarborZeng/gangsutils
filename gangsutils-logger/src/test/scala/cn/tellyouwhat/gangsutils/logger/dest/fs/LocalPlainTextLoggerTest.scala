@@ -3,13 +3,23 @@ package cn.tellyouwhat.gangsutils.logger.dest.fs
 import cn.tellyouwhat.gangsutils.core.constants.infoHead_unquote
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalactic.TimesOnInt.convertIntToRepeater
+import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.nio.file.{Files, Paths}
 import scala.io.Source
 
-class LocalPlainTextLoggerTest extends AnyFlatSpec with Matchers {
+class LocalPlainTextLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
+
+  before {
+    GangLogger.resetLoggerConfig()
+  }
+
+  after {
+    GangLogger.resetLoggerConfig()
+    LocalPlainTextLogger.resetLogSavePath()
+  }
 
   behavior of "LocalPlainTextLoggerTest"
 

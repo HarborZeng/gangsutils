@@ -18,6 +18,7 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
 
   after {
     WoaWebhookLogger.resetRobotsKeys()
+    GangLogger.resetLoggerConfig()
   }
 
   behavior of "WoaWebhookLoggerTest"

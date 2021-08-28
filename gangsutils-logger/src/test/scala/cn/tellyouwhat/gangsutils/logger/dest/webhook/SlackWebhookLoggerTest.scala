@@ -18,6 +18,7 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
   }
 
   after {
+    GangLogger.resetLoggerConfig()
     SlackWebhookLogger.resetSlackUrls()
   }
 

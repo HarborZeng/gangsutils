@@ -95,4 +95,6 @@ object LocalFileLogger {
    * @param path Log save path, which is a full path
    */
   def setLogSavePath(path: String): Unit = logSavePath = Some(path)
+
+  def resetLogSavePath(): Unit = logSavePath = None
 }

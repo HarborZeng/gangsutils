@@ -15,4 +15,6 @@ object LocalPlainTextLogger {
 
   def setLogSavePath(path: String): Unit = LocalFileLogger.setLogSavePath(path)
 
+  def resetLogSavePath(): Unit = LocalFileLogger.resetLogSavePath()
+
 }

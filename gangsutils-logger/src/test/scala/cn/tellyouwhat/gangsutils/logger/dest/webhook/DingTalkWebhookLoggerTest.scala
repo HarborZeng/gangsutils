@@ -19,6 +19,7 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   after {
+    GangLogger.resetLoggerConfig()
     DingTalkWebhookLogger.resetRobots()
   }
 

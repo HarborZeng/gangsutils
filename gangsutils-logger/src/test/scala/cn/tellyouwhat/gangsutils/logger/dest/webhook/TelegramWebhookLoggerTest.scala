@@ -18,6 +18,7 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   after {
+    GangLogger.resetLoggerConfig()
     TelegramWebhookLogger.resetRobots()
   }
 

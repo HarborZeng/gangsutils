@@ -18,6 +18,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
   }
 
   after {
+    GangLogger.resetLoggerConfig()
     FeishuWebhookLogger.resetRobots()
   }
 

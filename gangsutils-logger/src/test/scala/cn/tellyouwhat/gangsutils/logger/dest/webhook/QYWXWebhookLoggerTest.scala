@@ -18,6 +18,7 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
   }
 
   after {
+    GangLogger.resetLoggerConfig()
     QYWXWebhookLogger.resetRobotsKeys()
   }
 

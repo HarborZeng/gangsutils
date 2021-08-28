@@ -17,6 +17,7 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
   }
 
   after {
+    GangLogger.resetLoggerConfig()
     ServerChanWebhookLogger.resetRobotsKeys()
   }
 
