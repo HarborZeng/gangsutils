@@ -26,7 +26,7 @@ object funcs {
    * @param path  目标路径
    * @param spark sparkSession
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
-   * @throws GangException if the path does not exists
+   * @throws PathNotFoundException if the path does not exists
    */
   def fileModifiedTime(path: String)(implicit spark: SparkSession): Either[PathNotFoundException, Long] =
     fileModifiedTime(new Path(path))
@@ -37,7 +37,7 @@ object funcs {
    * @param path  目标路径
    * @param spark sparkSession
    * @return the modification time of file in milliseconds since January 1, 1970 UTC.
-   * @throws GangException if the path does not exists
+   * @throws PathNotFoundException if the path does not exists
    */
   def fileModifiedTime(path: Path)(implicit spark: SparkSession): Either[PathNotFoundException, Long] = {
     if (isPathExists(path)) {
