@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
@@ -22,7 +23,7 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
   behavior of "WoaWebhookLoggerTest"
 
   it should "initializeWoaWebhook(robotsKeys: String)" in {
-    a[NullPointerException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook(null: String)
+    the[NullPointerException] thrownBy WoaWebhookLogger.initializeWoaWebhook(null: String) should have message null
     WoaWebhookLogger.initializeWoaWebhook("abc,def")
     GangLogger().woaRobotsToSend should contain theSameElementsAs Seq("abc", "def")
     WoaWebhookLogger.initializeWoaWebhook("abc")
@@ -30,10 +31,18 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
   }
 
   it should "initializeWoaWebhook(robotsKeys: Array[String])" in {
-    an[IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook("")
-    an[IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook("123,,abc")
-    an[IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook(null: Array[String])
-    an[IllegalArgumentException] should be thrownBy WoaWebhookLogger.initializeWoaWebhook(Array.empty[String])
+    the[IllegalArgumentException] thrownBy {
+      WoaWebhookLogger.initializeWoaWebhook("")
+    } should have message I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format("Array()")
+    the[IllegalArgumentException] thrownBy {
+      WoaWebhookLogger.initializeWoaWebhook("123,,abc")
+    } should have message I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format("Array(123, , abc)")
+    the[IllegalArgumentException] thrownBy {
+      WoaWebhookLogger.initializeWoaWebhook(null: Array[String])
+    } should have message I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format("null")
+    the[IllegalArgumentException] thrownBy {
+      WoaWebhookLogger.initializeWoaWebhook(Array.empty[String])
+    } should have message I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format("Array()")
   }
 
   "woa webhook logger" should "send a log into woa with correct key" in {

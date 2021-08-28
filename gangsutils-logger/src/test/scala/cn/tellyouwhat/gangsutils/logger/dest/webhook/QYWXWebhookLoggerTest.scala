@@ -1,8 +1,9 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.QYWX_WEBHOOK_LOGGER
+import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -23,7 +24,7 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
   behavior of "QYWXWebhookLoggerTest"
 
   it should "initializeQYWXWebhook(robotsKeys: String)" in {
-    a[NullPointerException] should be thrownBy QYWXWebhookLogger.initializeQYWXWebhook(null: String)
+    the[NullPointerException] thrownBy QYWXWebhookLogger.initializeQYWXWebhook(null: String) should have message null
     QYWXWebhookLogger.initializeQYWXWebhook("abc,def")
     GangLogger().qywxRobotsToSend should contain theSameElementsAs Seq("abc", "def")
     QYWXWebhookLogger.initializeQYWXWebhook("abc")
@@ -31,10 +32,18 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
   }
 
   it should "initializeQYWXWebhook(robotsKeys: Array[String])" in {
-    an[IllegalArgumentException] should be thrownBy QYWXWebhookLogger.initializeQYWXWebhook("")
-    an[IllegalArgumentException] should be thrownBy QYWXWebhookLogger.initializeQYWXWebhook("123,,abc")
-    an[IllegalArgumentException] should be thrownBy QYWXWebhookLogger.initializeQYWXWebhook(null: Array[String])
-    an[IllegalArgumentException] should be thrownBy QYWXWebhookLogger.initializeQYWXWebhook(Array.empty[String])
+    the[IllegalArgumentException] thrownBy {
+      QYWXWebhookLogger.initializeQYWXWebhook("")
+    } should have message I18N.getRB.getString("qyexWebhookLogger.initializeQYWXWebhook").format("Array()")
+    the[IllegalArgumentException] thrownBy {
+      QYWXWebhookLogger.initializeQYWXWebhook("123,,abc")
+    } should have message I18N.getRB.getString("qyexWebhookLogger.initializeQYWXWebhook").format("Array(123, , abc)")
+    the[IllegalArgumentException] thrownBy {
+      QYWXWebhookLogger.initializeQYWXWebhook(null: Array[String])
+    } should have message I18N.getRB.getString("qyexWebhookLogger.initializeQYWXWebhook").format("null")
+    the[IllegalArgumentException] thrownBy {
+      QYWXWebhookLogger.initializeQYWXWebhook(Array.empty[String])
+    } should have message I18N.getRB.getString("qyexWebhookLogger.initializeQYWXWebhook").format("Array()")
   }
 
   "qywx webhook logger" should "send a log into qywx with correct key" in {

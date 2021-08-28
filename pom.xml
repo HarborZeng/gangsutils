@@ -262,11 +262,10 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
                 <configuration>
                     <excludes>
                         <exclude>cn/tellyouwhat/gangsutils/useless/**/*</exclude>
-                        <exclude>cn/tellyouwhat/gangsutils/core/constants?.*</exclude>
+                        <exclude>cn/tellyouwhat/gangsutils/core/constants*.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -277,7 +276,7 @@
                     </execution>
                     <execution>
                         <id>report</id>
-                        <phase>test</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
@@ -285,6 +284,16 @@
                 </executions>
             </plugin>
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.7</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <scm>

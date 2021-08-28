@@ -1,16 +1,18 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.cc.Robot
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
-import org.scalatest.BeforeAndAfter
+import org.mockito.MockitoSugar
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 
 import java.net.SocketTimeoutException
 import scala.util.{Failure, Success}
 
-class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
+class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter with MockitoSugar with PrivateMethodTester {
 
   before {
     GangLogger.resetLoggerConfig()
@@ -23,7 +25,9 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   behavior of "DingTalkWebhookLoggerTest"
 
   it should "initializeDingTalkWebhook(robotsKeysSigns: String)" in {
-    a[NullPointerException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook(null: String)
+    the[NullPointerException] thrownBy {
+      DingTalkWebhookLogger.initializeDingTalkWebhook(null: String)
+    } should have message null
     DingTalkWebhookLogger.initializeDingTalkWebhook("abc,def")
     GangLogger().dingTalkRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None), Robot(Some("def"), None))
     DingTalkWebhookLogger.initializeDingTalkWebhook("abc;123,def")
@@ -33,11 +37,25 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   it should "initializeDingTalkWebhook(robotsKeysSigns: Array[Array[String]])" in {
-    an[IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook("")
-    an[IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook("123,,abc")
-    an[IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook("123,,abc;123;234")
-    an[IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook(null: Array[Array[String]])
-    an[IllegalArgumentException] should be thrownBy DingTalkWebhookLogger.initializeDingTalkWebhook(Array.empty[Array[String]])
+    the[IllegalArgumentException] thrownBy {
+      DingTalkWebhookLogger.initializeDingTalkWebhook("")
+    } should have message I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format("Array(Array())")
+
+    the[IllegalArgumentException] thrownBy {
+      DingTalkWebhookLogger.initializeDingTalkWebhook("123,,abc")
+    } should have message I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format("Array(Array(123), Array(), Array(abc))")
+
+    the[IllegalArgumentException] thrownBy {
+      DingTalkWebhookLogger.initializeDingTalkWebhook("123,,abc;123;234")
+    } should have message I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format("Array(Array(123), Array(), Array(abc, 123, 234))")
+
+    the[IllegalArgumentException] thrownBy {
+      DingTalkWebhookLogger.initializeDingTalkWebhook(null: Array[Array[String]])
+    } should have message I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format("null")
+
+    the[IllegalArgumentException] thrownBy {
+      DingTalkWebhookLogger.initializeDingTalkWebhook(Array.empty[Array[String]])
+    } should have message I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format("Array()")
   }
 
   "dingtalk webhook logger" should "send a log into dingtalk with correct key and sign" in {

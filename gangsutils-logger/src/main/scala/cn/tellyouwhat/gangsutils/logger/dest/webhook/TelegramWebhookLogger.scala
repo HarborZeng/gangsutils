@@ -64,7 +64,7 @@ object TelegramWebhookLogger {
       robotsChatIdsTokens.exists(p => p.length != 2)
     ) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format(if (robotsChatIdsTokens == null) null else robotsChatIdsTokens.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format(if (robotsChatIdsTokens == null) null else robotsChatIdsTokens.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
     }
     robotsChatIdsTokens.map(chatIDToken => {
       val chatID = chatIDToken.head

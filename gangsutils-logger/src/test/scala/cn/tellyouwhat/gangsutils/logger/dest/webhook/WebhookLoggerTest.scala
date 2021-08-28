@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.GangLogger
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongHttpMethodException
 import org.scalatest.PrivateMethodTester
@@ -23,9 +24,14 @@ class WebhookLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTest
       case Success(v) => v shouldBe true
     }
 
-    a[WrongHttpMethodException] should be thrownBy {
-      logger invokePrivate sendRequest("", "WRONG HTTP METHOD", "", Seq.empty[(String, String)])
-    }
+    val method = "WRONG HTTP METHOD"
+    the[WrongHttpMethodException] thrownBy {
+      logger invokePrivate sendRequest("", method, "", Seq.empty[(String, String)])
+    } should have message s"""${I18N.getRB.getString("sendRequest.wrongHttpMethod").format(method)}"""
+
+    the[IllegalArgumentException] thrownBy {
+      logger invokePrivate sendRequest("", "POST", "", Seq.empty[(String, String)])
+    } should have message "body , queryStrings List(), they can not be empty or non-empty at the same time."
   }
 
 }

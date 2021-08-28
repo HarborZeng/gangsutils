@@ -79,7 +79,7 @@ object DingTalkWebhookLogger {
       robotsKeysSigns.exists(p => p.length > 2 || p.length == 0)
     ) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format(if (robotsKeysSigns == null) null else robotsKeysSigns.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format(if (robotsKeysSigns == null) null else robotsKeysSigns.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
     }
     robotsKeysSigns.map(keySign => {
       if (keySign.length == 1) {

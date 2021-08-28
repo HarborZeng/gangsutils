@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.cc.Robot
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
@@ -23,21 +24,34 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
   behavior of "FeishuWebhookLoggerTest"
 
   it should "initializeFeishuWebhook(robotsKeysSigns: String)" in {
-    a[NullPointerException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook(null: String)
+    the[NullPointerException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook(null: String)
+    } should have message null
+
     FeishuWebhookLogger.initializeFeishuWebhook("abc,def")
-    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(new Robot(Some("abc"), None), new Robot(Some("def"), None))
+    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None), Robot(Some("def"), None))
     FeishuWebhookLogger.initializeFeishuWebhook("abc;123,def")
-    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(new Robot(Some("abc"), Some("123")), new Robot(Some("def"), None))
+    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), Some("123")), Robot(Some("def"), None))
     FeishuWebhookLogger.initializeFeishuWebhook("abc")
-    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(new Robot(Some("abc"), None))
+    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None))
   }
 
   it should "initializeFeishuWebhook(robotsKeysSigns: Array[Array[String]])" in {
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook("")
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook("123,,abc")
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook("123,,abc;123;234")
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook(null: Array[Array[String]])
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook(Array.empty[Array[String]])
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook("")
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array(Array())")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook("123,,abc")
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array(Array(123), Array(), Array(abc))")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook("123,,abc;123;234")
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array(Array(123), Array(), Array(abc, 123, 234))")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook(null: Array[Array[String]])
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("null")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook(Array.empty[Array[String]])
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array()")
   }
 
   "feishu webhook logger" should "send a log into feishu with correct key and sign" in {

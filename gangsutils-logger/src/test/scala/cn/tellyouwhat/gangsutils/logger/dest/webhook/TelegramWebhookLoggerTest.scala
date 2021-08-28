@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.cc.TelegramRobot
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
@@ -23,7 +24,7 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   behavior of "TelegramWebhookLoggerTest"
 
   it should "initializeTelegramWebhook(robotsChatIdsTokens: String)" in {
-    a[NullPointerException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook(null: String)
+    the[NullPointerException] thrownBy TelegramWebhookLogger.initializeTelegramWebhook(null: String) should have message null
     an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("abc,def")
     an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("abc;123,def")
     an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("abc")
@@ -32,11 +33,21 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   it should "initializeTelegramWebhook(robotsChatIdsTokens: Array[Array[String]])" in {
-    an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("")
-    an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("123,,abc")
-    an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook("123,,abc;123;234")
-    an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook(null: Array[Array[String]])
-    an[IllegalArgumentException] should be thrownBy TelegramWebhookLogger.initializeTelegramWebhook(Array.empty[Array[String]])
+    the[IllegalArgumentException] thrownBy {
+      TelegramWebhookLogger.initializeTelegramWebhook("")
+    } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("Array(Array())")
+    the[IllegalArgumentException] thrownBy {
+      TelegramWebhookLogger.initializeTelegramWebhook("123,,abc")
+    } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("Array(Array(123), Array(), Array(abc))")
+    the[IllegalArgumentException] thrownBy {
+      TelegramWebhookLogger.initializeTelegramWebhook("123,,abc;123;234")
+    } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("Array(Array(123), Array(), Array(abc, 123, 234))")
+    the[IllegalArgumentException] thrownBy {
+      TelegramWebhookLogger.initializeTelegramWebhook(null: Array[Array[String]])
+    } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("null")
+    the[IllegalArgumentException] thrownBy {
+      TelegramWebhookLogger.initializeTelegramWebhook(Array.empty[Array[String]])
+    } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("Array()")
   }
 
   "telegram webhook logger" should "send a log into telegram with correct chat_id and token" in {

@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
@@ -23,7 +24,7 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
   behavior of "SlackWebhookLoggerTest"
 
   it should "initializeSlackUrls(slackUrls: String)" in {
-    a[NullPointerException] should be thrownBy SlackWebhookLogger.initializeSlackUrls(null: String)
+    the[NullPointerException] thrownBy SlackWebhookLogger.initializeSlackUrls(null: String) should have message null
     SlackWebhookLogger.initializeSlackUrls("abc,def")
     GangLogger().slackWebhookURLs should contain theSameElementsAs Seq("abc", "def")
     SlackWebhookLogger.initializeSlackUrls("abc")
@@ -31,10 +32,18 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
   }
 
   it should "initializeSlackUrls(slackUrls: Array[String])" in {
-    an[IllegalArgumentException] should be thrownBy SlackWebhookLogger.initializeSlackUrls("")
-    an[IllegalArgumentException] should be thrownBy SlackWebhookLogger.initializeSlackUrls("123,,abc")
-    an[IllegalArgumentException] should be thrownBy SlackWebhookLogger.initializeSlackUrls(null: Array[String])
-    an[IllegalArgumentException] should be thrownBy SlackWebhookLogger.initializeSlackUrls(Array.empty[String])
+    the[IllegalArgumentException] thrownBy {
+      SlackWebhookLogger.initializeSlackUrls("")
+    } should have message I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format("Array()")
+    the[IllegalArgumentException] thrownBy {
+      SlackWebhookLogger.initializeSlackUrls("123,,abc")
+    } should have message I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format("Array(123, , abc)")
+    the[IllegalArgumentException] thrownBy {
+      SlackWebhookLogger.initializeSlackUrls(null: Array[String])
+    } should have message I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format("null")
+    the[IllegalArgumentException] thrownBy {
+      SlackWebhookLogger.initializeSlackUrls(Array.empty[String])
+    } should have message I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format("Array()")
   }
 
   "slack webhook logger" should "send a log into slack with correct webhook url" in {

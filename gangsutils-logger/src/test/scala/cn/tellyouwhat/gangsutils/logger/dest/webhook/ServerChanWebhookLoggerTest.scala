@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
+import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
@@ -22,7 +23,7 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
   behavior of "ServerChanWebhookLoggerTest"
 
   it should "initializeServerChanWebhook(robotsKeys: String)" in {
-    a[NullPointerException] should be thrownBy ServerChanWebhookLogger.initializeServerChanWebhook(null: String)
+    the[NullPointerException] thrownBy ServerChanWebhookLogger.initializeServerChanWebhook(null: String) should have message null
     ServerChanWebhookLogger.initializeServerChanWebhook("abc,def")
     GangLogger().serverChanRobotsToSend should contain theSameElementsAs Seq("abc", "def")
     ServerChanWebhookLogger.initializeServerChanWebhook("abc")
@@ -30,10 +31,19 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
   }
 
   it should "initializeServerChanWebhook(robotsKeys: Array[String])" in {
-    an[IllegalArgumentException] should be thrownBy ServerChanWebhookLogger.initializeServerChanWebhook("")
-    an[IllegalArgumentException] should be thrownBy ServerChanWebhookLogger.initializeServerChanWebhook("123,,abc")
-    an[IllegalArgumentException] should be thrownBy ServerChanWebhookLogger.initializeServerChanWebhook(null: Array[String])
-    an[IllegalArgumentException] should be thrownBy ServerChanWebhookLogger.initializeServerChanWebhook(Array.empty[String])
+    the[IllegalArgumentException] thrownBy {
+      ServerChanWebhookLogger.initializeServerChanWebhook("")
+    } should have message I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format("Array()")
+    the[IllegalArgumentException] thrownBy {
+      ServerChanWebhookLogger.initializeServerChanWebhook("123,,abc")
+    } should have message I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format("Array(123, , abc)")
+    the[IllegalArgumentException] thrownBy {
+      ServerChanWebhookLogger.initializeServerChanWebhook(null: Array[String])
+    } should have message I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format("null")
+    the[IllegalArgumentException] thrownBy {
+      ServerChanWebhookLogger.initializeServerChanWebhook(Array.empty[String])
+    } should have message I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format("Array()")
+
   }
 
   "serverChan webhook logger" should "send a log into serverChan with correct key" in {
