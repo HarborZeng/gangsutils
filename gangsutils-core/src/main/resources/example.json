@@ -1,0 +1,7 @@
+{
+  "foo": "bar",
+  "app": {
+    "name": "gangsutils-core",
+    "versionDouble": 1.0
+  }
+}

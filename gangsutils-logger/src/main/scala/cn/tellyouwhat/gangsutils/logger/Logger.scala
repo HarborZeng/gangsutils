@@ -1,9 +1,9 @@
 package cn.tellyouwhat.gangsutils.logger
 
+import cn.tellyouwhat.gangsutils.core.exceptions.GangException
 import cn.tellyouwhat.gangsutils.core.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.PRINTLN_LOGGER
-import cn.tellyouwhat.gangsutils.logger.cc.OneLog
+import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, OneLog}
 
 import java.net.InetAddress
 import java.time.LocalDateTime
@@ -12,89 +12,77 @@ import java.time.LocalDateTime
  * 日志基础特质
  */
 trait Logger {
-  private[logger] lazy val hostname: String = InetAddress.getLocalHost.getHostName
-  /**
-   * 是否在日志中启用时间
-   */
-  private[logger] val isDTEnabled: Boolean = true
 
-  /**
-   * 默认的日志输出目的地
-   */
-  private[logger] implicit val defaultLogDest: Seq[SupportedLogDest.Value] = Seq(PRINTLN_LOGGER)
-  /**
-   * 是否在日志中启用跟踪（包名类名方法名行号）字段
-   */
-  private[logger] val isTraceEnabled: Boolean = false
-  /**
-   * 默认的不同的日志输出目的地的级别
-   */
-  private[logger] val logsLevels: Array[LogLevel.Value] = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
-  /**
-   * 每条日志的前缀
-   */
-  private[logger] val logPrefix: Option[String] = None
-  private[logger] val isHostnameEnabled: Boolean = true
-
-  /**
-   * 通过参数指定级别的日志
-   *
-   * @param msg     日志内容
-   * @param level   日志级别
-   * @param enabled 启用的日志目的地
-   */
-  def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean
+  lazy val hostname: String = InetAddress.getLocalHost.getHostName
+  val loggerConfig: LoggerConfiguration = null
 
   /**
    * 记录一条跟踪级别的日志
    *
-   * @param msg     日志内容
-   * @param enabled 启用的日志目的地
+   * @param msg 日志内容
+   *
    */
-  def trace(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = log(msg, LogLevel.TRACE)(enabled)
+  def trace(msg: Any): Boolean = log(msg, LogLevel.TRACE)
 
   /**
    * 记录一条信息级别的日志
    *
-   * @param msg     日志内容
-   * @param enabled 启用的日志目的地
+   * @param msg 日志内容
+   *
    */
-  def info(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = log(msg, LogLevel.INFO)(enabled)
+  def info(msg: Any): Boolean = log(msg, LogLevel.INFO)
+
+  /**
+   * 通过参数指定级别的日志
+   *
+   * @param msg   日志内容
+   * @param level 日志级别
+   *
+   */
+  def log(msg: Any, level: LogLevel.Value): Boolean = {
+    checkPrerequisite()
+    doTheLogAction(msg.toString, level)
+  }
+
+  protected def checkPrerequisite(): Unit = {
+    if (loggerConfig == null)
+      throw GangException("loggerConfig is null")
+  }
 
   /**
    * 记录一条成功级别的日志
    *
-   * @param msg     日志内容
-   * @param enabled 启用的日志目的地
+   * @param msg 日志内容
+   *
    */
-  def success(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = log(msg, LogLevel.SUCCESS)(enabled)
+  def success(msg: Any): Boolean = log(msg, LogLevel.SUCCESS)
 
   /**
    * 记录一条警告级别的日志
    *
-   * @param msg     日志内容
-   * @param enabled 启用的日志目的地
+   * @param msg 日志内容
+   *
    */
-  def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = log(msg, LogLevel.WARNING)(enabled)
+  def warning(msg: Any): Boolean = log(msg, LogLevel.WARNING)
 
   /**
    * 记录一条错误级别的日志
    *
-   * @param msg     日志内容
-   * @param enabled 启用的日志目的地
+   * @param msg 日志内容
+   *
    */
-  def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = log(msg, LogLevel.ERROR)(enabled)
+  def error(msg: Any): Boolean = log(msg, LogLevel.ERROR)
 
   /**
    * 记录一条致命级别的日志
    *
-   * @param msg     日志内容
-   * @param enabled 启用的日志目的地
+   * @param msg 日志内容
+   *
    */
-  def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
+  def critical(msg: Any, throwable: Throwable = null): Boolean = {
     if (msg == null) false
     else msg.toString |>
-      (msgStr => log(if (throwable != null) s"$msgStr，exception.getMessage: ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled))
+      (msgStr => log(if (throwable != null) s"$msgStr，message is ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL))
   }
 
   /**
@@ -104,7 +92,7 @@ trait Logger {
    * @return
    */
   protected def buildLog(msg: String, level: LogLevel.Value): OneLog = {
-    val (className, methodName, lineNumber) = if (isTraceEnabled) {
+    val (className, methodName, lineNumber) = if (loggerConfig.isTraceEnabled) {
       val stackTraceElements = Thread.currentThread().getStackTrace
       val slicedElements = stackTraceElements.drop(stackTraceElements
         .lastIndexWhere(_.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.logger")) + 1
@@ -122,12 +110,12 @@ trait Logger {
     }
     OneLog(
       level = Some(level),
-      hostname = if (isHostnameEnabled) Some(hostname) else None,
-      datetime = if (isDTEnabled) Some(LocalDateTime.now()) else None,
+      hostname = if (loggerConfig.isHostnameEnabled) Some(hostname) else None,
+      datetime = if (loggerConfig.isDTEnabled) Some(LocalDateTime.now()) else None,
       className = className,
       methodName = methodName,
       lineNumber = lineNumber,
-      prefix = logPrefix,
+      prefix = loggerConfig.logPrefix,
       msg = Some(msg)
     )
   }
@@ -140,4 +128,12 @@ trait Logger {
    */
   protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean
 
+}
+
+trait LoggerCompanion {
+  def apply(): Logger
+
+  def apply(c: LoggerConfiguration): Logger
+
+  def initializeConfiguration(c: LoggerConfiguration): Unit
 }

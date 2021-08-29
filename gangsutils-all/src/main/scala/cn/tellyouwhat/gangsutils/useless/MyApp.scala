@@ -9,7 +9,7 @@ import cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}
  */
 class MyApp extends Timeit {
 
-  private val logger: Logger = MyApp.logger
+  private val logger: GangLogger = MyApp.logger
 
   override def run(desc: String): Unit = {
     logger.info("123")
@@ -19,11 +19,9 @@ class MyApp extends Timeit {
 
 object MyApp {
 
-  private implicit var logger: Logger = _
+  private implicit var logger: GangLogger = _
 
   def main(args: Array[String]): Unit = {
-    GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE))
-    GangLogger.disableTrace()
     logger = GangLogger(isTraceEnabled = true)
     logger.trace("tracing")
 

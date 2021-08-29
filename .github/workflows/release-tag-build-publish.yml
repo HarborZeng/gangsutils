@@ -36,3 +36,7 @@ jobs:
           server_id: ossrh
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
+        with:
+          directory: ./gangsutils-all/target/site/jacoco-aggregate/
+          files: jacoco.xml
+          verbose: true

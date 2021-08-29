@@ -1,8 +1,10 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
-import cn.tellyouwhat.gangsutils.logger.cc.Robot
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
+import cn.tellyouwhat.gangsutils.core.helper.I18N
+import cn.tellyouwhat.gangsutils.logger.GangLogger
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.FEISHU_WEBHOOK_LOGGER
+import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -13,36 +15,56 @@ import scala.util.{Failure, Success}
 class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
 
   before {
-    GangLogger.resetLoggerConfig()
+    GangLogger.setLoggerAndConfiguration(Map(
+      FEISHU_WEBHOOK_LOGGER -> LoggerConfiguration()
+    ))
   }
 
   after {
+    GangLogger.killLogger()
+    GangLogger.clearLogger2Configuration()
     FeishuWebhookLogger.resetRobots()
   }
 
   behavior of "FeishuWebhookLoggerTest"
 
   it should "initializeFeishuWebhook(robotsKeysSigns: String)" in {
-    a[NullPointerException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook(null: String)
+    the[NullPointerException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook(null: String)
+    } should have message null
+
     FeishuWebhookLogger.initializeFeishuWebhook("abc,def")
-    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(new Robot(Some("abc"), None), new Robot(Some("def"), None))
+    val logger1 = GangLogger()
+    logger1.loggers.head.asInstanceOf[FeishuWebhookLogger].feishuRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None), Robot(Some("def"), None))
     FeishuWebhookLogger.initializeFeishuWebhook("abc;123,def")
-    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(new Robot(Some("abc"), Some("123")), new Robot(Some("def"), None))
+    val logger2 = GangLogger()
+    logger2.loggers.head.asInstanceOf[FeishuWebhookLogger].feishuRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), Some("123")), Robot(Some("def"), None))
     FeishuWebhookLogger.initializeFeishuWebhook("abc")
-    GangLogger().feishuRobotsToSend should contain theSameElementsAs Seq(new Robot(Some("abc"), None))
+    val logger3 = GangLogger()
+    logger3.loggers.head.asInstanceOf[FeishuWebhookLogger].feishuRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None))
   }
 
   it should "initializeFeishuWebhook(robotsKeysSigns: Array[Array[String]])" in {
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook("")
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook("123,,abc")
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook("123,,abc;123;234")
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook(null: Array[Array[String]])
-    an[IllegalArgumentException] should be thrownBy FeishuWebhookLogger.initializeFeishuWebhook(Array.empty[Array[String]])
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook("")
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array(Array())")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook("123,,abc")
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array(Array(123), Array(), Array(abc))")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook("123,,abc;123;234")
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array(Array(123), Array(), Array(abc, 123, 234))")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook(null: Array[Array[String]])
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("null")
+    the[IllegalArgumentException] thrownBy {
+      FeishuWebhookLogger.initializeFeishuWebhook(Array.empty[Array[String]])
+    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array()")
   }
 
   "feishu webhook logger" should "send a log into feishu with correct key and sign" in {
     FeishuWebhookLogger.initializeFeishuWebhook("085380aa-4d07-4ecc-b17f-fbb978e1da72;BRH2wOO3SOi64Sw0wiMXtb")
-    val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.FEISHU_WEBHOOK_LOGGER))
+    val logger = GangLogger()
     retry(2)(logger.info("feishu webhook logger send a log into feishu with correct key and sign")) match {
       case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
@@ -51,7 +73,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
 
   it should "send a log into feishu with correct key" in {
     FeishuWebhookLogger.initializeFeishuWebhook("040117de-7776-444b-ba61-9bbee3ad5e33")
-    val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.FEISHU_WEBHOOK_LOGGER))
+    val logger = GangLogger()
     retry(2)(logger.info("feishu webhook logger send a log into feishu with correct key")) match {
       case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
@@ -60,7 +82,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
 
   it should "not send a log into feishu with incorrect key" in {
     FeishuWebhookLogger.initializeFeishuWebhook("a3af")
-    val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.FEISHU_WEBHOOK_LOGGER))
+    val logger = GangLogger()
     retry(2)(logger.info("feishu webhook logger not send a log into feishu with incorrect key")) match {
       case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe false
@@ -68,7 +90,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
   }
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
-    val logger = GangLogger(defaultLogDest = SupportedLogDest.FEISHU_WEBHOOK_LOGGER :: Nil)
+    val logger = GangLogger()
     an[IllegalArgumentException] should be thrownBy logger.info()
   }
 

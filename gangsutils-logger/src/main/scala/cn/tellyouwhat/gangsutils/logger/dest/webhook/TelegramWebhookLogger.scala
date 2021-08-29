@@ -3,10 +3,12 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.LogLevel
-import cn.tellyouwhat.gangsutils.logger.cc.TelegramRobot
+import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, TelegramRobot}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
-trait TelegramWebhookLogger extends WebhookLogger {
+class TelegramWebhookLogger extends WebhookLogger {
+
+  override val loggerConfig: LoggerConfiguration = TelegramWebhookLogger.loggerConfig
 
   /**
    * 要发往的机器人的密钥
@@ -27,17 +29,18 @@ trait TelegramWebhookLogger extends WebhookLogger {
   }
 }
 
-object TelegramWebhookLogger {
+object TelegramWebhookLogger extends LoggerCompanion {
 
   /**
    * TELEGRAM_WEBHOOK_LOGGER 文本
    */
-  val TELEGRAM_WEBHOOK_LOGGER = "telegram_webhook_logger"
+  val TELEGRAM_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.TelegramWebhookLogger"
 
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[TelegramRobot] = Array.empty[TelegramRobot]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[TelegramRobot]
 
@@ -49,7 +52,6 @@ object TelegramWebhookLogger {
   def initializeTelegramWebhook(robotsChatIdsTokens: String): Unit = {
     robotsChatIdsTokens.split(",").map(_.trim.split(";").map(_.trim)) |! initializeTelegramWebhook
   }
-
 
   /**
    * 初始化 telegram webhook 的密钥
@@ -64,12 +66,25 @@ object TelegramWebhookLogger {
       robotsChatIdsTokens.exists(p => p.length != 2)
     ) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format(if (robotsChatIdsTokens == null) null else robotsChatIdsTokens.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format(if (robotsChatIdsTokens == null) null else robotsChatIdsTokens.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
     }
     robotsChatIdsTokens.map(chatIDToken => {
       val chatID = chatIDToken.head
       val token = chatIDToken.last
       TelegramRobot(Some(chatID), Some(token))
     })
+  }
+
+  override def apply(c: LoggerConfiguration): TelegramWebhookLogger = {
+    initializeConfiguration(c)
+    apply()
+  }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+
+  override def apply(): TelegramWebhookLogger = {
+    if (loggerConfig == null)
+      throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
+    new TelegramWebhookLogger()
   }
 }

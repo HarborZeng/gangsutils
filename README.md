@@ -2,11 +2,16 @@
 
 | __Goal__                  | Badges                                                       |
 | :------------------------ | :----------------------------------------------------------- |
-| __Packages and Releases__ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils) [![Sonatype Nexus](https://img.shields.io/nexus/r/cn.tellyouwhat/gangsutils?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/releases/cn/tellyouwhat/gangsutils/) |
-| __Java Documentation__    | [![javadoc](https://javadoc.io/badge2/cn.tellyouwhat/gangsutils-common/javadoc.svg)](https://javadoc.io/doc/cn.tellyouwhat/gangsutils-common) |
-| __Build Status__          | [![develop build](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml) [![master build](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml/badge.svg?branch=master)](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml) |
-| __JaCoCo Test Coverage__  | [![codecov](https://codecov.io/gh/HarborZeng/gangsutils/branch/master/graph/badge.svg?token=MUYXET5V4O)](https://codecov.io/gh/HarborZeng/gangsutils) |
-| __License__               | [![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils?ref=badge_shield) |
+| __Packages and
+Releases__ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils) [![Sonatype Nexus](https://img.shields.io/nexus/r/cn.tellyouwhat/gangsutils?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/releases/cn/tellyouwhat/gangsutils/) |
+| __Java
+Documentation__    | [![javadoc](https://javadoc.io/badge2/cn.tellyouwhat/gangsutils-common/javadoc.svg)](https://javadoc.io/doc/cn.tellyouwhat/gangsutils-common) |
+| __Build
+Status__          | [![develop build](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml) [![master build](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml/badge.svg?branch=master)](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml) |
+| __JaCoCo Test
+Coverage__  | [![codecov](https://codecov.io/gh/HarborZeng/gangsutils/branch/master/graph/badge.svg?token=MUYXET5V4O)](https://codecov.io/gh/HarborZeng/gangsutils) |
+| __
+License__               | [![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils?ref=badge_shield) |
 
 ## Utilities
 
@@ -18,31 +23,33 @@ badge [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tell
 **Maven**
 
 ```xml
+
 <dependency>
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils-logger</artifactId>
     <version>${gangsutils.version}</version>
 </dependency>
 <dependency>
-    <groupId>cn.tellyouwhat</groupId>
-    <artifactId>gangsutils-spark</artifactId>
-    <version>${gangsutils.version}</version>
+<groupId>cn.tellyouwhat</groupId>
+<artifactId>gangsutils-spark</artifactId>
+<version>${gangsutils.version}</version>
 </dependency>
 <dependency>
-    <groupId>cn.tellyouwhat</groupId>
-    <artifactId>gangsutils-hadoop</artifactId>
-    <version>${gangsutils.version}</version>
+<groupId>cn.tellyouwhat</groupId>
+<artifactId>gangsutils-hadoop</artifactId>
+<version>${gangsutils.version}</version>
 </dependency>
 <dependency>
-    <groupId>cn.tellyouwhat</groupId>
-    <artifactId>gangsutils-core</artifactId>
-    <version>${gangsutils.version}</version>
+<groupId>cn.tellyouwhat</groupId>
+<artifactId>gangsutils-core</artifactId>
+<version>${gangsutils.version}</version>
 </dependency>
 ```
 
 or import all by
 
 ```xml
+
 <dependency>
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils-all</artifactId>
@@ -118,65 +125,45 @@ To config a logger, you can:
 1. config using pre-defined methods
 
   ```scala
-  //enable or disable "package#method line number n" part in "[level] - hostname - datetime - package#method$: content"
-GangLogger.enable / disableTrace()
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.DINGTALK_WEBHOOK_LOGGER
+import cn.tellyouwhat.gangsutils.logger.GangLogger
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 
-//enable or disable "datetime$" part in "[level] - hostname - datetime - package#method$: content"
-GangLogger.enable / disableDateTime()
+GangLogger.setLoggerAndConfiguration(Map(
+  DINGTALK_WEBHOOK_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("prefix"), logLevel = LogLevel.TRACE)
+))
+DingTalkWebhookLogger.initializeDingTalkWebhook("key;signSecret")
 
-//enable or disable "hostname" part in "[level] - hostname - datetime - package#method$: content"
-GangLogger.enable / disableHostname()
+val logger = GangLogger()
+logger.info("dingtalk webhook logger send a log into dingtalk with correct key and sign")
 
-//set logger default output destination, default is PRINTLN_LOGGER. PS: in Seq brackets press ctrl+shift+space, idea will prompt the available enumerations.
-GangLogger.setDefaultLogDest(Seq(SupportedLogDest.PRINTLN_LOGGER, SupportedLogDest.WOA_WEBHOOK_LOGGER))
+//If you new GangLogger in this way:
+val logger = GangLogger(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("prefix"), logLevel = LogLevel.TRACE)
+//the parameters you filled in GangLogger apply method are for PrintlnLogger if the underlying logger2Configuration is null
 
-//enable all logger
-GangLogger.setDefaultLogDest(SupportedLogDest.values.toSeq)
-
-//control log levels, multiple values should be put in Array, orderd by knagene.ai.common.logger.SupportedLogDest enumerations order
-//as below, "跟踪,信息" means PRINTLN_LOGGER level is trace, WOA_WEBHOOK_LOGGER level is info in Chinese, if your system language is English, use "TRACE,INFO" instead
-//default is all trace
-val l = "跟踪,信息"
-GangLogger.setLogsLevels(l.split(",").map(LogLevel.withName)) // set PRINTLN_LOGGER trace, set WOA_WEBHOOK_LOGGER info, if there are other loggers undefined, an IllegalArgumentException will be throwed
-//or
-GangLogger.setLogsLevels(Array(LogLevel.TRACE, LogLevel.INFO)) // set PRINTLN_LOGGER trace, set WOA_WEBHOOK_LOGGER info, if there are other loggers undefined, an IllegalArgumentException will be throwed
-//equivalent to
-GangLogger.setLogsLevels(LogLevel.TRACE :: LogLevel.INFO :: Nil) // set PRINTLN_LOGGER trace, set WOA_WEBHOOK_LOGGER info, if there are other loggers undefined, an IllegalArgumentException will be throwed
-//equivalent to
-GangLogger.setLogsLevels(Map(SupportedLogDest.WOA_WEBHOOK_LOGGER -> LogLevel.INFO)) // set WOA_WEBHOOK_LOGGER info, trace for the rest
-
-//reset static variables config to default
-GangLogger.resetLoggerConfig()
-
-//set a prefix for every log before content block
-//eg: "package#method line number n" part in "[level] - hostname - datetime - package#method$: logPrefix - content"
-GangLogger.setLogPrefix("a prefix")
-
-//reset logPrefix to default empty string. Note that this only take effect when you create a new instance of GangLogger
-GangLogger.clearLogPrefix()
-
-//get an already exists(previously created) logger instance, or create a new one with GangLogger current static variables config
+//get an already exists(previously created) logger instance, or create a new `PrintlnLogger` with default `LoggerConfiguration`
 GangLogger.getLogger
 
-//set stored logger variable to None
+//set stored _logger variable to None
 GangLogger.killLogger()
-  ```
 
-2. config when invoking apply
-
-  ```scala
-  val logger = GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix, isHostnameEnabled)
+//set stored logger2Configuration to null
+GangLogger.clearLogger2Configuration()
   ```
 
 #### log levels
 
 There are **6 levels** in this util pack, trace、info、success、warning、error and critical. None of them throw exceptions,
-you should throw it manually.
+you should throw it manually if needed.
 
 Other than pre-config log destination, you can set the-log-level log destination by `enabled` parameter, like
 
 ```scala
-// means whatever destination you configured at before, this one log will be sent to parameter enabled specified destination.
+// means whatever destination you configured at before,
+// this one log will be sent to parameter enabled specified destination, 
+// which must be contained in the previously configured destination.
+// That is to say if you use `GangLogger.setLoggerAndConfiguration` set DINGTALK_WEBHOOK_LOGGER and PRINTLN_LOGGER, then specify WOA_WEBHOOK_LOGGER in enabled parameter,
+// then there will be no logger instance left in the underlying loggers seq, so nothing will be logged.
 logger.info("hello world")(enabled = Seq(SupportedLogDest.PRINTLN_LOGGER))
 ```
 
@@ -202,23 +189,62 @@ We support
 - [Telegram](https://telegram.org/) webhook logger
 - [Feishu(飞书)](https://www.feishu.cn/) webhook logger
 - [ServerChan(方糖Server酱)](https://sct.ftqq.com/) webhook logger
+- local plain text logger (write log to file, if file size reach threshold, move it with a timestamp tailing new name)
+- local html logger (write log to file with colorful style, if file size reach threshold, move it with a timestamp
+  tailing new name)
 
 It is very simple to use, bear in mind to invoke `XXWebhookLogger.initializeXXWebhook(...)` before you create a new
 GangLogger instance.
 
+For `cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger`
+and `cn.tellyouwhat.gangsutils.logger.dest.fs.LocalPlainTextLogger`, additionally invoke `LocalXXXLogger.setLogSavePath`
+before create a new GangLogger instance.
+
 eg:
 
 ```scala
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.DINGTALK_WEBHOOK_LOGGER
+import cn.tellyouwhat.gangsutils.logger.GangLogger
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+
+GangLogger.setLoggerAndConfiguration(Map(
+  SLACK_WEBHOOK_LOGGER -> LoggerConfiguration(),
+  // more loggers here
+))
 SlackWebhookLogger.initializeSlackUrls(slackWebhookURL)
-val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.SLACK_WEBHOOK_LOGGER))
+val logger = GangLogger()
 retry(2)(logger.info("slack webhook logger send a log into slack with correct url")) match {
   case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
   case Success(v) => v shouldBe true
 }
 ```
 
-For more examples, see
-test <https://github.com/HarborZeng/gangsutils/tree/master/gangsutils-common/src/test/scala/cn/tellyouwhat/gangsutils/common/logger>
+GangLogger uses reflection to create all the logger you filled in `setLoggerAndConfiguration` map parameter, and do the log action iterate over all the loggers instance.
+
+But if you just want one `PrintlnLogger`, directly use it 
+
+```scala
+// make sure no bother
+GangLogger.clearLogger2Configuration()
+// create default `PrintLogger` with default `LoggerConfiguration`
+val logger = GangLogger(foo=bar, xxx)
+```
+
+By default, it is `PrintlnLogger` with default `LoggerConfiguration`
+
+Plus, you can directly use XXLogger like
+
+```scala
+LocalPlainTextLogger.setLogSavePath(path)
+LocalPlainTextLogger.initializeConfiguration(LoggerConfiguration())
+val logger = LocalPlainTextLogger()
+// which equivalent to
+val logger = LocalHtmlLogger(LoggerConfiguration(), path)
+
+logger.asInstanceOf[LocalPlainTextLogger].logSavePath shouldBe Paths.get(path)
+```
+
+For more examples, see test <https://github.com/HarborZeng/gangsutils/tree/master/gangsutils-common/src/test/scala/cn/tellyouwhat/gangsutils/common/logger>
 
 #### Full example
 
@@ -229,7 +255,7 @@ import cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}
 
 class MyApp extends Timeit {
 
-  private val logger: Logger = MyApp.logger
+  private val logger: GangLogger = MyApp.logger
 
   override def run(desc: String): Unit = {
     logger.info("123")
@@ -239,11 +265,9 @@ class MyApp extends Timeit {
 
 object MyApp {
 
-  private implicit var logger: Logger = _
+  private implicit var logger: GangLogger = _
 
   def main(args: Array[String]): Unit = {
-    GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE))
-    GangLogger.disableTrace()
     logger = GangLogger(isTraceEnabled = true)
     logger.trace("tracing")
 
@@ -252,18 +276,18 @@ object MyApp {
 
   def apply(): MyApp = new MyApp() with TimeitLogger
 }
+
 ```
 
 ```
 【跟踪】 - GANG-PC - 2021-08-27T13:11:19.549114400 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: tracing
-【跟踪】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 开始任务
-【信息】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 123
-【成功】 - GANG-PC - 2021-08-27T13:11:19.564740600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: 完成任务，耗时0s
 ```
 
-In this example, we used `cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}` to implement an AOP logger to calculate the start and end(success or failure) of a function. You can use it too.
+In this example, we used `cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}` to implement an AOP logger to
+calculate the start and end(success or failure) of a function. You can use it elsewhere too.
 
-Just extends your class from `Timeit` and implement `run` method, and new your class with `TimeitLogger` to get aspect delegated.
+Just extends your class from `Timeit` and implement `run` method, and new your class with `TimeitLogger` to get aspect
+delegated.
 
 ### functions and helpers
 
@@ -275,7 +299,9 @@ There are a lot of strings, used to build log content and test.
 
 #### functions
 
-These functions could be useful in you are coding in Scala, see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-core/src/test/scala/cn/tellyouwhat/gangsutils/core/funcsTest.scala> test case for use case.
+These functions could be useful in you are coding in Scala,
+see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-core/src/test/scala/cn/tellyouwhat/gangsutils/core/funcsTest.scala>
+test case for use case.
 
 #### helpers
 
@@ -299,7 +325,8 @@ If you just want functions and helpers which is spark related, add only `gangsut
 
 Spark function.
 
-see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-spark/src/test/scala/cn/tellyouwhat/gangsutils/spark/funcsTest.scala> for use cases.
+see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-spark/src/test/scala/cn/tellyouwhat/gangsutils/spark/funcsTest.scala>
+for use cases.
 
 ## TODO
 
@@ -310,16 +337,16 @@ see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-spark/src/t
   or `default-region` are missing
 - [x] Change `sendRequest`  parameter `queryStrings` to `form`
 - [x] Extract `.replaceAll("""\e\[[\d;]*[^\d;]""", "")` to a method `stripANSIColor`
-- [x] Change `Logger` `defaultLogDest` to `PRINTLN_LOGGER` to test whether `enabled` parameter works when logger is
-  got by `GangLogger.getLogger`
+- [x] Change `Logger` `defaultLogDest` to `PRINTLN_LOGGER` to test whether `enabled` parameter works when logger is got
+  by `GangLogger.getLogger`
 - [x] Separate spark and hadoop tools into separate modules
 - [x] Extract logger module from common module
-- [ ] Add FileLogger (by date)
+- [x] Add FileLogger (by date)
 - [ ] Add LogStash(Stream)Logger
 - [x] Make hostname lazy
 - [x] Make log a case class containing hostname, datetime, trace, content and etc, serialize it when using(println or
   send to webhook)
-- [ ] Different log configurations for different logs by default value and config file
+- [x] Different log configurations for different logs by default value and config file
 
 ## License
 

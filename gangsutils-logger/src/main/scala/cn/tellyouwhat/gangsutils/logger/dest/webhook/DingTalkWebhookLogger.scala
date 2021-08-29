@@ -3,15 +3,17 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.LogLevel
-import cn.tellyouwhat.gangsutils.logger.cc.Robot
+import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
+import org.apache.commons.codec.binary.Base64
 
 import java.net.URLEncoder
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import org.apache.commons.codec.binary.Base64
 
-trait DingTalkWebhookLogger extends WebhookLogger {
+class DingTalkWebhookLogger extends WebhookLogger {
+
+  override val loggerConfig: LoggerConfiguration = DingTalkWebhookLogger.loggerConfig
 
   /**
    * 要发往的机器人的密钥
@@ -42,17 +44,18 @@ trait DingTalkWebhookLogger extends WebhookLogger {
       throw new IllegalArgumentException(I18N.getRB.getString("dingTalkWebhookLogger.prerequisite"))
 }
 
-object DingTalkWebhookLogger {
+object DingTalkWebhookLogger extends LoggerCompanion {
 
   /**
    * DINGTALK_WEBHOOK_LOGGER 文本
    */
-  val DINGTALK_WEBHOOK_LOGGER = "dingtalk_webhook_logger"
+  val DINGTALK_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger"
 
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[Robot] = Array.empty[Robot]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[Robot]
 
@@ -64,7 +67,6 @@ object DingTalkWebhookLogger {
   def initializeDingTalkWebhook(robotsKeysSigns: String): Unit = {
     robotsKeysSigns.split(",").map(_.trim.split(";").map(_.trim)) |! initializeDingTalkWebhook
   }
-
 
   /**
    * 初始化 dingtalk webhook 的密钥
@@ -79,7 +81,7 @@ object DingTalkWebhookLogger {
       robotsKeysSigns.exists(p => p.length > 2 || p.length == 0)
     ) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format(if (robotsKeysSigns == null) null else robotsKeysSigns.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format(if (robotsKeysSigns == null) null else robotsKeysSigns.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
     }
     robotsKeysSigns.map(keySign => {
       if (keySign.length == 1) {
@@ -91,5 +93,18 @@ object DingTalkWebhookLogger {
         Robot(Some(token), Some(sign))
       }
     })
+  }
+
+  override def apply(c: LoggerConfiguration): DingTalkWebhookLogger = {
+    initializeConfiguration(c)
+    apply()
+  }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+
+  override def apply(): DingTalkWebhookLogger = {
+    if (loggerConfig == null)
+      throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
+    new DingTalkWebhookLogger()
   }
 }

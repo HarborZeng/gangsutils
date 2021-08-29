@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
+import cn.tellyouwhat.gangsutils.logger.dest.fs.{LocalHtmlLogger, LocalPlainTextLogger}
 import cn.tellyouwhat.gangsutils.logger.dest.webhook._
 
 /**
@@ -46,4 +47,15 @@ object SupportedLogDest extends Enumeration {
    * telegram 机器人通知的日志枚举
    */
   val TELEGRAM_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(TelegramWebhookLogger.TELEGRAM_WEBHOOK_LOGGER)
+
+  /**
+   * 本地txt文件的日志枚举
+   */
+  val LOCAL_PLAIN_TEXT_LOGGER: SupportedLogDest.Value = Value(LocalPlainTextLogger.LOCAL_PLAIN_TEXT_LOGGER)
+
+  /**
+   * 本地html文件的日志枚举
+   */
+  val LOCAL_HTML_LOGGER: SupportedLogDest.Value = Value(LocalHtmlLogger.LOCAL_HTML_LOGGER)
+
 }

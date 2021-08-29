@@ -2,9 +2,8 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.exceptions.GangException
 import cn.tellyouwhat.gangsutils.core.helper.I18N
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.PRINTLN_LOGGER
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongHttpMethodException
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, LogLevel, Logger}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 import scalaj.http.Http
 
 /**
@@ -53,15 +52,15 @@ trait WebhookLogger extends Logger {
       """"code":19001""", // feishu
       """"errcode":93000""", // qywx(企业微信)
     ).exists(response.body.contains)) {
-      GangLogger.getLogger.critical(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))(enabled = Seq(PRINTLN_LOGGER))
+      println(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))
       return false
     }
     if (response.isError) {
-      GangLogger.getLogger.critical(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}"))(enabled = Seq(PRINTLN_LOGGER))
+      println(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}"))
     }
     response.isSuccess
   }
 
-  protected def checkPrerequisite(): Unit
+  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = webhookLog(msg, level)
 
 }

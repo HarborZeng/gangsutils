@@ -1,3 +1,6 @@
 logger:
   lang: zh-hans
   timeZone: "+8"
+  fs:
+    localFile:
+      blockSize: 8388608 # 8M

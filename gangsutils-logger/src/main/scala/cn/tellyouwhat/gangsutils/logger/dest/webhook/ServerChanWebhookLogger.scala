@@ -4,11 +4,14 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.LogLevel
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
 import java.net.URLEncoder
 
-trait ServerChanWebhookLogger extends WebhookLogger {
+class ServerChanWebhookLogger extends WebhookLogger {
+  override val loggerConfig: LoggerConfiguration = ServerChanWebhookLogger.loggerConfig
+
   /**
    * 要发往的机器人的密钥
    */
@@ -31,17 +34,18 @@ trait ServerChanWebhookLogger extends WebhookLogger {
   }
 }
 
-object ServerChanWebhookLogger {
+object ServerChanWebhookLogger extends LoggerCompanion {
 
   /**
    * SERVERCHAN_WEBHOOK_LOGGER 文本
    */
-  val SERVERCHAN_WEBHOOK_LOGGER = "serverchan_webhook_logger"
+  val SERVERCHAN_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.ServerChanWebhookLogger"
 
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[String] = Array.empty[String]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
 
@@ -53,7 +57,6 @@ object ServerChanWebhookLogger {
   def initializeServerChanWebhook(robotsKeys: String): Unit = {
     robotsKeys.split(",").map(_.trim) |! initializeServerChanWebhook
   }
-
 
   /**
    * 初始化 ServerChan webhook 的密钥
@@ -68,4 +71,16 @@ object ServerChanWebhookLogger {
     robotsKeys
   }
 
+  override def apply(c: LoggerConfiguration): ServerChanWebhookLogger = {
+    initializeConfiguration(c)
+    apply()
+  }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+
+  override def apply(): ServerChanWebhookLogger = {
+    if (loggerConfig == null)
+      throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
+    new ServerChanWebhookLogger()
+  }
 }

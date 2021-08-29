@@ -3,15 +3,17 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.LogLevel
-import cn.tellyouwhat.gangsutils.logger.cc.Robot
+import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import org.apache.commons.codec.binary.Base64
 
 import java.time.Duration
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-trait FeishuWebhookLogger extends WebhookLogger {
+class FeishuWebhookLogger extends WebhookLogger {
+
+  override val loggerConfig: LoggerConfiguration = FeishuWebhookLogger.loggerConfig
 
   /**
    * 要发往的机器人的密钥
@@ -43,17 +45,18 @@ trait FeishuWebhookLogger extends WebhookLogger {
       throw new IllegalArgumentException(I18N.getRB.getString("feishuWebhookLogger.prerequisite"))
 }
 
-object FeishuWebhookLogger {
+object FeishuWebhookLogger extends LoggerCompanion {
 
   /**
    * FEISHU_WEBHOOK_LOGGER 文本
    */
-  val FEISHU_WEBHOOK_LOGGER = "feishu_webhook_logger"
+  val FEISHU_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.FeishuWebhookLogger"
 
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[Robot] = Array.empty[Robot]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[Robot]
 
@@ -65,7 +68,6 @@ object FeishuWebhookLogger {
   def initializeFeishuWebhook(robotsKeysSigns: String): Unit = {
     robotsKeysSigns.split(",").map(_.trim.split(";").map(_.trim)) |! initializeFeishuWebhook
   }
-
 
   /**
    * 初始化 feishu webhook 的密钥
@@ -80,17 +82,30 @@ object FeishuWebhookLogger {
       robotsKeysSigns.exists(p => p.length > 2 || p.length == 0)
     ) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format(if (robotsKeysSigns == null) null else robotsKeysSigns.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format(if (robotsKeysSigns == null) null else robotsKeysSigns.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
     }
     robotsKeysSigns.map(keySign => {
       if (keySign.length == 1) {
         val token = keySign.head
-        new Robot(Some(token), None)
+        Robot(Some(token), None)
       } else {
         val token = keySign.head
         val sign = keySign.last
-        new Robot(Some(token), Some(sign))
+        Robot(Some(token), Some(sign))
       }
     })
+  }
+
+  override def apply(c: LoggerConfiguration): FeishuWebhookLogger = {
+    initializeConfiguration(c)
+    apply()
+  }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+
+  override def apply(): FeishuWebhookLogger = {
+    if (loggerConfig == null)
+      throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
+    new FeishuWebhookLogger()
   }
 }

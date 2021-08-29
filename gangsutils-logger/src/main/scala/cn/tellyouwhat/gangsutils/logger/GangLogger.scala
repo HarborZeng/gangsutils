@@ -1,263 +1,145 @@
 package cn.tellyouwhat.gangsutils.logger
 
+import cn.tellyouwhat.gangsutils.core.constants.{errorLog_unquote, infoLog_unquote}
 import cn.tellyouwhat.gangsutils.core.helper.I18N
-import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
+import cn.tellyouwhat.gangsutils.core.helper.chaining.TapIt
 import cn.tellyouwhat.gangsutils.logger.SupportedLogDest._
-import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
-import cn.tellyouwhat.gangsutils.logger.dest.webhook._
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException
 
+import scala.reflect.runtime.universe
 
-/**
- * Logger 的具体实现，混入了 PrintlnLogger 和 WoaWebhookLogger
- */
-protected class GangLogger(
-                            override val isDTEnabled: Boolean = GangLogger.isDTEnabled,
-                            override val isTraceEnabled: Boolean = GangLogger.isTraceEnabled,
-                            override implicit val defaultLogDest: Seq[SupportedLogDest.Value] = GangLogger.defaultLogDest,
-                            override val logsLevels: Array[LogLevel.Value] = GangLogger.logsLevels,
-                            override val logPrefix: Option[String] = GangLogger.logPrefix,
-                            override val isHostnameEnabled: Boolean = GangLogger.isHostnameEnabled,
-                          ) extends PrintlnLogger with WoaWebhookLogger with SlackWebhookLogger with QYWXWebhookLogger with DingTalkWebhookLogger with ServerChanWebhookLogger with FeishuWebhookLogger with TelegramWebhookLogger {
+class GangLogger {
 
-  override def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = defaultLogDest): Boolean = {
+  private val logger2Configuration: Map[SupportedLogDest.Value, LoggerConfiguration] = GangLogger.logger2Configuration
+
+  private[logger] val loggers: Seq[Logger] = {
+    logger2Configuration.map {
+      case (loggerEnum, configuration) =>
+        val rm = universe.runtimeMirror(getClass.getClassLoader)
+        val module = rm.staticModule(loggerEnum.toString)
+        rm.reflectModule(module).instance.asInstanceOf[LoggerCompanion].apply(configuration)
+    }
+  }.toSeq
+
+  /**
+   * 记录一条跟踪级别的日志
+   *
+   * @param msg 日志内容
+   *
+   */
+  def trace(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.TRACE)(enabled)
+
+  /**
+   * 记录一条信息级别的日志
+   *
+   * @param msg 日志内容
+   *
+   */
+  def info(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.INFO)(enabled)
+
+  /**
+   * 记录一条成功级别的日志
+   *
+   * @param msg 日志内容
+   *
+   */
+  def success(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.SUCCESS)(enabled)
+
+  /**
+   * 记录一条警告级别的日志
+   *
+   * @param msg 日志内容
+   *
+   */
+  def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.WARNING)(enabled)
+
+  /**
+   * 记录一条错误级别的日志
+   *
+   * @param msg 日志内容
+   *
+   */
+  def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.ERROR)(enabled)
+
+  /**
+   * 通过参数指定级别的日志
+   *
+   * @param msg   日志内容
+   * @param level 日志级别
+   *
+   */
+  def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
+    (if (enabled != null && enabled.nonEmpty) {
+      val unsupportedDests = enabled.map(_.toString).diff(loggers.map(_.getClass.getName))
+      if (unsupportedDests.nonEmpty)
+        println(errorLog_unquote.format(
+          s"Specified log destination ${unsupportedDests.toVector} in ${enabled.map(_.toString).toVector} does not support, supported are ${loggers.map(_.getClass.getName)}"
+        ))
+      loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
+    } else loggers)
+      .map(_.log(msg, level)).forall(p => p)
+  }
+
+  /**
+   * 记录一条致命级别的日志
+   *
+   * @param msg 日志内容
+   *
+   */
+  def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
     if (msg == null) false
     else {
       val msgStr = msg.toString
-      val logStatus = Array.newBuilder[Boolean]
-      if (enabled.contains(PRINTLN_LOGGER) && level >= logsLevels(PRINTLN_LOGGER.id)) {
-        val status = super[PrintlnLogger].doTheLogAction(msgStr, level)
-        logStatus += status
-      }
-      if (enabled.contains(WOA_WEBHOOK_LOGGER) && level >= logsLevels(WOA_WEBHOOK_LOGGER.id)) {
-        val status = doTheLogAction4WOA(msgStr, level)
-        logStatus += status
-      }
-      if (enabled.contains(SLACK_WEBHOOK_LOGGER) && level >= logsLevels(SLACK_WEBHOOK_LOGGER.id)) {
-        val status = doTheLogAction4Slack(msgStr, level)
-        logStatus += status
-      }
-      if (enabled.contains(QYWX_WEBHOOK_LOGGER) && level >= logsLevels(QYWX_WEBHOOK_LOGGER.id)) {
-        val status = doTheLogAction4QYWX(msgStr, level)
-        logStatus += status
-      }
-      if (enabled.contains(DINGTALK_WEBHOOK_LOGGER) && level >= logsLevels(DINGTALK_WEBHOOK_LOGGER.id)) {
-        val status = doTheLogAction4DingTalk(msgStr, level)
-        logStatus += status
-      }
-      if (enabled.contains(SERVERCHAN_WEBHOOK_LOGGER) && level >= logsLevels(SERVERCHAN_WEBHOOK_LOGGER.id)) {
-        val status = doTheLogAction4ServerChan(msgStr, level)
-        logStatus += status
-      }
-      if (enabled.contains(FEISHU_WEBHOOK_LOGGER) && level >= logsLevels(FEISHU_WEBHOOK_LOGGER.id)) {
-        val status = doTheLogAction4Feishu(msgStr, level)
-        logStatus += status
-      }
-      if (enabled.contains(TELEGRAM_WEBHOOK_LOGGER) && level >= logsLevels(TELEGRAM_WEBHOOK_LOGGER.id)) {
-        val status = doTheLogAction4Telegram(msgStr, level)
-        logStatus += status
-      }
-      logStatus.result().forall(b => b)
+      log(if (throwable != null) s"$msgStr，message is ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled)
     }
   }
 
-  private def doTheLogAction4WOA(msg: String, level: LogLevel.Value): Boolean = {
-    super[WoaWebhookLogger].checkPrerequisite()
-    super[WoaWebhookLogger].webhookLog(msg, level)
-  }
-
-  private def doTheLogAction4Slack(msg: String, level: LogLevel.Value): Boolean = {
-    super[SlackWebhookLogger].checkPrerequisite()
-    super[SlackWebhookLogger].webhookLog(msg, level)
-  }
-
-  private def doTheLogAction4QYWX(msg: String, level: LogLevel.Value): Boolean = {
-    super[QYWXWebhookLogger].checkPrerequisite()
-    super[QYWXWebhookLogger].webhookLog(msg, level)
-  }
-
-  private def doTheLogAction4DingTalk(msg: String, level: LogLevel.Value): Boolean = {
-    super[DingTalkWebhookLogger].checkPrerequisite()
-    super[DingTalkWebhookLogger].webhookLog(msg, level)
-  }
-
-  private def doTheLogAction4ServerChan(msg: String, level: LogLevel.Value): Boolean = {
-    super[ServerChanWebhookLogger].checkPrerequisite()
-    super[ServerChanWebhookLogger].webhookLog(msg, level)
-  }
-
-  private def doTheLogAction4Feishu(msg: String, level: LogLevel.Value): Boolean = {
-    super[FeishuWebhookLogger].checkPrerequisite()
-    super[FeishuWebhookLogger].webhookLog(msg, level)
-  }
-
-  private def doTheLogAction4Telegram(msg: String, level: LogLevel.Value): Boolean = {
-    super[TelegramWebhookLogger].checkPrerequisite()
-    super[TelegramWebhookLogger].webhookLog(msg, level)
-  }
 }
 
 object GangLogger {
 
-  /**
-   * Logger 的单例对象
-   */
-  private[logger] var _logger: Option[Logger] = None
-  /**
-   * 是否在日志中启用时间
-   */
-  private var isDTEnabled: Boolean = true
-  /**
-   * 是否在日志中启用跟踪（包名类名方法名行号）字段
-   */
-  private var isTraceEnabled: Boolean = false
-  /**
-   * 是否在日志中启用主机名字段
-   */
-  private var isHostnameEnabled: Boolean = true
-  /**
-   * 默认的日志输出目的地
-   */
-  private var defaultLogDest: Seq[SupportedLogDest.Value] = Seq(PRINTLN_LOGGER)
-  /**
-   * 默认的不同的日志输出目的地的级别
-   */
-  private var logsLevels: Array[LogLevel.Value] = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
-  /**
-   * 日志前缀，每条日志前都会被加上的前缀
-   */
-  private var logPrefix: Option[String] = None
+  private var logger2Configuration: Map[SupportedLogDest.Value, LoggerConfiguration] = _
+  private[logger] var _logger: Option[GangLogger] = None
 
-  /**
-   * 创建一个新的 GangLogger 实例
-   *
-   * @param isDTEnabled       是否在日志中启用时间
-   * @param isTraceEnabled    是否在日志中启用跟踪（包名类名方法名行号）字段
-   * @param defaultLogDest    默认的日志输出目的地
-   * @param logsLevels        默认的不同的日志输出目的地的级别
-   * @param logPrefix         每条日志的前缀
-   * @param isHostnameEnabled 是否在日志中启用主机名字段
-   * @return 一个新的 GangLogger 实例
-   */
-  def apply(
-             isDTEnabled: Boolean = isDTEnabled,
-             isTraceEnabled: Boolean = isTraceEnabled,
-             defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,
-             logsLevels: Array[LogLevel.Value] = logsLevels,
-             logPrefix: Option[String] = logPrefix,
-             isHostnameEnabled: Boolean = isHostnameEnabled
-           ): GangLogger =
-    new GangLogger(isDTEnabled, isTraceEnabled, defaultLogDest, logsLevels, logPrefix, isHostnameEnabled) |! (l => _logger = Some(l))
-
-  /**
-   * 获取 Logger 单例对象
-   *
-   * @return
-   */
-  def getLogger: Logger = {
-    _logger match {
-      case Some(logger) => logger
-      case None => apply() |! (logger => logger.warning(NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))))
-    }
+  def setLoggerAndConfiguration(m: Map[SupportedLogDest.Value, LoggerConfiguration]): Unit = {
+    if (m == null)
+      throw new IllegalArgumentException("null m: Map[SupportedLogDest.Value, LoggerConfiguration]")
+    if (m.isEmpty)
+      throw new IllegalArgumentException("empty m: Map[SupportedLogDest.Value, LoggerConfiguration]")
+    logger2Configuration = m
   }
 
-  /**
-   * 创建一个新的 GangLogger 实例
-   *
-   * @return 一个新的 GangLogger 实例
-   */
-  def apply(): GangLogger = new GangLogger() |! (l => _logger = Some(l))
+  def apply(isDTEnabled: Boolean = true,
+            isTraceEnabled: Boolean = false,
+            isHostnameEnabled: Boolean = true,
+            logPrefix: Option[String] = None,
+            logLevel: LogLevel.Value = LogLevel.TRACE): GangLogger = {
+    if (logger2Configuration == null) {
+      logger2Configuration = Map(PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled, isTraceEnabled, isHostnameEnabled, logPrefix, logLevel))
+    }
+    apply()
+  }
 
   /**
    * 清除单例 Logger 对象
    */
   def killLogger(): Unit = _logger = None
 
-  /**
-   * 将 GangLogger 伴生对像变量初始化
-   */
-  def resetLoggerConfig(): Unit = {
-    isDTEnabled = true
-    isTraceEnabled = false
-    defaultLogDest = Seq(PRINTLN_LOGGER)
-    logsLevels = Array.fill(SupportedLogDest.values.size)(LogLevel.TRACE)
-    logPrefix = None
-    isHostnameEnabled = true
+  def getLogger: GangLogger = _logger match {
+    case Some(logger) => logger
+    case None =>
+      apply() |! (l => _logger = Some(l)) |! (_ => println(infoLog_unquote.format(
+        NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))
+      )))
   }
 
-  /**
-   * 关闭日志中的日期时间
-   */
-  def disableDateTime(): Unit =
-    isDTEnabled = false
-
-  /**
-   * 启用日志中的日期时间
-   */
-  def enableDateTime(): Unit =
-    isDTEnabled = true
-
-  /**
-   * 关闭日志中的包名类名方法名行号
-   */
-  def disableTrace(): Unit =
-    isTraceEnabled = false
-
-  /**
-   * 启用日志中的包名类名方法名行号
-   *
-   * 注意：如果有短时大量日志输出，启用此功能将会影响程序性能
-   */
-  def enableTrace(): Unit =
-    isTraceEnabled = true
-
-  /**
-   * 关闭日志中的主机名字段
-   */
-  def disableHostname(): Unit =
-    isHostnameEnabled = false
-
-  /**
-   * 启用日志中的主机名字段
-   */
-  def enableHostname(): Unit =
-    isHostnameEnabled = true
-
-  /**
-   * 设置默认的日志输出目的地
-   *
-   * @param destination 日志输出目的地
-   */
-  def setDefaultLogDest(destination: Seq[SupportedLogDest.Value]): Unit =
-    defaultLogDest = destination
-
-  /**
-   * 设置日志级别
-   *
-   * @param levels 每个级别对应所支持的每一个日志
-   */
-  def setLogsLevels(levels: Array[LogLevel.Value]): Unit = {
-    if (levels.length != SupportedLogDest.values.size) {
-      throw new IllegalArgumentException(I18N.getRB.getString("setLogsLevels.illegalArray").format(levels.length, SupportedLogDest.values.size))
+  def apply(): GangLogger = {
+    if (logger2Configuration == null) {
+      logger2Configuration = Map(PRINTLN_LOGGER -> LoggerConfiguration())
     }
-    logsLevels = levels
+    new GangLogger() |! (l => _logger = Some(l))
   }
 
-  /**
-   * 设置日志级别
-   *
-   * @param levels 每个级别对应所支持的每一个日志，如 `Map(PRINTLN_LOGGER -> LogLevel.TRACE)`
-   */
-  def setLogsLevels(levels: Map[SupportedLogDest.Value, LogLevel.Value]): Unit = {
-    if (levels == null || levels.isEmpty) {
-      throw new IllegalArgumentException(I18N.getRB.getString("setLogsLevels.IllegalMap").format(levels))
-    }
-    // ValueSet object is a sorted set by design
-    (SupportedLogDest.values.map(_ -> LogLevel.TRACE).toMap ++ levels).values.toArray |> setLogsLevels
-  }
-
-  def setLogPrefix(prefix: String): Unit = logPrefix = Some(prefix)
-
-  def clearLogPrefix(): Unit = logPrefix = None
-
+  def clearLogger2Configuration(): Unit = logger2Configuration = null
 }

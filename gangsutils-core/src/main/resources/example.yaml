@@ -1,0 +1,8 @@
+foo:
+  bar: 1.1
+  app:
+    name: gangsutils
+    versionNumbers:
+      - 1.0
+      - 1.1
+      - 1.2

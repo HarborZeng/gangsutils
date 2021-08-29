@@ -20,14 +20,6 @@ object NoAliveLoggerException {
   def apply: NoAliveLoggerException = NoAliveLoggerException()
 
   /**
-   * 使用错误信息生成一个新的 NoAliveLoggerException
-   *
-   * @param message 错误信息
-   * @return 一个新的 NoAliveLoggerException
-   */
-  def apply(message: String): NoAliveLoggerException = NoAliveLoggerException(optionMessage = Some(message))
-
-  /**
    * 使用错误信息、异常、isEnableSuppression、isWritableStackTrace 生成一个新的 NoAliveLoggerException
    *
    * @param optionMessage        Option[错误信息]
@@ -41,6 +33,14 @@ object NoAliveLoggerException {
             isEnableSuppression: Boolean = false,
             isWritableStackTrace: Boolean = false): NoAliveLoggerException =
     new NoAliveLoggerException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
+
+  /**
+   * 使用错误信息生成一个新的 NoAliveLoggerException
+   *
+   * @param message 错误信息
+   * @return 一个新的 NoAliveLoggerException
+   */
+  def apply(message: String): NoAliveLoggerException = NoAliveLoggerException(optionMessage = Some(message))
 
   /**
    * 使用异常生成一个新的 NoAliveLoggerException
