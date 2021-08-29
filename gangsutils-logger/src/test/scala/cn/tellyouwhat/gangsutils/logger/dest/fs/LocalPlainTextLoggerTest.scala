@@ -22,8 +22,10 @@ class LocalPlainTextLoggerTest extends AnyFlatSpec with Matchers with BeforeAndA
   }
 
   after {
-    Files.delete(Paths.get(path))
-    Files.delete(Paths.get(path).getParent)
+    if (Files.exists(Paths.get(path))) {
+      Files.delete(Paths.get(path))
+      Files.delete(Paths.get(path).getParent)
+    }
   }
 
   behavior of "LocalPlainTextLoggerTest"
