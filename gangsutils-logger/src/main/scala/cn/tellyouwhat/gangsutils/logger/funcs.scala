@@ -17,7 +17,7 @@ object funcs {
    * @return block 的执行结果
    */
   def timeit[R](block: => R, desc: String = I18N.getRB.getString("task")): R = {
-    implicit val logger: Logger = GangLogger.getLogger
+    implicit val logger: GangLogger = GangLogger.getLogger
     printOrLog(I18N.getRB.getString("timeit.start").format(desc))
     val t0 = System.currentTimeMillis()
     val result = Try(block) match {
@@ -39,7 +39,7 @@ object funcs {
    * @param level   日志级别
    * @param logger  日志对象
    */
-  def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: Logger = null): Unit =
+  def printOrLog(content: String, level: LogLevel.Value = LogLevel.TRACE)(implicit logger: GangLogger = null): Unit =
     if (logger == null) {
       println(s"${placeholderHead_unquote.format(level)}: $content")
     } else {

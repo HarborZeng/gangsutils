@@ -53,13 +53,15 @@ trait WebhookLogger extends Logger {
       """"code":19001""", // feishu
       """"errcode":93000""", // qywx(企业微信)
     ).exists(response.body.contains)) {
-      GangLogger.getLogger.critical(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))(enabled = Seq(PRINTLN_LOGGER))
+      println(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))
       return false
     }
     if (response.isError) {
-      GangLogger.getLogger.critical(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}"))(enabled = Seq(PRINTLN_LOGGER))
+      println(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}"))
     }
     response.isSuccess
   }
+
+  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = webhookLog(msg, level)
 
 }

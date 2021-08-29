@@ -266,6 +266,7 @@
                     <excludes>
                         <exclude>cn/tellyouwhat/gangsutils/useless/**/*</exclude>
                         <exclude>cn/tellyouwhat/gangsutils/core/constants*.class</exclude>
+                        <exclude>cn/tellyouwhat/gangsutils/**/exceptions/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

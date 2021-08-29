@@ -3,10 +3,12 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.LogLevel
-import cn.tellyouwhat.gangsutils.logger.cc.TelegramRobot
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, TelegramRobot}
 
-trait TelegramWebhookLogger extends WebhookLogger {
+class TelegramWebhookLogger extends WebhookLogger {
+  
+  override val loggerConfig: LoggerConfiguration = TelegramWebhookLogger.loggerConfig
 
   /**
    * 要发往的机器人的密钥
@@ -27,12 +29,12 @@ trait TelegramWebhookLogger extends WebhookLogger {
   }
 }
 
-object TelegramWebhookLogger {
+object TelegramWebhookLogger extends LoggerCompanion {
 
   /**
    * TELEGRAM_WEBHOOK_LOGGER 文本
    */
-  val TELEGRAM_WEBHOOK_LOGGER = "telegram_webhook_logger"
+  val TELEGRAM_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.TelegramWebhookLogger"
 
   /**
    * 要发往的机器人的密钥
@@ -71,5 +73,20 @@ object TelegramWebhookLogger {
       val token = chatIDToken.last
       TelegramRobot(Some(chatID), Some(token))
     })
+  }
+
+  private var loggerConfig: LoggerConfiguration = _
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+
+  override def apply(c: LoggerConfiguration): TelegramWebhookLogger = {
+    loggerConfig = c
+    apply()
+  }
+
+  override def apply(): TelegramWebhookLogger = {
+    if (loggerConfig == null)
+      throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
+    new TelegramWebhookLogger()
   }
 }

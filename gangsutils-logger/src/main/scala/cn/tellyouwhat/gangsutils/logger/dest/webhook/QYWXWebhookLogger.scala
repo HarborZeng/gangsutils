@@ -3,12 +3,14 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.LogLevel
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 
 /**
  * 往企业微信里面发送日志
  */
-trait QYWXWebhookLogger extends WebhookLogger {
+class QYWXWebhookLogger extends WebhookLogger {
+  override val loggerConfig: LoggerConfiguration = QYWXWebhookLogger.loggerConfig
 
   /**
    * 要发往的机器人的密钥
@@ -33,12 +35,12 @@ trait QYWXWebhookLogger extends WebhookLogger {
 /**
  * QYWX webhook 日志的伴生对象
  */
-object QYWXWebhookLogger {
+object QYWXWebhookLogger extends LoggerCompanion {
 
   /**
    * QYWX_WEBHOOK_LOGGER 文本
    */
-  val QYWX_WEBHOOK_LOGGER = "qywx_webhook_logger"
+  val QYWX_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.QYWXWebhookLogger"
 
   /**
    * 要发往的机器人的密钥
@@ -70,4 +72,18 @@ object QYWXWebhookLogger {
     robotsKeys
   }
 
+  private var loggerConfig: LoggerConfiguration = _
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+
+  override  def apply(c: LoggerConfiguration): QYWXWebhookLogger = {
+    initializeConfiguration(c)
+    apply()
+  }
+
+  override def apply(): QYWXWebhookLogger = {
+    if (loggerConfig == null)
+      throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
+    new QYWXWebhookLogger()
+  }
 }

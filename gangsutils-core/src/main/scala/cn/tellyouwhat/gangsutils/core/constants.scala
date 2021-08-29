@@ -54,7 +54,7 @@ object constants {
   val warningLog: String = s"$yellowPattern$warningHead$resetPattern%s\\s+"
   val criticalLog: String = s"$redPattern$boldPattern$criticalHead$resetPattern%s\\s+"
   val errorLog: String = s"$redPattern$errorHead$resetPattern%s\\s+"
-  val traceLog: String = s"$traceHead%s\\s+"
+  val traceLog: String = s"$traceHead$resetPattern%s\\s+"
   /**
    * placeholders with unquote head for println
    */
@@ -63,7 +63,7 @@ object constants {
   val warningLog_unquote: String = s"$YELLOW$warningHead_unquote$RESET%s"
   val criticalLog_unquote: String = s"$RED$BOLD$criticalHead_unquote$RESET%s"
   val errorLog_unquote: String = s"$RED$errorHead_unquote$RESET%s"
-  val traceLog_unquote: String = s"$traceHead_unquote%s"
+  val traceLog_unquote: String = s"$traceHead_unquote$RESET%s"
   val datetimeRe = """\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+"""
 
 }

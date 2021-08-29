@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
-import cn.tellyouwhat.gangsutils.logger.dest.webhook.{DingTalkWebhookLogger, FeishuWebhookLogger, QYWXWebhookLogger, ServerChanWebhookLogger, SlackWebhookLogger, TelegramWebhookLogger, WoaWebhookLogger}
+import cn.tellyouwhat.gangsutils.logger.dest.webhook._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

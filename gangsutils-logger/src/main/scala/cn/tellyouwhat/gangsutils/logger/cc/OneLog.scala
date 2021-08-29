@@ -1,10 +1,12 @@
 package cn.tellyouwhat.gangsutils.logger.cc
 
 import cn.tellyouwhat.gangsutils.core.constants._
+import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.logger.LogLevel
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongLogLevelException
 
 import java.time.LocalDateTime
+import scala.io.AnsiColor._
 
 case class OneLog(
                    level: Option[LogLevel.Value],
@@ -78,4 +80,16 @@ case class OneLog(
   }
 
   override def toString: String = toStandardLogString
+
+  def toHtmlString: String = {
+    toStandardLogString
+      .replace(s"$RED$BOLD", """<div class="head critical">""")
+      .replace(s"$RED", """<div class="head error">""")
+      .replace(s"$YELLOW", """<div class="head warning">""")
+      .replace(s"$GREEN", """<div class="head success">""")
+      .replace(s"$BOLD", """<div class="head info">""")
+      .replace(s"$RESET", """</div><pre>""")
+      .pipe(log => (if (log.startsWith("<div")) """<div class="log">""" else """<div class="log"><div class="head">""") + log + "</pre></div>")
+  }
+
 }

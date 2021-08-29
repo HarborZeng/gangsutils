@@ -2,7 +2,7 @@ package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.core.constants.{criticalLog, errorLog, infoLog, successLog, traceLog, warningLog}
 import cn.tellyouwhat.gangsutils.core.helper.I18N
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
+import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
@@ -10,19 +10,18 @@ import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
 
   before {
-    GangLogger.disableDateTime()
-    GangLogger.disableHostname()
+    GangLogger.killLogger()
+    GangLogger.clearLogger2Configuration()
   }
-
   after {
     GangLogger.killLogger()
-    GangLogger.resetLoggerConfig()
+    GangLogger.clearLogger2Configuration()
   }
 
   behavior of "GangLoggerTest"
 
   it should "success" in {
-    val logger: Logger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
+    val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.success("a success log")
@@ -31,7 +30,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "info" in {
-    val logger: Logger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
+    val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.info("an info log")
@@ -40,7 +39,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "trace" in {
-    val logger: Logger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
+    val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.trace("a trace log")
@@ -49,7 +48,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "log" in {
-    val logger: Logger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
+    val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.log("a log", level = LogLevel.TRACE)
@@ -58,7 +57,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "critical" in {
-    val logger: Logger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
+    val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.critical("a critical log")
@@ -67,7 +66,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "warning" in {
-    val logger: Logger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
+    val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.warning("a warning log")
@@ -76,7 +75,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   it should "error" in {
-    val logger: Logger = GangLogger(isDTEnabled = false, isTraceEnabled = false)
+    val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.error("an error log")
@@ -84,85 +83,8 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     stream.toString should fullyMatch regex errorLog.format(": an error log")
   }
 
-  it should "setLogsLevels(levels: Array[LogLevel.Value])" in {
-    an[IllegalArgumentException] should be thrownBy GangLogger.setLogsLevels(Array.empty[LogLevel.Value])
-    a[NullPointerException] should be thrownBy GangLogger.setLogsLevels(null: Array[LogLevel.Value])
-
-    GangLogger.setLogsLevels(Array.fill(SupportedLogDest.maxId)(LogLevel.TRACE))
-    val levels = GangLogger().logsLevels
-    levels should contain theSameElementsAs Array.fill(SupportedLogDest.maxId)(LogLevel.TRACE)
-  }
-
-  it should "setLogsLevels(levels: Map[SupportedLogDest.Value, LogLevel.Value])" in {
-    an[IllegalArgumentException] should be thrownBy GangLogger.setLogsLevels(Map.empty[SupportedLogDest.Value, LogLevel.Value])
-    an[IllegalArgumentException] should be thrownBy GangLogger.setLogsLevels(null: Map[SupportedLogDest.Value, LogLevel.Value])
-
-    GangLogger.setLogsLevels(Map(PRINTLN_LOGGER -> LogLevel.TRACE, WOA_WEBHOOK_LOGGER -> LogLevel.INFO))
-    val levels = GangLogger().logsLevels
-    levels should contain theSameElementsAs Array(LogLevel.TRACE, LogLevel.INFO) ++ Array.fill(SupportedLogDest.maxId - 2)(LogLevel.TRACE)
-  }
-
-  it should "setDefaultLogDest" in {
-    GangLogger.setDefaultLogDest(Seq(SupportedLogDest.WOA_WEBHOOK_LOGGER, SupportedLogDest.PRINTLN_LOGGER))
-    val dest = GangLogger().defaultLogDest
-    dest should have size 2
-    dest should contain(SupportedLogDest.WOA_WEBHOOK_LOGGER)
-    dest should contain(SupportedLogDest.PRINTLN_LOGGER)
-  }
-
-  it should "apply" in {
-    val logger1 = GangLogger.apply()
-    val logger2 = new GangLogger()
-
-    logger1.logsLevels should contain theSameElementsAs logger2.logsLevels
-    logger1.defaultLogDest should contain theSameElementsAs logger2.defaultLogDest
-  }
-
-  it should "apply(isDTEnabled: Boolean = isDTEnabled,isTraceEnabled: Boolean = isTraceEnabled,defaultLogDest: Seq[SupportedLogDest.Value] = defaultLogDest,logsLevels: Array[LogLevel.Value] = logsLevels, logPrefix = logPrefix)" in {
-    val logger1 = GangLogger.apply(isDTEnabled = false, isTraceEnabled = true, defaultLogDest = SupportedLogDest.values.toSeq, logsLevels = Array.fill(SupportedLogDest.maxId)(LogLevel.INFO))
-    val logger2 = new GangLogger(isDTEnabled = false, isTraceEnabled = true, defaultLogDest = SupportedLogDest.values.toSeq, logsLevels = Array.fill(SupportedLogDest.maxId)(LogLevel.INFO))
-
-    logger1.isDTEnabled shouldEqual logger2.isDTEnabled
-    logger1.isTraceEnabled shouldEqual logger2.isTraceEnabled
-    logger1.logsLevels should contain theSameElementsAs logger2.logsLevels
-    logger1.defaultLogDest should contain theSameElementsAs logger2.defaultLogDest
-  }
-
-  it should "disable/enableTrace" in {
-    GangLogger.disableTrace()
-    GangLogger().isTraceEnabled shouldBe false
-    GangLogger.enableTrace()
-    GangLogger().isTraceEnabled shouldBe true
-    GangLogger.disableTrace()
-    GangLogger().isTraceEnabled shouldBe false
-  }
-
-  it should "disable/enableHostname" in {
-    GangLogger.disableHostname()
-    GangLogger().isHostnameEnabled shouldBe false
-    GangLogger.enableHostname()
-    GangLogger().isHostnameEnabled shouldBe true
-    GangLogger.disableHostname()
-    GangLogger().isHostnameEnabled shouldBe false
-  }
-
-  it should "disable/enableDateTime" in {
-    GangLogger.disableDateTime()
-    GangLogger().isDTEnabled shouldBe false
-    GangLogger.enableDateTime()
-    val logger3 = GangLogger()
-    logger3.isDTEnabled shouldBe true
-    val stream = new java.io.ByteArrayOutputStream()
-    Console.withOut(stream) {
-      logger3.trace("logger3 info")
-    }
-    stream.toString() should fullyMatch regex traceLog.format(""" - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+: logger3 info""")
-    GangLogger.disableDateTime()
-    GangLogger().isDTEnabled shouldBe false
-  }
-
   it should "apply with logPrefix" in {
-    val logger2 = GangLogger(isDTEnabled = false, logPrefix = Some("a prefix"))
+    val logger2 = GangLogger(isDTEnabled = false, logPrefix = Some("a prefix"), isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger2.trace("a log with prefix")
@@ -171,10 +93,9 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   "setLogPrefix" should "set logPrefix variable" in {
-    GangLogger.setLogPrefix("another prefix")
-    val logger1 = GangLogger(isDTEnabled = false)
+    val logger1 = GangLogger(isDTEnabled = false, logPrefix = Some("another prefix"), isHostnameEnabled = false)
 
-    logger1.logPrefix shouldBe Some("another prefix")
+    logger1.loggers.head.asInstanceOf[PrintlnLogger].loggerConfig.logPrefix shouldBe Some("another prefix")
 
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
@@ -183,31 +104,22 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     stream.toString() should fullyMatch regex traceLog.format(": another prefix - another log with prefix")
   }
 
-  "clearLogPrefix" should "reset logPrefix variable to default empty string" in {
-    GangLogger.setLogPrefix("another prefix")
-    val logger1 = GangLogger()
-
-    GangLogger.clearLogPrefix()
-    val logger2 = GangLogger()
-
-    logger1.logPrefix shouldBe Some("another prefix")
-    logger2.logPrefix shouldBe None
-  }
-
   "getLogger" should "return an existing GangLogger or a new GangLogger()" in {
-    val newLogger = GangLogger(logPrefix = Some("123"))
+    GangLogger.killLogger()
+    val newLogger = GangLogger(logPrefix = Some("123"), isHostnameEnabled = false)
     val logger1 = GangLogger.getLogger
-    logger1 shouldEqual newLogger
+    val logger2 = GangLogger.getLogger
+    logger1 shouldEqual logger2
 
-    GangLogger._logger = None
+    GangLogger.killLogger()
     val stream = new java.io.ByteArrayOutputStream()
-    val logger2 = Console.withOut(stream) {
+    val logger3 = Console.withOut(stream) {
       GangLogger.getLogger
     }
-    logger2 shouldEqual GangLogger._logger.get
+    logger3 shouldEqual GangLogger._logger.get
 
     stream.toString() should fullyMatch regex
-      warningLog.format(": cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException: " + I18N.getRB.getString("getLogger.NoAliveLogger"))
+      infoLog.format("cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException: " + I18N.getRB.getString("getLogger.NoAliveLogger"))
   }
 
   "killLogger" should "reset the _logger variable to None" in {

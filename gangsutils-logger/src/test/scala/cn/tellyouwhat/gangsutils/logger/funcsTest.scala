@@ -2,25 +2,29 @@ package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.core.constants.{criticalLog, successLog, traceLog}
 import cn.tellyouwhat.gangsutils.core.helper.I18N.getRB
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.PRINTLN_LOGGER
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 
 import java.io.ByteArrayOutputStream
+import java.util.regex.Pattern
+import scala.io.AnsiColor.RESET
 
 class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
 
   before {
-    GangLogger.disableDateTime()
-    GangLogger.disableHostname()
+    GangLogger.setLoggerAndConfiguration(Map(
+      PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
+    ))
     GangLogger()
   }
 
   after {
     GangLogger.killLogger()
-    GangLogger.resetLoggerConfig()
+    GangLogger.clearLogger2Configuration()
   }
-
 
   "timeit" should "time a function invocation and log the start and execution duration" in {
     val stream = new ByteArrayOutputStream()
@@ -49,11 +53,11 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
     Console.withOut(stream) {
       funcs.printOrLog("content", LogLevel.TRACE)
     }
-    stream.toString() should fullyMatch regex traceLog.format(": content")
+    stream.toString() should fullyMatch regex traceLog.replace(Pattern.quote(RESET), "").format(": content")
 
     stream.reset()
     Console.withOut(stream) {
-      funcs.printOrLog("content", LogLevel.TRACE)(GangLogger(isDTEnabled = false))
+      funcs.printOrLog("content", LogLevel.TRACE)(GangLogger(isDTEnabled = false, isHostnameEnabled = false))
     }
     stream.toString() should fullyMatch regex traceLog.format(": content")
   }

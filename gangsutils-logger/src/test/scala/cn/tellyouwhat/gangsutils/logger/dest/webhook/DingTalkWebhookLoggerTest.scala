@@ -2,8 +2,9 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
 import cn.tellyouwhat.gangsutils.core.helper.I18N
-import cn.tellyouwhat.gangsutils.logger.cc.Robot
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
+import cn.tellyouwhat.gangsutils.logger.GangLogger
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.DINGTALK_WEBHOOK_LOGGER
+import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
 import org.mockito.MockitoSugar
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -15,13 +16,16 @@ import scala.util.{Failure, Success}
 class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter with MockitoSugar with PrivateMethodTester {
 
   before {
-    GangLogger.resetLoggerConfig()
+    GangLogger.setLoggerAndConfiguration(Map(
+      DINGTALK_WEBHOOK_LOGGER -> LoggerConfiguration()
+    ))
   }
-
   after {
-    GangLogger.resetLoggerConfig()
+    GangLogger.killLogger()
+    GangLogger.clearLogger2Configuration()
     DingTalkWebhookLogger.resetRobots()
   }
+
 
   behavior of "DingTalkWebhookLoggerTest"
 
@@ -29,12 +33,18 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     the[NullPointerException] thrownBy {
       DingTalkWebhookLogger.initializeDingTalkWebhook(null: String)
     } should have message null
+
     DingTalkWebhookLogger.initializeDingTalkWebhook("abc,def")
-    GangLogger().dingTalkRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None), Robot(Some("def"), None))
+    val logger1 = GangLogger()
+    logger1.loggers.head.asInstanceOf[DingTalkWebhookLogger].dingTalkRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None), Robot(Some("def"), None))
+
     DingTalkWebhookLogger.initializeDingTalkWebhook("abc;123,def")
-    GangLogger().dingTalkRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), Some("123")), Robot(Some("def"), None))
+    val logger2 = GangLogger()
+    logger2.loggers.head.asInstanceOf[DingTalkWebhookLogger].dingTalkRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), Some("123")), Robot(Some("def"), None))
+
     DingTalkWebhookLogger.initializeDingTalkWebhook("abc")
-    GangLogger().dingTalkRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None))
+    val logger3 = GangLogger()
+    logger3.loggers.head.asInstanceOf[DingTalkWebhookLogger].dingTalkRobotsToSend should contain theSameElementsAs Seq(Robot(Some("abc"), None))
   }
 
   it should "initializeDingTalkWebhook(robotsKeysSigns: Array[Array[String]])" in {
@@ -61,7 +71,8 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
 
   "dingtalk webhook logger" should "send a log into dingtalk with correct key and sign" in {
     DingTalkWebhookLogger.initializeDingTalkWebhook("b50b785dcba656265195521be1dd5accc9dadc5cb461dcda37d73a2dc86f309d;SEC26320f0a940219f49ab1858fee0eafbd4b5b4ff5da8e92e13ffdb5b57d91753b")
-    val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.DINGTALK_WEBHOOK_LOGGER))
+
+    val logger = GangLogger()
     retry(2)(logger.info("dingtalk webhook logger send a log into dingtalk with correct key and sign")) match {
       case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
@@ -70,7 +81,7 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
 
   it should "send a log into dingtalk with correct key" in {
     DingTalkWebhookLogger.initializeDingTalkWebhook("0ff315d9238ebe9a0a1bb229610e0434001a5998f5adf6a597887e48ddf0f270")
-    val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.DINGTALK_WEBHOOK_LOGGER))
+    val logger = GangLogger()
     retry(2)(logger.info("dingtalk webhook logger send a log into dingtalk with correct key")) match {
       case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
@@ -79,7 +90,7 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
 
   it should "not send a log into dingtalk with incorrect key" in {
     DingTalkWebhookLogger.initializeDingTalkWebhook("a3af")
-    val logger = GangLogger(defaultLogDest = Seq(SupportedLogDest.DINGTALK_WEBHOOK_LOGGER))
+    val logger = GangLogger()
     retry(2)(logger.info("dingtalk webhook logger not send a log into dingtalk with incorrect key")) match {
       case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe false
@@ -87,7 +98,7 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
-    val logger = GangLogger(defaultLogDest = SupportedLogDest.DINGTALK_WEBHOOK_LOGGER :: Nil)
+    val logger = GangLogger()
     an[IllegalArgumentException] should be thrownBy {
       logger.info()
     }

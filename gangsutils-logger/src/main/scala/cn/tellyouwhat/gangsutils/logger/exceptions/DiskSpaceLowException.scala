@@ -1,16 +1,29 @@
 package cn.tellyouwhat.gangsutils.logger.exceptions
 
-import cn.tellyouwhat.gangsutils.core.exceptions.GangException
+import java.nio.file.FileSystemException
 
-class DiskSpaceLowException(override val optionMessage: Option[String],
-                            override val optionCause: Option[Throwable],
-                            override val isEnableSuppression: Boolean,
-                            override val isWritableStackTrace: Boolean
-                            ) extends GangException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
+class DiskSpaceLowException(
+                             val optionFile: Option[String],
+                             val optionOther: Option[String],
+                             val optionReason: Option[String],
+                           ) extends FileSystemException(
+  optionFile match {
+    case Some(file) => file
+    case None => null
+  },
+  optionOther match {
+    case Some(other) => other
+    case None => null
+  },
+  optionReason match {
+    case Some(reason) => reason
+    case None => null
+  }
+)
 
 
 /**
- * DiskSpaceLowException who extends RuntimeException
+ * DiskSpaceLowException who extends FileSystemException
  */
 object DiskSpaceLowException {
   /**
@@ -20,43 +33,17 @@ object DiskSpaceLowException {
    */
   def apply: DiskSpaceLowException = DiskSpaceLowException()
 
-  /**
-   * 使用错误信息生成一个新的 DiskSpaceLowException
-   *
-   * @param message 错误信息
-   * @return 一个新的 DiskSpaceLowException
-   */
-  def apply(message: String): DiskSpaceLowException = DiskSpaceLowException(optionMessage = Some(message))
 
-  /**
-   * 使用错误信息、异常、isEnableSuppression、isWritableStackTrace 生成一个新的 DiskSpaceLowException
-   *
-   * @param optionMessage        Option[错误信息]
-   * @param optionCause          Option[异常]
-   * @param isEnableSuppression  whether or not suppression is enabled or disabled
-   * @param isWritableStackTrace whether or not the stack trace should be writable
-   * @return 一个新的 DiskSpaceLowException
-   */
-  def apply(optionMessage: Option[String] = None,
-            optionCause: Option[Throwable] = None,
-            isEnableSuppression: Boolean = false,
-            isWritableStackTrace: Boolean = false): DiskSpaceLowException =
-    new DiskSpaceLowException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
+  def apply(file: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file))
 
-  /**
-   * 使用异常生成一个新的 DiskSpaceLowException
-   *
-   * @param cause 异常
-   * @return 一个新的 DiskSpaceLowException
-   */
-  def apply(cause: Throwable): DiskSpaceLowException = DiskSpaceLowException(optionCause = Some(cause))
+  def apply(file: String, reason: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file), optionReason = Some(reason))
 
-  /**
-   * 使用错误信息和异常生成一个新的 DiskSpaceLowException
-   *
-   * @param message 错误信息
-   * @param cause   异常
-   * @return 一个新的 DiskSpaceLowException
-   */
-  def apply(message: String, cause: Throwable): DiskSpaceLowException = DiskSpaceLowException(optionMessage = Some(message), optionCause = Some(cause))
+  def apply(file: String, other: String, reason: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file), optionOther = Some(other), optionReason = Some(reason))
+
+
+  def apply(optionFile: Option[String] = None,
+            optionOther: Option[String] = None,
+            optionReason: Option[String] = None): DiskSpaceLowException =
+    new DiskSpaceLowException(optionFile, optionOther, optionReason)
+
 }
