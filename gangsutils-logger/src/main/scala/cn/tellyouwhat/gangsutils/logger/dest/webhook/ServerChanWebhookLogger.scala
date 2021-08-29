@@ -76,7 +76,7 @@ object ServerChanWebhookLogger extends LoggerCompanion {
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(c: LoggerConfiguration): ServerChanWebhookLogger = {
-    loggerConfig = c
+    initializeConfiguration(c)
     apply()
   }
 

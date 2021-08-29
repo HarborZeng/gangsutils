@@ -77,7 +77,7 @@ object WoaWebhookLogger extends LoggerCompanion {
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(c: LoggerConfiguration): WoaWebhookLogger = {
-    loggerConfig = c
+    initializeConfiguration(c)
     apply()
   }
 

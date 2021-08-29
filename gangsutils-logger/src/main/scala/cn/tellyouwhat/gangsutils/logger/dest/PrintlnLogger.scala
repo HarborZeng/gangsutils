@@ -41,7 +41,7 @@ object PrintlnLogger extends LoggerCompanion {
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(c: LoggerConfiguration): PrintlnLogger = {
-    loggerConfig = c
+    initializeConfiguration(c)
     apply()
   }
 

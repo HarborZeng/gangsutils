@@ -80,7 +80,7 @@ object TelegramWebhookLogger extends LoggerCompanion {
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(c: LoggerConfiguration): TelegramWebhookLogger = {
-    loggerConfig = c
+    initializeConfiguration(c)
     apply()
   }
 

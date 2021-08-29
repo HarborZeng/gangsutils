@@ -50,7 +50,7 @@ object SlackWebhookLogger extends LoggerCompanion {
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(c: LoggerConfiguration): SlackWebhookLogger = {
-    loggerConfig = c
+    initializeConfiguration(c)
     apply()
   }
 
