@@ -3,8 +3,8 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
 /**
  * 往企业微信里面发送日志
@@ -46,6 +46,7 @@ object QYWXWebhookLogger extends LoggerCompanion {
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[String] = Array.empty[String]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
 
@@ -57,7 +58,6 @@ object QYWXWebhookLogger extends LoggerCompanion {
   def initializeQYWXWebhook(robotsKeys: String): Unit = {
     robotsKeys.split(",").map(_.trim) |! initializeQYWXWebhook
   }
-
 
   /**
    * 初始化 QYWX webhook 的密钥
@@ -72,14 +72,12 @@ object QYWXWebhookLogger extends LoggerCompanion {
     robotsKeys
   }
 
-  private var loggerConfig: LoggerConfiguration = _
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
-
-  override  def apply(c: LoggerConfiguration): QYWXWebhookLogger = {
+  override def apply(c: LoggerConfiguration): QYWXWebhookLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): QYWXWebhookLogger = {
     if (loggerConfig == null)

@@ -3,8 +3,8 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import org.apache.commons.codec.binary.Base64
 
 import java.time.Duration
@@ -56,6 +56,7 @@ object FeishuWebhookLogger extends LoggerCompanion {
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[Robot] = Array.empty[Robot]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[Robot]
 
@@ -67,7 +68,6 @@ object FeishuWebhookLogger extends LoggerCompanion {
   def initializeFeishuWebhook(robotsKeysSigns: String): Unit = {
     robotsKeysSigns.split(",").map(_.trim.split(";").map(_.trim)) |! initializeFeishuWebhook
   }
-
 
   /**
    * 初始化 feishu webhook 的密钥
@@ -87,24 +87,21 @@ object FeishuWebhookLogger extends LoggerCompanion {
     robotsKeysSigns.map(keySign => {
       if (keySign.length == 1) {
         val token = keySign.head
-        new Robot(Some(token), None)
+        Robot(Some(token), None)
       } else {
         val token = keySign.head
         val sign = keySign.last
-        new Robot(Some(token), Some(sign))
+        Robot(Some(token), Some(sign))
       }
     })
   }
-
-
-  private var loggerConfig: LoggerConfiguration = _
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(c: LoggerConfiguration): FeishuWebhookLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): FeishuWebhookLogger = {
     if (loggerConfig == null)

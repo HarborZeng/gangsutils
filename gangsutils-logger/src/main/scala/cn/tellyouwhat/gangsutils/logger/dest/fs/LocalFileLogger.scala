@@ -10,10 +10,12 @@ import java.nio.file._
 
 trait LocalFileLogger extends Logger with FileLifeCycle {
 
-  private[fs] val logSavePath: Path = null
   private lazy val logSaveFileName: Path = logSavePath.getFileName
   private lazy val logSaveDir: Path = logSavePath.getParent
+  private[fs] val logSavePath: Path = null
   private var optionOS: Option[OutputStream] = None
+
+  def closeOutputStream(): Unit = getOS.close()
 
   override protected def checkPrerequisite(): Unit = {
     super.checkPrerequisite()
@@ -33,15 +35,6 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
 
   protected def writeString(s: String): Boolean = writeBytes(s.getBytes("UTF-8"))
 
-  private def getOS: OutputStream = optionOS match {
-    case Some(os) => os
-    case None =>
-      val needHookSOF = !Files.exists(logSavePath)
-      Files.newOutputStream(logSavePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
-        .tap(os => optionOS = Some(os))
-        .tap(os => if (needHookSOF) onSOF(os))
-  }
-
   protected def writeBytes(logBytes: Array[Byte]): Boolean = {
     getOS.write(logBytes)
     getOS.write("\n".getBytes("UTF-8"))
@@ -58,6 +51,15 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
       optionOS = None
     }
     true
+  }
+
+  private def getOS: OutputStream = optionOS match {
+    case Some(os) => os
+    case None =>
+      val needHookSOF = !Files.exists(logSavePath)
+      Files.newOutputStream(logSavePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
+        .tap(os => optionOS = Some(os))
+        .tap(os => if (needHookSOF) onSOF(os))
   }
 
   /**
@@ -82,6 +84,4 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
   protected def fileLog(msg: String, level: LogLevel.Value): Boolean
 
   override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = fileLog(msg, level)
-
-  def closeOutputStream(): Unit = getOS.close()
 }

@@ -36,14 +36,13 @@ object NotFileException {
 
   def apply(file: String): NotFileException = NotFileException(optionFile = Some(file))
 
-  def apply(file: String, reason: String): NotFileException = NotFileException(optionFile = Some(file), optionReason = Some(reason))
-
-  def apply(file: String, other: String, reason: String): NotFileException = NotFileException(optionFile = Some(file), optionOther = Some(other), optionReason = Some(reason))
-
-
   def apply(optionFile: Option[String] = None,
             optionOther: Option[String] = None,
             optionReason: Option[String] = None): NotFileException =
     new NotFileException(optionFile, optionOther, optionReason)
+
+  def apply(file: String, reason: String): NotFileException = NotFileException(optionFile = Some(file), optionReason = Some(reason))
+
+  def apply(file: String, other: String, reason: String): NotFileException = NotFileException(optionFile = Some(file), optionOther = Some(other), optionReason = Some(reason))
 
 }

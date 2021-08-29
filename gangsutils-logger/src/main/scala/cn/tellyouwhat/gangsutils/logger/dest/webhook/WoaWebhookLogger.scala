@@ -3,14 +3,14 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
 /**
  * 往 woa 里面发送日志
  */
 class WoaWebhookLogger extends WebhookLogger {
-  
+
   override val loggerConfig: LoggerConfiguration = WoaWebhookLogger.loggerConfig
 
   /**
@@ -46,6 +46,7 @@ object WoaWebhookLogger extends LoggerCompanion {
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[String] = Array.empty[String]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
 
@@ -57,7 +58,6 @@ object WoaWebhookLogger extends LoggerCompanion {
   def initializeWoaWebhook(robotsKeys: String): Unit = {
     robotsKeys.split(",").map(_.trim) |! initializeWoaWebhook
   }
-
 
   /**
    * 初始化 woa webhook 的密钥
@@ -72,14 +72,12 @@ object WoaWebhookLogger extends LoggerCompanion {
     robotsKeys
   }
 
-  private var loggerConfig: LoggerConfiguration = _
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
-
   override def apply(c: LoggerConfiguration): WoaWebhookLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): WoaWebhookLogger = {
     if (loggerConfig == null)

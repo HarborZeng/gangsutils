@@ -3,11 +3,11 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, TelegramRobot}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
 class TelegramWebhookLogger extends WebhookLogger {
-  
+
   override val loggerConfig: LoggerConfiguration = TelegramWebhookLogger.loggerConfig
 
   /**
@@ -40,6 +40,7 @@ object TelegramWebhookLogger extends LoggerCompanion {
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[TelegramRobot] = Array.empty[TelegramRobot]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[TelegramRobot]
 
@@ -51,7 +52,6 @@ object TelegramWebhookLogger extends LoggerCompanion {
   def initializeTelegramWebhook(robotsChatIdsTokens: String): Unit = {
     robotsChatIdsTokens.split(",").map(_.trim.split(";").map(_.trim)) |! initializeTelegramWebhook
   }
-
 
   /**
    * 初始化 telegram webhook 的密钥
@@ -75,14 +75,12 @@ object TelegramWebhookLogger extends LoggerCompanion {
     })
   }
 
-  private var loggerConfig: LoggerConfiguration = _
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
-
   override def apply(c: LoggerConfiguration): TelegramWebhookLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): TelegramWebhookLogger = {
     if (loggerConfig == null)

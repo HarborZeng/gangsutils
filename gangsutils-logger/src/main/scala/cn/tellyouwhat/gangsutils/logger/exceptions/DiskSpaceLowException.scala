@@ -36,14 +36,13 @@ object DiskSpaceLowException {
 
   def apply(file: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file))
 
-  def apply(file: String, reason: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file), optionReason = Some(reason))
-
-  def apply(file: String, other: String, reason: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file), optionOther = Some(other), optionReason = Some(reason))
-
-
   def apply(optionFile: Option[String] = None,
             optionOther: Option[String] = None,
             optionReason: Option[String] = None): DiskSpaceLowException =
     new DiskSpaceLowException(optionFile, optionOther, optionReason)
+
+  def apply(file: String, reason: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file), optionReason = Some(reason))
+
+  def apply(file: String, other: String, reason: String): DiskSpaceLowException = DiskSpaceLowException(optionFile = Some(file), optionOther = Some(other), optionReason = Some(reason))
 
 }

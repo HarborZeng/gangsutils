@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.logger
 
-import cn.tellyouwhat.gangsutils.core.constants.{criticalLog, errorLog, infoLog, successLog, traceLog, warningLog}
+import cn.tellyouwhat.gangsutils.core.constants._
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
 import org.scalatest.flatspec.AnyFlatSpec

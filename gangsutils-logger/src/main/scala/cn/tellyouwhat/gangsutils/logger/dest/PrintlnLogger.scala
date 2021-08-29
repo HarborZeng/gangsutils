@@ -8,8 +8,8 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
  * 打印到标准输出的日志，只会打印到 stdout（打印到 stderr 的话会有日志顺序不一致的问题，统一打印到 stdout 更加整齐）
  */
 class PrintlnLogger(
-                               override val loggerConfig: LoggerConfiguration = PrintlnLogger.loggerConfig
-                             ) extends Logger {
+                     override val loggerConfig: LoggerConfiguration = PrintlnLogger.loggerConfig
+                   ) extends Logger {
 
   override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = printlnLog(msg, level)
 
@@ -38,12 +38,12 @@ object PrintlnLogger extends LoggerCompanion {
 
   private var loggerConfig: LoggerConfiguration = _
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
-
   override def apply(c: LoggerConfiguration): PrintlnLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): PrintlnLogger = {
     if (loggerConfig == null)

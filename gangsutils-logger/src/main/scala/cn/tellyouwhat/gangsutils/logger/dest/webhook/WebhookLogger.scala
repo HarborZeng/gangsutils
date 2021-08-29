@@ -2,9 +2,8 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.exceptions.GangException
 import cn.tellyouwhat.gangsutils.core.helper.I18N
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.PRINTLN_LOGGER
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongHttpMethodException
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, LogLevel, Logger}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 import scalaj.http.Http
 
 /**

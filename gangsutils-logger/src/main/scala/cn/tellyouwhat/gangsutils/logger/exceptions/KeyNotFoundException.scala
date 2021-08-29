@@ -6,8 +6,7 @@ class KeyNotFoundException(override val optionMessage: Option[String],
                            override val optionCause: Option[Throwable],
                            override val isEnableSuppression: Boolean,
                            override val isWritableStackTrace: Boolean
-                            ) extends GangException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
-
+                          ) extends GangException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
 
 
 /**
@@ -30,6 +29,14 @@ object KeyNotFoundException {
   def apply(message: String): KeyNotFoundException = KeyNotFoundException(optionMessage = Some(message))
 
   /**
+   * 使用异常生成一个新的 KeyNotFoundException
+   *
+   * @param cause 异常
+   * @return 一个新的 KeyNotFoundException
+   */
+  def apply(cause: Throwable): KeyNotFoundException = KeyNotFoundException(optionCause = Some(cause))
+
+  /**
    * 使用错误信息、异常、isEnableSuppression、isWritableStackTrace 生成一个新的 KeyNotFoundException
    *
    * @param optionMessage        Option[错误信息]
@@ -43,14 +50,6 @@ object KeyNotFoundException {
             isEnableSuppression: Boolean = false,
             isWritableStackTrace: Boolean = false): KeyNotFoundException =
     new KeyNotFoundException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
-
-  /**
-   * 使用异常生成一个新的 KeyNotFoundException
-   *
-   * @param cause 异常
-   * @return 一个新的 KeyNotFoundException
-   */
-  def apply(cause: Throwable): KeyNotFoundException = KeyNotFoundException(optionCause = Some(cause))
 
   /**
    * 使用错误信息和异常生成一个新的 KeyNotFoundException

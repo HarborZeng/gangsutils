@@ -19,6 +19,19 @@ case class OneLog(
                    msg: Option[String],
                  ) {
 
+  override def toString: String = toStandardLogString
+
+  def toHtmlString: String = {
+    toStandardLogString
+      .replace(s"$RED$BOLD", """<div class="head critical">""")
+      .replace(s"$RED", """<div class="head error">""")
+      .replace(s"$YELLOW", """<div class="head warning">""")
+      .replace(s"$GREEN", """<div class="head success">""")
+      .replace(s"$BOLD", """<div class="head info">""")
+      .replace(s"$RESET", """</div><pre>""")
+      .pipe(log => (if (log.startsWith("<div")) """<div class="log">""" else """<div class="log"><div class="head">""") + log + "</pre></div>")
+  }
+
   def toStandardLogString: String = {
     val sb = StringBuilder.newBuilder
     hostname match {
@@ -77,19 +90,6 @@ case class OneLog(
       }
       case None => throw WrongLogLevelException("Empty log level")
     }
-  }
-
-  override def toString: String = toStandardLogString
-
-  def toHtmlString: String = {
-    toStandardLogString
-      .replace(s"$RED$BOLD", """<div class="head critical">""")
-      .replace(s"$RED", """<div class="head error">""")
-      .replace(s"$YELLOW", """<div class="head warning">""")
-      .replace(s"$GREEN", """<div class="head success">""")
-      .replace(s"$BOLD", """<div class="head info">""")
-      .replace(s"$RESET", """</div><pre>""")
-      .pipe(log => (if (log.startsWith("<div")) """<div class="log">""" else """<div class="log"><div class="head">""") + log + "</pre></div>")
   }
 
 }

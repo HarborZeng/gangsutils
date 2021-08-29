@@ -2,9 +2,9 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.funcs.retry
 import cn.tellyouwhat.gangsutils.core.helper.I18N
+import cn.tellyouwhat.gangsutils.logger.GangLogger
 import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.WOA_WEBHOOK_LOGGER
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, SupportedLogDest}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

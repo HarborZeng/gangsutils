@@ -4,8 +4,8 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
 import java.net.URLEncoder
 
@@ -45,6 +45,7 @@ object ServerChanWebhookLogger extends LoggerCompanion {
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[String] = Array.empty[String]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
 
@@ -56,7 +57,6 @@ object ServerChanWebhookLogger extends LoggerCompanion {
   def initializeServerChanWebhook(robotsKeys: String): Unit = {
     robotsKeys.split(",").map(_.trim) |! initializeServerChanWebhook
   }
-
 
   /**
    * 初始化 ServerChan webhook 的密钥
@@ -71,14 +71,12 @@ object ServerChanWebhookLogger extends LoggerCompanion {
     robotsKeys
   }
 
-  private var loggerConfig: LoggerConfiguration = _
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
-
   override def apply(c: LoggerConfiguration): ServerChanWebhookLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): ServerChanWebhookLogger = {
     if (loggerConfig == null)

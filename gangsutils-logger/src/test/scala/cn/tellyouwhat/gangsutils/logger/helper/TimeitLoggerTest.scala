@@ -58,9 +58,9 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
       TL.tl()
     }
     stream.toString should fullyMatch regex
-    """.+\s+""" +
-      traceLog.format(s""" - .+ - $datetimeRe: """ + getRB.getString("timeit.start").format(getRB.getString("task"))) +
-      successLog.format(s""" - .+ - $datetimeRe: """ + getRB.getString("timeit.finished").format(getRB.getString("task"), """\d*\.*\d*s"""))
+      """.+\s+""" +
+        traceLog.format(s""" - .+ - $datetimeRe: """ + getRB.getString("timeit.start").format(getRB.getString("task"))) +
+        successLog.format(s""" - .+ - $datetimeRe: """ + getRB.getString("timeit.finished").format(getRB.getString("task"), """\d*\.*\d*s"""))
   }
 
 

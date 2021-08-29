@@ -28,6 +28,14 @@ object WrongLogLevelException {
   def apply(message: String): WrongLogLevelException = WrongLogLevelException(optionMessage = Some(message))
 
   /**
+   * 使用异常生成一个新的 WrongLogLevelException
+   *
+   * @param cause 异常
+   * @return 一个新的 WrongLogLevelException
+   */
+  def apply(cause: Throwable): WrongLogLevelException = WrongLogLevelException(optionCause = Some(cause))
+
+  /**
    * 使用错误信息、异常、isEnableSuppression、isWritableStackTrace 生成一个新的 WrongLogLevelException
    *
    * @param optionMessage        Option[错误信息]
@@ -41,14 +49,6 @@ object WrongLogLevelException {
             isEnableSuppression: Boolean = false,
             isWritableStackTrace: Boolean = false): WrongLogLevelException =
     new WrongLogLevelException(optionMessage, optionCause, isEnableSuppression, isWritableStackTrace)
-
-  /**
-   * 使用异常生成一个新的 WrongLogLevelException
-   *
-   * @param cause 异常
-   * @return 一个新的 WrongLogLevelException
-   */
-  def apply(cause: Throwable): WrongLogLevelException = WrongLogLevelException(optionCause = Some(cause))
 
   /**
    * 使用错误信息和异常生成一个新的 WrongLogLevelException

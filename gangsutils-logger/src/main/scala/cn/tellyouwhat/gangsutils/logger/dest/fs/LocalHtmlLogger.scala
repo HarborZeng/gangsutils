@@ -17,10 +17,6 @@ class LocalHtmlLogger extends LocalFileLogger {
 
   override val loggerConfig: LoggerConfiguration = LocalHtmlLogger.loggerConfig
 
-  override protected def fileLog(msg: String, level: LogLevel.Value): Boolean = {
-    buildLog(msg, level).toHtmlString |> writeString
-  }
-
   override def onEOF(os: OutputStream): Unit = {
     os.write("</body></html>".getBytes("UTF-8"))
     os.flush()
@@ -29,6 +25,10 @@ class LocalHtmlLogger extends LocalFileLogger {
   override def onSOF(os: OutputStream): Unit = {
     os.write(Source.fromResource("gangsutils-logger-html-template.html").mkString.getBytes("UTF-8"))
     os.flush()
+  }
+
+  override protected def fileLog(msg: String, level: LogLevel.Value): Boolean = {
+    buildLog(msg, level).toHtmlString |> writeString
   }
 
 }
@@ -41,21 +41,21 @@ object LocalHtmlLogger extends LoggerCompanion {
 
   private var logSavePath: Option[String] = None
 
-  def setLogSavePath(path: String): Unit = logSavePath = Some(path)
-
   def resetLogSavePath(): Unit = logSavePath = None
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   def apply(c: LoggerConfiguration, path: String): Logger = {
     setLogSavePath(path)
     apply(c)
   }
 
+  def setLogSavePath(path: String): Unit = logSavePath = Some(path)
+
   override def apply(c: LoggerConfiguration): Logger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): Logger = {
     if (loggerConfig == null)

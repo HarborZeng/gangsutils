@@ -3,8 +3,8 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
 class SlackWebhookLogger extends WebhookLogger {
 
@@ -30,12 +30,12 @@ object SlackWebhookLogger extends LoggerCompanion {
   val SLACK_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.SlackWebhookLogger"
 
   private var slackWebhookURLs: Seq[String] = Seq.empty[String]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetSlackUrls(): Unit = slackWebhookURLs = Seq.empty[String]
 
   def initializeSlackUrls(slackUrls: String): Unit =
     slackUrls.split(",").map(_.trim) |! initializeSlackUrls
-
 
   def initializeSlackUrls(slackUrls: Array[String]): Unit = slackWebhookURLs = {
     if (slackUrls == null || slackUrls.isEmpty || slackUrls.exists(_.isEmpty)) {
@@ -45,14 +45,12 @@ object SlackWebhookLogger extends LoggerCompanion {
     slackUrls
   }
 
-  private var loggerConfig: LoggerConfiguration = _
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
-
   override def apply(c: LoggerConfiguration): SlackWebhookLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): SlackWebhookLogger = {
     if (loggerConfig == null)

@@ -55,6 +55,7 @@ object DingTalkWebhookLogger extends LoggerCompanion {
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[Robot] = Array.empty[Robot]
+  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[Robot]
 
@@ -66,7 +67,6 @@ object DingTalkWebhookLogger extends LoggerCompanion {
   def initializeDingTalkWebhook(robotsKeysSigns: String): Unit = {
     robotsKeysSigns.split(",").map(_.trim.split(";").map(_.trim)) |! initializeDingTalkWebhook
   }
-
 
   /**
    * 初始化 dingtalk webhook 的密钥
@@ -95,14 +95,12 @@ object DingTalkWebhookLogger extends LoggerCompanion {
     })
   }
 
-  private var loggerConfig: LoggerConfiguration = _
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
-
   override def apply(c: LoggerConfiguration): DingTalkWebhookLogger = {
     initializeConfiguration(c)
     apply()
   }
+
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
 
   override def apply(): DingTalkWebhookLogger = {
     if (loggerConfig == null)

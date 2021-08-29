@@ -23,25 +23,6 @@ class GangLogger {
   }.toSeq
 
   /**
-   * 通过参数指定级别的日志
-   *
-   * @param msg   日志内容
-   * @param level 日志级别
-   *
-   */
-  def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
-    (if (enabled != null && enabled.nonEmpty) {
-      val unsupportedDests = enabled.map(_.toString).diff(loggers.map(_.getClass.getName))
-      if (unsupportedDests.nonEmpty)
-        println(errorLog_unquote.format(
-          s"Specified log destination ${unsupportedDests.toVector} in ${enabled.map(_.toString).toVector} does not support, supported are ${loggers.map(_.getClass.getName)}"
-        ))
-      loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
-    } else loggers)
-      .map(_.log(msg, level)).forall(p => p)
-  }
-
-  /**
    * 记录一条跟踪级别的日志
    *
    * @param msg 日志内容
@@ -82,6 +63,25 @@ class GangLogger {
   def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.ERROR)(enabled)
 
   /**
+   * 通过参数指定级别的日志
+   *
+   * @param msg   日志内容
+   * @param level 日志级别
+   *
+   */
+  def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
+    (if (enabled != null && enabled.nonEmpty) {
+      val unsupportedDests = enabled.map(_.toString).diff(loggers.map(_.getClass.getName))
+      if (unsupportedDests.nonEmpty)
+        println(errorLog_unquote.format(
+          s"Specified log destination ${unsupportedDests.toVector} in ${enabled.map(_.toString).toVector} does not support, supported are ${loggers.map(_.getClass.getName)}"
+        ))
+      loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
+    } else loggers)
+      .map(_.log(msg, level)).forall(p => p)
+  }
+
+  /**
    * 记录一条致命级别的日志
    *
    * @param msg 日志内容
@@ -100,6 +100,7 @@ class GangLogger {
 object GangLogger {
 
   private var logger2Configuration: Map[SupportedLogDest.Value, LoggerConfiguration] = _
+  private[logger] var _logger: Option[GangLogger] = None
 
   def setLoggerAndConfiguration(m: Map[SupportedLogDest.Value, LoggerConfiguration]): Unit = {
     if (m == null)
@@ -107,13 +108,6 @@ object GangLogger {
     if (m.isEmpty)
       throw new IllegalArgumentException("empty m: Map[SupportedLogDest.Value, LoggerConfiguration]")
     logger2Configuration = m
-  }
-
-  def apply(): GangLogger = {
-    if (logger2Configuration == null) {
-      logger2Configuration = Map(PRINTLN_LOGGER -> LoggerConfiguration())
-    }
-    new GangLogger() |! (l => _logger = Some(l))
   }
 
   def apply(isDTEnabled: Boolean = true,
@@ -127,8 +121,6 @@ object GangLogger {
     apply()
   }
 
-  private[logger] var _logger: Option[GangLogger] = None
-
   /**
    * 清除单例 Logger 对象
    */
@@ -140,6 +132,13 @@ object GangLogger {
       apply() |! (l => _logger = Some(l)) |! (_ => println(infoLog_unquote.format(
         NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))
       )))
+  }
+
+  def apply(): GangLogger = {
+    if (logger2Configuration == null) {
+      logger2Configuration = Map(PRINTLN_LOGGER -> LoggerConfiguration())
+    }
+    new GangLogger() |! (l => _logger = Some(l))
   }
 
   def clearLogger2Configuration(): Unit = logger2Configuration = null

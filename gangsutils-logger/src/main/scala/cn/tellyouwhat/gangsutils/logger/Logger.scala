@@ -4,7 +4,6 @@ import cn.tellyouwhat.gangsutils.core.exceptions.GangException
 import cn.tellyouwhat.gangsutils.core.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, OneLog}
-import cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger.loggerConfig
 
 import java.net.InetAddress
 import java.time.LocalDateTime
@@ -14,21 +13,8 @@ import java.time.LocalDateTime
  */
 trait Logger {
 
-  val loggerConfig: LoggerConfiguration = null
-
   lazy val hostname: String = InetAddress.getLocalHost.getHostName
-
-  /**
-   * 通过参数指定级别的日志
-   *
-   * @param msg   日志内容
-   * @param level 日志级别
-   *
-   */
-  def log(msg: Any, level: LogLevel.Value): Boolean = {
-    checkPrerequisite()
-    doTheLogAction(msg.toString, level)
-  }
+  val loggerConfig: LoggerConfiguration = null
 
   /**
    * 记录一条跟踪级别的日志
@@ -45,6 +31,23 @@ trait Logger {
    *
    */
   def info(msg: Any): Boolean = log(msg, LogLevel.INFO)
+
+  /**
+   * 通过参数指定级别的日志
+   *
+   * @param msg   日志内容
+   * @param level 日志级别
+   *
+   */
+  def log(msg: Any, level: LogLevel.Value): Boolean = {
+    checkPrerequisite()
+    doTheLogAction(msg.toString, level)
+  }
+
+  protected def checkPrerequisite(): Unit = {
+    if (loggerConfig == null)
+      throw GangException("loggerConfig is null")
+  }
 
   /**
    * 记录一条成功级别的日志
@@ -125,15 +128,12 @@ trait Logger {
    */
   protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean
 
-  protected def checkPrerequisite(): Unit = {
-    if (loggerConfig == null)
-      throw GangException("loggerConfig is null")
-  }
-
 }
 
 trait LoggerCompanion {
   def apply(): Logger
+
   def apply(c: LoggerConfiguration): Logger
+
   def initializeConfiguration(c: LoggerConfiguration): Unit
 }
