@@ -314,12 +314,12 @@ see <https://github.com/HarborZeng/gangsutils/blob/master/gangsutils-spark/src/t
   got by `GangLogger.getLogger`
 - [x] Separate spark and hadoop tools into separate modules
 - [x] Extract logger module from common module
-- [ ] Add FileLogger (by date)
+- [x] Add FileLogger (by date)
 - [ ] Add LogStash(Stream)Logger
 - [x] Make hostname lazy
 - [x] Make log a case class containing hostname, datetime, trace, content and etc, serialize it when using(println or
   send to webhook)
-- [ ] Different log configurations for different logs by default value and config file
+- [x] Different log configurations for different logs by default value and config file
 
 ## License
 
