@@ -15,7 +15,10 @@ class LocalPlainTextLogger extends LocalFileLogger {
     case None => null
   }
 
-  override val loggerConfig: LoggerConfiguration = LocalPlainTextLogger.loggerConfig
+  override val loggerConfig: LoggerConfiguration = LocalPlainTextLogger.loggerConfig match {
+    case Some(value) => value
+    case None => throw new IllegalArgumentException("LocalPlainTextLogger.loggerConfig is None")
+  }
 
   override def onEOF(os: OutputStream): Unit = {
     //do nothing
@@ -33,9 +36,9 @@ class LocalPlainTextLogger extends LocalFileLogger {
 
 object LocalPlainTextLogger extends LoggerCompanion {
 
-  val LOCAL_PLAIN_TEXT_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalPlainTextLogger"
+  override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalPlainTextLogger"
 
-  private var loggerConfig: LoggerConfiguration = _
+  override var loggerConfig: Option[LoggerConfiguration] = None
 
   private var logSavePath: Option[String] = None
 
@@ -53,10 +56,10 @@ object LocalPlainTextLogger extends LoggerCompanion {
     apply()
   }
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
 
   override def apply(): Logger = {
-    if (loggerConfig == null)
+    if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new LocalPlainTextLogger()
   }

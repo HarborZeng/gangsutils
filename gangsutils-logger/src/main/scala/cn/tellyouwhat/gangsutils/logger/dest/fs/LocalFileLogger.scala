@@ -10,9 +10,9 @@ import java.nio.file._
 
 trait LocalFileLogger extends Logger with FileLifeCycle {
 
+  private[fs] val logSavePath: Path = null
   private lazy val logSaveFileName: Path = logSavePath.getFileName
   private lazy val logSaveDir: Path = logSavePath.getParent
-  private[fs] val logSavePath: Path = null
   private var optionOS: Option[OutputStream] = None
 
   def closeOutputStream(): Unit = getOS.close()

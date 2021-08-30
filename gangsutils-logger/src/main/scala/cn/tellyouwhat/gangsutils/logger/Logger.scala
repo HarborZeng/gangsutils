@@ -131,6 +131,11 @@ trait Logger {
 }
 
 trait LoggerCompanion {
+
+  val loggerName: String = null
+
+  var loggerConfig: Option[LoggerConfiguration]
+
   def apply(): Logger
 
   def apply(c: LoggerConfiguration): Logger

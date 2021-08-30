@@ -15,7 +15,10 @@ class LocalHtmlLogger extends LocalFileLogger {
     case None => null
   }
 
-  override val loggerConfig: LoggerConfiguration = LocalHtmlLogger.loggerConfig
+  override val loggerConfig: LoggerConfiguration = LocalHtmlLogger.loggerConfig match {
+    case Some(value) => value
+    case None => throw new IllegalArgumentException("LocalHtmlLogger.loggerConfig is None")
+  }
 
   override def onEOF(os: OutputStream): Unit = {
     os.write("</body></html>".getBytes("UTF-8"))
@@ -35,9 +38,9 @@ class LocalHtmlLogger extends LocalFileLogger {
 
 object LocalHtmlLogger extends LoggerCompanion {
 
-  val LOCAL_HTML_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger"
+  override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger"
 
-  private var loggerConfig: LoggerConfiguration = _
+  override var loggerConfig: Option[LoggerConfiguration] = None
 
   private var logSavePath: Option[String] = None
 
@@ -55,10 +58,10 @@ object LocalHtmlLogger extends LoggerCompanion {
     apply()
   }
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
 
   override def apply(): Logger = {
-    if (loggerConfig == null)
+    if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new LocalHtmlLogger()
   }

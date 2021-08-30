@@ -13,7 +13,10 @@ import javax.crypto.spec.SecretKeySpec
 
 class FeishuWebhookLogger extends WebhookLogger {
 
-  override val loggerConfig: LoggerConfiguration = FeishuWebhookLogger.loggerConfig
+  override val loggerConfig: LoggerConfiguration = FeishuWebhookLogger.loggerConfig match {
+    case Some(value) => value
+    case None => throw new IllegalArgumentException("FeishuWebhookLogger.loggerConfig is None")
+  }
 
   /**
    * 要发往的机器人的密钥
@@ -50,13 +53,13 @@ object FeishuWebhookLogger extends LoggerCompanion {
   /**
    * FEISHU_WEBHOOK_LOGGER 文本
    */
-  val FEISHU_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.FeishuWebhookLogger"
+  override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.FeishuWebhookLogger"
 
+  override var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[Robot] = Array.empty[Robot]
-  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[Robot]
 
@@ -101,10 +104,10 @@ object FeishuWebhookLogger extends LoggerCompanion {
     apply()
   }
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
 
   override def apply(): FeishuWebhookLogger = {
-    if (loggerConfig == null)
+    if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new FeishuWebhookLogger()
   }

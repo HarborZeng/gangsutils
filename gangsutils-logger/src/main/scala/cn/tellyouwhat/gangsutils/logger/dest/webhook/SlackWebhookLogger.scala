@@ -8,7 +8,10 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 
 class SlackWebhookLogger extends WebhookLogger {
 
-  override val loggerConfig: LoggerConfiguration = SlackWebhookLogger.loggerConfig
+  override val loggerConfig: LoggerConfiguration = SlackWebhookLogger.loggerConfig match {
+    case Some(value) => value
+    case None => throw new IllegalArgumentException("SlackWebhookLogger.loggerConfig is None")
+  }
 
   val slackWebhookURLs: Set[String] = SlackWebhookLogger.slackWebhookURLs.toSet
 
@@ -27,10 +30,11 @@ class SlackWebhookLogger extends WebhookLogger {
 
 object SlackWebhookLogger extends LoggerCompanion {
 
-  val SLACK_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.SlackWebhookLogger"
+  override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.SlackWebhookLogger"
+
+  override var loggerConfig: Option[LoggerConfiguration] = None
 
   private var slackWebhookURLs: Seq[String] = Seq.empty[String]
-  private var loggerConfig: LoggerConfiguration = _
 
   def resetSlackUrls(): Unit = slackWebhookURLs = Seq.empty[String]
 
@@ -50,10 +54,10 @@ object SlackWebhookLogger extends LoggerCompanion {
     apply()
   }
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
 
   override def apply(): SlackWebhookLogger = {
-    if (loggerConfig == null)
+    if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new SlackWebhookLogger()
   }
