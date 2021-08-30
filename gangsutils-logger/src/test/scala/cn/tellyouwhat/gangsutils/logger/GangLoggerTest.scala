@@ -2,7 +2,7 @@ package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.core.constants._
 import cn.tellyouwhat.gangsutils.core.helper.I18N
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{DINGTALK_WEBHOOK_LOGGER, PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
 import cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger
@@ -96,9 +96,11 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     val logger = GangLogger()
     val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
-      logger.trace("l")(enabled = PRINTLN_LOGGER :: Nil)
+      logger.trace("l")(enabled = DINGTALK_WEBHOOK_LOGGER :: Nil)
     }
-    stream.toString should fullyMatch regex traceLog.format(": l")
+    stream.toString should fullyMatch regex errorLog.format(
+      """: Specified log destination Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) in Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) does not support, supported are List\(cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger, cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger\)"""
+    )
   }
 
   it should "apply with logPrefix" in {

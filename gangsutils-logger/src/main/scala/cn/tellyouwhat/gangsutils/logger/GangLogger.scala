@@ -74,7 +74,7 @@ class GangLogger {
       val unsupportedDests = enabled.map(_.toString).diff(loggers.map(_.getClass.getName))
       if (unsupportedDests.nonEmpty)
         println(errorLog_unquote.format(
-          s"Specified log destination ${unsupportedDests.toVector} in ${enabled.map(_.toString).toVector} does not support, supported are ${loggers.map(_.getClass.getName)}"
+          s": Specified log destination ${unsupportedDests.toVector} in ${enabled.map(_.toString).toVector} does not support, supported are ${loggers.map(_.getClass.getName)}"
         ))
       loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
     } else loggers)
