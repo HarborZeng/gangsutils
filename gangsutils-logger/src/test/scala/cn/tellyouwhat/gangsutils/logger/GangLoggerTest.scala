@@ -15,7 +15,7 @@ import java.net.InetAddress
 class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
 
   before {
-
+    GangLogger.clearLogger2Configuration()
   }
   after {
     GangLogger.killLogger()
