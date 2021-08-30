@@ -101,6 +101,9 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     stream.toString should fullyMatch regex errorLog.format(
       """: Specified log destination Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) in Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) does not support, supported are List\(cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger, cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger\)"""
     )
+    stream.close()
+    WoaWebhookLogger.resetConfiguration()
+    WoaWebhookLogger.resetRobotsKeys()
   }
 
   it should "apply with logPrefix" in {
