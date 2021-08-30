@@ -24,6 +24,7 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
     TelegramWebhookLogger.resetRobots()
+    TelegramWebhookLogger.resetConfiguration()
   }
 
   behavior of "TelegramWebhookLoggerTest"
@@ -79,4 +80,11 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     an[IllegalArgumentException] should be thrownBy logger.info()
   }
 
+  "TelegramWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
+    the [IllegalArgumentException] thrownBy new TelegramWebhookLogger() should have message "TelegramWebhookLogger.loggerConfig is None"
+  }
+
+  it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
+    the [IllegalArgumentException] thrownBy TelegramWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
+  }
 }

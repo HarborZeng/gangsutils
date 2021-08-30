@@ -24,6 +24,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
     FeishuWebhookLogger.resetRobots()
+    FeishuWebhookLogger.resetConfiguration()
   }
 
   behavior of "FeishuWebhookLoggerTest"
@@ -94,4 +95,11 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
     an[IllegalArgumentException] should be thrownBy logger.info()
   }
 
+  "FeishuWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
+    the [IllegalArgumentException] thrownBy new FeishuWebhookLogger() should have message "FeishuWebhookLogger.loggerConfig is None"
+  }
+
+  it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
+    the [IllegalArgumentException] thrownBy FeishuWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
+  }
 }

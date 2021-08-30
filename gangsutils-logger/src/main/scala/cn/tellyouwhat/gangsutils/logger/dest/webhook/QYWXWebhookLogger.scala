@@ -45,7 +45,7 @@ object QYWXWebhookLogger extends LoggerCompanion {
    */
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.QYWXWebhookLogger"
 
-  override var loggerConfig: Option[LoggerConfiguration] = None
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
@@ -81,6 +81,8 @@ object QYWXWebhookLogger extends LoggerCompanion {
   }
 
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): QYWXWebhookLogger = {
     if (loggerConfig.isEmpty)

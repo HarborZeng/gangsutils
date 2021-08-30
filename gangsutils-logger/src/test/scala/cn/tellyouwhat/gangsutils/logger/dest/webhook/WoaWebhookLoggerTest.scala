@@ -24,6 +24,7 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
     WoaWebhookLogger.resetRobotsKeys()
+    WoaWebhookLogger.resetConfiguration()
   }
 
   behavior of "WoaWebhookLoggerTest"
@@ -76,4 +77,11 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     an[IllegalArgumentException] should be thrownBy logger.info()
   }
 
+  "WoaWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
+    the [IllegalArgumentException] thrownBy new WoaWebhookLogger() should have message "WoaWebhookLogger.loggerConfig is None"
+  }
+
+  it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
+    the [IllegalArgumentException] thrownBy WoaWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
+  }
 }

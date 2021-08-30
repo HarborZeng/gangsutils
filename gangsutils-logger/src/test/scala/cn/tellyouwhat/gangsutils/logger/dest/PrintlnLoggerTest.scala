@@ -18,6 +18,7 @@ class PrintlnLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTest
   after {
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
+    PrintlnLogger.resetConfiguration()
   }
 
   behavior of "PrintlnLoggerTest"
@@ -28,6 +29,14 @@ class PrintlnLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     a[WrongLogLevelException] should be thrownBy {
       logger.loggers.head.asInstanceOf[PrintlnLogger] invokePrivate printlnLog("a msg", null)
     }
+  }
+
+  "PrintlnLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
+    the [IllegalArgumentException] thrownBy new PrintlnLogger() should have message "PrintlnLogger.loggerConfig is None"
+  }
+
+  it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
+    the [IllegalArgumentException] thrownBy PrintlnLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
   }
 
 }

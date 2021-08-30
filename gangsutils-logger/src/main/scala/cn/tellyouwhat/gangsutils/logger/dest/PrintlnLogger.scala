@@ -38,7 +38,7 @@ object PrintlnLogger extends LoggerCompanion {
    */
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger"
 
-  override var loggerConfig: Option[LoggerConfiguration] = None
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
 
   override def apply(c: LoggerConfiguration): PrintlnLogger = {
     initializeConfiguration(c)
@@ -46,6 +46,7 @@ object PrintlnLogger extends LoggerCompanion {
   }
 
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): PrintlnLogger = {
     if (loggerConfig.isEmpty)

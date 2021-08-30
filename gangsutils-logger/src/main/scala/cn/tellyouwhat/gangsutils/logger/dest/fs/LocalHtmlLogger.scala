@@ -12,7 +12,7 @@ class LocalHtmlLogger extends LocalFileLogger {
 
   override private[fs] val logSavePath: Path = LocalHtmlLogger.logSavePath match {
     case Some(path) => Paths.get(path)
-    case None => null
+    case None => throw new IllegalArgumentException("LocalHtmlLogger.logSavePath is None")
   }
 
   override val loggerConfig: LoggerConfiguration = LocalHtmlLogger.loggerConfig match {
@@ -40,11 +40,9 @@ object LocalHtmlLogger extends LoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger"
 
-  override var loggerConfig: Option[LoggerConfiguration] = None
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
 
   private var logSavePath: Option[String] = None
-
-  def resetLogSavePath(): Unit = logSavePath = None
 
   def apply(c: LoggerConfiguration, path: String): Logger = {
     setLogSavePath(path)
@@ -53,12 +51,16 @@ object LocalHtmlLogger extends LoggerCompanion {
 
   def setLogSavePath(path: String): Unit = logSavePath = Some(path)
 
+  def resetLogSavePath(): Unit = logSavePath = None
+
   override def apply(c: LoggerConfiguration): Logger = {
     initializeConfiguration(c)
     apply()
   }
 
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): Logger = {
     if (loggerConfig.isEmpty)

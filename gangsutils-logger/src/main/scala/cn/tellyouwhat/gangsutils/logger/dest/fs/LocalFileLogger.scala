@@ -15,7 +15,10 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
   private lazy val logSaveDir: Path = logSavePath.getParent
   private var optionOS: Option[OutputStream] = None
 
-  def closeOutputStream(): Unit = getOS.close()
+  def closeOutputStream(): Unit = optionOS match {
+    case Some(os) => os.close()
+    case None =>
+  }
 
   override protected def checkPrerequisite(): Unit = {
     super.checkPrerequisite()

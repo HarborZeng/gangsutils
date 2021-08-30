@@ -32,7 +32,7 @@ object SlackWebhookLogger extends LoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.SlackWebhookLogger"
 
-  override var loggerConfig: Option[LoggerConfiguration] = None
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
 
   private var slackWebhookURLs: Seq[String] = Seq.empty[String]
 
@@ -55,6 +55,8 @@ object SlackWebhookLogger extends LoggerCompanion {
   }
 
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): SlackWebhookLogger = {
     if (loggerConfig.isEmpty)

@@ -12,7 +12,7 @@ class LocalPlainTextLogger extends LocalFileLogger {
 
   override private[fs] val logSavePath: Path = LocalPlainTextLogger.logSavePath match {
     case Some(path) => Paths.get(path)
-    case None => null
+    case None => throw new IllegalArgumentException("LocalPlainTextLogger.logSavePath is None")
   }
 
   override val loggerConfig: LoggerConfiguration = LocalPlainTextLogger.loggerConfig match {
@@ -38,7 +38,7 @@ object LocalPlainTextLogger extends LoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalPlainTextLogger"
 
-  override var loggerConfig: Option[LoggerConfiguration] = None
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
 
   private var logSavePath: Option[String] = None
 
@@ -57,6 +57,8 @@ object LocalPlainTextLogger extends LoggerCompanion {
   }
 
   override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): Logger = {
     if (loggerConfig.isEmpty)

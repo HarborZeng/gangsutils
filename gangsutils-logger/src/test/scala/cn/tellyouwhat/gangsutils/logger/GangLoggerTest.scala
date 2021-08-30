@@ -2,16 +2,20 @@ package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.core.constants._
 import cn.tellyouwhat.gangsutils.core.helper.I18N
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
+import cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
 
+import java.net.InetAddress
+
 class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
 
   before {
-    GangLogger.killLogger()
-    GangLogger.clearLogger2Configuration()
+
   }
   after {
     GangLogger.killLogger()
@@ -83,6 +87,20 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     stream.toString should fullyMatch regex errorLog.format(": an error log")
   }
 
+  it should "trace with enabled parameter" in {
+    WoaWebhookLogger.initializeWoaWebhook("abc")
+    GangLogger.setLoggerAndConfiguration(Map(
+      PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled = false, isHostnameEnabled = false),
+      WOA_WEBHOOK_LOGGER -> LoggerConfiguration(),
+    ))
+    val logger = GangLogger()
+    val stream = new java.io.ByteArrayOutputStream()
+    Console.withOut(stream) {
+      logger.trace("l")(enabled = PRINTLN_LOGGER :: Nil)
+    }
+    stream.toString should fullyMatch regex traceLog.format(": l")
+  }
+
   it should "apply with logPrefix" in {
     val logger2 = GangLogger(isDTEnabled = false, logPrefix = Some("a prefix"), isHostnameEnabled = false)
     val stream = new java.io.ByteArrayOutputStream()
@@ -90,6 +108,15 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
       logger2.trace("a log with prefix")
     }
     stream.toString() should fullyMatch regex traceLog.format(": a prefix - a log with prefix")
+  }
+
+  it should "apply with hostname" in {
+    val logger = GangLogger(isDTEnabled = false, isHostnameEnabled = true)
+    val stream = new java.io.ByteArrayOutputStream()
+    Console.withOut(stream) {
+      logger.trace("a log with hostname")
+    }
+    stream.toString() should fullyMatch regex traceLog.format(s" - ${InetAddress.getLocalHost.getHostName}: a log with hostname")
   }
 
   "setLogPrefix" should "set logPrefix variable" in {
@@ -108,8 +135,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     GangLogger.killLogger()
     val newLogger = GangLogger(logPrefix = Some("123"), isHostnameEnabled = false)
     val logger1 = GangLogger.getLogger
-    val logger2 = GangLogger.getLogger
-    logger1 shouldEqual logger2
+    newLogger shouldEqual logger1
 
     GangLogger.killLogger()
     val stream = new java.io.ByteArrayOutputStream()
@@ -130,4 +156,14 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     GangLogger._logger shouldBe None
   }
 
+  "setLoggerAndConfiguration" should "throw exceptions when m is illegal" in {
+    the [IllegalArgumentException] thrownBy {
+      GangLogger.setLoggerAndConfiguration(null: Map[SupportedLogDest.Value, LoggerConfiguration])
+    } should have message "null m: Map[SupportedLogDest.Value, LoggerConfiguration]"
+
+    the [IllegalArgumentException] thrownBy {
+      GangLogger.setLoggerAndConfiguration(Map.empty[SupportedLogDest.Value, LoggerConfiguration])
+    } should have message "empty m: Map[SupportedLogDest.Value, LoggerConfiguration]"
+
+  }
 }

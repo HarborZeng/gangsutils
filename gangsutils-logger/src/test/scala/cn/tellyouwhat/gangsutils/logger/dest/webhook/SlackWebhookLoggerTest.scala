@@ -25,6 +25,7 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
     SlackWebhookLogger.resetSlackUrls()
+    SlackWebhookLogger.resetConfiguration()
   }
 
   behavior of "SlackWebhookLoggerTest"
@@ -79,4 +80,11 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
     an[IllegalArgumentException] should be thrownBy logger.info()
   }
 
+  "SlackWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
+    the [IllegalArgumentException] thrownBy new SlackWebhookLogger() should have message "SlackWebhookLogger.loggerConfig is None"
+  }
+
+  it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
+    the [IllegalArgumentException] thrownBy SlackWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
+  }
 }

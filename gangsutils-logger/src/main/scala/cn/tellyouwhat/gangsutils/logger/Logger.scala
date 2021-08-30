@@ -134,11 +134,12 @@ trait LoggerCompanion {
 
   val loggerName: String = null
 
-  var loggerConfig: Option[LoggerConfiguration]
+  private[logger] var loggerConfig: Option[LoggerConfiguration]
 
   def apply(): Logger
 
   def apply(c: LoggerConfiguration): Logger
 
   def initializeConfiguration(c: LoggerConfiguration): Unit
+  def resetConfiguration(): Unit
 }
