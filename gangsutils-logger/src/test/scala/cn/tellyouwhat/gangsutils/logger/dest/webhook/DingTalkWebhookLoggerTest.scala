@@ -24,6 +24,7 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
     DingTalkWebhookLogger.resetRobots()
+    DingTalkWebhookLogger.resetConfiguration()
   }
 
 
@@ -104,4 +105,11 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     }
   }
 
+  "DingTalkWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
+    the [IllegalArgumentException] thrownBy new DingTalkWebhookLogger() should have message "DingTalkWebhookLogger.loggerConfig is None"
+  }
+
+  it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
+    the [IllegalArgumentException] thrownBy DingTalkWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
+  }
 }

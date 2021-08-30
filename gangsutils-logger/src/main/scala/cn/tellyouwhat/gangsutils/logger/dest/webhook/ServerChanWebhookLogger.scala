@@ -10,7 +10,10 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
 import java.net.URLEncoder
 
 class ServerChanWebhookLogger extends WebhookLogger {
-  override val loggerConfig: LoggerConfiguration = ServerChanWebhookLogger.loggerConfig
+  override val loggerConfig: LoggerConfiguration = ServerChanWebhookLogger.loggerConfig match {
+    case Some(value) => value
+    case None => throw new IllegalArgumentException("ServerChanWebhookLogger.loggerConfig is None")
+  }
 
   /**
    * 要发往的机器人的密钥
@@ -39,13 +42,13 @@ object ServerChanWebhookLogger extends LoggerCompanion {
   /**
    * SERVERCHAN_WEBHOOK_LOGGER 文本
    */
-  val SERVERCHAN_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.ServerChanWebhookLogger"
+  override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.ServerChanWebhookLogger"
 
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[String] = Array.empty[String]
-  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
 
@@ -76,10 +79,12 @@ object ServerChanWebhookLogger extends LoggerCompanion {
     apply()
   }
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): ServerChanWebhookLogger = {
-    if (loggerConfig == null)
+    if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new ServerChanWebhookLogger()
   }

@@ -10,20 +10,33 @@ import java.nio.file._
 
 trait LocalFileLogger extends Logger with FileLifeCycle {
 
-  private lazy val logSaveFileName: Path = logSavePath.getFileName
-  private lazy val logSaveDir: Path = logSavePath.getParent
   private[fs] val logSavePath: Path = null
+  private lazy val logSaveFileName: Path = logSavePath match {
+    case null => throw new IllegalStateException("The underlying logSavePath is null")
+    case path => path.getFileName
+  }
+  private lazy val logSaveDir: Path = logSavePath match {
+    case null => throw new IllegalStateException("The underlying logSavePath is null")
+    case path => path.getParent
+  }
   private var optionOS: Option[OutputStream] = None
 
-  def closeOutputStream(): Unit = getOS.close()
+  def closeOutputStream(): Unit = optionOS match {
+    case Some(os) => os.close()
+    case None =>
+  }
 
   override protected def checkPrerequisite(): Unit = {
     super.checkPrerequisite()
+    if (logSavePath == null)
+      throw new IllegalStateException("The underlying logSavePath is null")
     //target path can not be a directory
     if (Files.exists(logSavePath) && Files.isDirectory(logSavePath))
       throw NotFileException(logSavePath.toString, "Path is a directory, use specific file path instead")
 
     // create directory
+    if (logSaveDir == null)
+      throw new IllegalStateException(s"The underlying logSaveDir is null, logSavePath: $logSavePath might does not have parent")
     Files.createDirectories(logSaveDir)
     // usable space can not be less than 64M and must have write permission (getUsableSpace)
     val usableSpaceInMegabyte = logSaveDir.toFile.getUsableSpace / 1024 / 1024

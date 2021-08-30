@@ -13,7 +13,10 @@ import javax.crypto.spec.SecretKeySpec
 
 class DingTalkWebhookLogger extends WebhookLogger {
 
-  override val loggerConfig: LoggerConfiguration = DingTalkWebhookLogger.loggerConfig
+  override val loggerConfig: LoggerConfiguration = DingTalkWebhookLogger.loggerConfig match {
+    case Some(value) => value
+    case None => throw new IllegalArgumentException("DingTalkWebhookLogger.loggerConfig is None")
+  }
 
   /**
    * 要发往的机器人的密钥
@@ -49,13 +52,13 @@ object DingTalkWebhookLogger extends LoggerCompanion {
   /**
    * DINGTALK_WEBHOOK_LOGGER 文本
    */
-  val DINGTALK_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger"
+  override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger"
 
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[Robot] = Array.empty[Robot]
-  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobots(): Unit = robotsToSend = Array.empty[Robot]
 
@@ -100,10 +103,12 @@ object DingTalkWebhookLogger extends LoggerCompanion {
     apply()
   }
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): DingTalkWebhookLogger = {
-    if (loggerConfig == null)
+    if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new DingTalkWebhookLogger()
   }

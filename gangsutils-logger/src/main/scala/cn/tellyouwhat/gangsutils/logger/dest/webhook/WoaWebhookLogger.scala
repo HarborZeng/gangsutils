@@ -11,7 +11,11 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
  */
 class WoaWebhookLogger extends WebhookLogger {
 
-  override val loggerConfig: LoggerConfiguration = WoaWebhookLogger.loggerConfig
+  override val loggerConfig: LoggerConfiguration = WoaWebhookLogger.loggerConfig match {
+    case Some(value) => value
+    case None => throw new IllegalArgumentException("WoaWebhookLogger.loggerConfig is None")
+  }
+
 
   /**
    * 要发往的机器人的密钥
@@ -40,13 +44,14 @@ object WoaWebhookLogger extends LoggerCompanion {
   /**
    * WOA_WEBHOOK_LOGGER 文本
    */
-  val WOA_WEBHOOK_LOGGER = "cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger"
+  override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger"
+
+  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
 
   /**
    * 要发往的机器人的密钥
    */
   private var robotsToSend: Array[String] = Array.empty[String]
-  private var loggerConfig: LoggerConfiguration = _
 
   def resetRobotsKeys(): Unit = robotsToSend = Array.empty[String]
 
@@ -77,10 +82,11 @@ object WoaWebhookLogger extends LoggerCompanion {
     apply()
   }
 
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = c
+  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): WoaWebhookLogger = {
-    if (loggerConfig == null)
+    if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new WoaWebhookLogger()
   }
