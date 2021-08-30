@@ -3,17 +3,19 @@
 | __Goal__                  | Badges                                                       |
 | :------------------------ | :----------------------------------------------------------- |
 | __Packages andReleases__ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils) [![Sonatype Nexus](https://img.shields.io/nexus/r/cn.tellyouwhat/gangsutils?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/releases/cn/tellyouwhat/gangsutils/) |
-| __JavaDocumentation__    | [![javadoc](https://javadoc.io/badge2/cn.tellyouwhat/gangsutils-common/javadoc.svg)](https://javadoc.io/doc/cn.tellyouwhat/gangsutils-common) |
+| __JavaDocumentation__    | [![javadoc](https://javadoc.io/badge2/cn.tellyouwhat/gangsutils-logger/javadoc.svg)](https://javadoc.io/doc/cn.tellyouwhat/gangsutils-logger) |
 | __BuildStatus__          | [![develop build](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/HarborZeng/gangsutils/actions/workflows/build.yml) [![master build](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml/badge.svg?branch=master)](https://github.com/HarborZeng/gangsutils/actions/workflows/master-build.yml) |
 | __JaCoCo TestCoverage__  | [![codecov](https://codecov.io/gh/HarborZeng/gangsutils/branch/master/graph/badge.svg?token=MUYXET5V4O)](https://codecov.io/gh/HarborZeng/gangsutils) |
 | __License__               | [![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHarborZeng%2Fgangsutils?ref=badge_shield) |
 
 ## Utilities
 
-To use this utils pack right away, add the following dependency to pom.xml or other dependencies management tools.
+To use this utils pack right away, add the following dependencies to pom.xml or other dependencies file.
 
 Replace `${gangsutils.version}` to the latest stable version showed in the Maven Central
-badge [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.tellyouwhat/gangsutils)
+badge [![Sonatype Nexus](https://img.shields.io/nexus/r/cn.tellyouwhat/gangsutils?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/releases/cn/tellyouwhat/gangsutils/)
+
+Note: Only import what you need to avoid unnecessary download.
 
 **Maven**
 
@@ -25,19 +27,19 @@ badge [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.tell
     <version>${gangsutils.version}</version>
 </dependency>
 <dependency>
-<groupId>cn.tellyouwhat</groupId>
-<artifactId>gangsutils-spark</artifactId>
-<version>${gangsutils.version}</version>
+    <groupId>cn.tellyouwhat</groupId>
+    <artifactId>gangsutils-spark</artifactId>
+    <version>${gangsutils.version}</version>
 </dependency>
 <dependency>
-<groupId>cn.tellyouwhat</groupId>
-<artifactId>gangsutils-hadoop</artifactId>
-<version>${gangsutils.version}</version>
+    <groupId>cn.tellyouwhat</groupId>
+    <artifactId>gangsutils-hadoop</artifactId>
+    <version>${gangsutils.version}</version>
 </dependency>
 <dependency>
-<groupId>cn.tellyouwhat</groupId>
-<artifactId>gangsutils-core</artifactId>
-<version>${gangsutils.version}</version>
+    <groupId>cn.tellyouwhat</groupId>
+    <artifactId>gangsutils-core</artifactId>
+    <version>${gangsutils.version}</version>
 </dependency>
 ```
 
@@ -113,7 +115,7 @@ Language is based on your system, retrieved by `Locale` default or you can set i
 
 #### Change logger style
 
-All the properties are immutable, so they can not be change after the logger is initialized unless you re-initialize it.
+All the properties are immutable, so they can not be change after the logger is instantiated unless you re-instantiate it.
 
 To config a logger, you can:
 
@@ -214,7 +216,7 @@ retry(2)(logger.info("slack webhook logger send a log into slack with correct ur
 }
 ```
 
-GangLogger uses reflection to create all the logger you filled in `setLoggerAndConfiguration` map parameter, and do the log action iterate over all the loggers instance.
+GangLogger uses reflection to create all the logger you filled in `setLoggerAndConfiguration` map parameter, and do the log action iteratively over all the loggers instance.
 
 But if you just want one `PrintlnLogger`, directly use it 
 
@@ -239,7 +241,7 @@ val logger = LocalHtmlLogger(LoggerConfiguration(), path)
 logger.asInstanceOf[LocalPlainTextLogger].logSavePath shouldBe Paths.get(path)
 ```
 
-For more examples, see test <https://github.com/HarborZeng/gangsutils/tree/master/gangsutils-common/src/test/scala/cn/tellyouwhat/gangsutils/common/logger>
+For more examples, see test <https://github.com/HarborZeng/gangsutils/tree/master/gangsutils-logger/src/test/scala/cn/tellyouwhat/gangsutils/logger/dest>
 
 #### Full example
 
@@ -276,6 +278,7 @@ object MyApp {
 
 ```
 【跟踪】 - GANG-PC - 2021-08-27T13:11:19.549114400 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: tracing
+...more output ...
 ```
 
 In this example, we used `cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}` to implement an AOP logger to
