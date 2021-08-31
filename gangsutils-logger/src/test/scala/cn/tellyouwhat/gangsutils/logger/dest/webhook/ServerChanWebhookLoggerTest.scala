@@ -16,7 +16,7 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
 
   before {
     GangLogger.setLoggerAndConfiguration(Map(
-      SERVERCHAN_WEBHOOK_LOGGER -> LoggerConfiguration()
+      SERVERCHAN_WEBHOOK_LOGGER -> LoggerConfiguration(isDTEnabled = false, isHostnameEnabled = false)
     ))
   }
 
@@ -79,11 +79,11 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
   }
 
   "ServerChanWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
-    the [IllegalArgumentException] thrownBy new ServerChanWebhookLogger() should have message "ServerChanWebhookLogger.loggerConfig is None"
+    the[IllegalArgumentException] thrownBy new ServerChanWebhookLogger() should have message "ServerChanWebhookLogger.loggerConfig is None"
   }
 
   it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
-    the [IllegalArgumentException] thrownBy ServerChanWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
+    the[IllegalArgumentException] thrownBy ServerChanWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
   }
 
 }

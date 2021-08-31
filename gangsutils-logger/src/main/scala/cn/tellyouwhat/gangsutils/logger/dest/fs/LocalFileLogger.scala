@@ -17,7 +17,10 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
   }
   private lazy val logSaveDir: Path = logSavePath match {
     case null => throw new IllegalStateException("The underlying logSavePath is null")
-    case path => path.getParent
+    case path => path.getParent match {
+      case null => throw new IllegalStateException(s"The underlying logSavePath: $logSavePath might does not have parent")
+      case path => path
+    }
   }
   private var optionOS: Option[OutputStream] = None
 
@@ -36,8 +39,6 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
       throw NotFileException(logSavePath.toString, "Path is a directory, use specific file path instead")
 
     // create directory
-    if (logSaveDir == null)
-      throw new IllegalStateException(s"The underlying logSaveDir is null, logSavePath: $logSavePath might does not have parent")
     Files.createDirectories(logSaveDir)
     // usable space can not be less than 64M and must have write permission (getUsableSpace)
     val usableSpaceInMegabyte = logSaveDir.toFile.getUsableSpace / 1024 / 1024

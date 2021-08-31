@@ -26,7 +26,7 @@ trait WebhookLogger extends Logger {
    * @param method    请求的动词
    * @param body      请求带上的内容
    */
-  protected def sendRequest(targetURL: String, method: String = "POST", body: String = "", form: Seq[(String, String)] = Seq.empty[(String, String)]): Boolean = {
+  private[logger] def sendRequest(targetURL: String, method: String = "POST", body: String = "", form: Seq[(String, String)] = Seq.empty[(String, String)]): Boolean = {
     val response = if (method == "POST") {
       if (body.isEmpty && form.nonEmpty) {
         Http(targetURL)
@@ -56,7 +56,7 @@ trait WebhookLogger extends Logger {
       return false
     }
     if (response.isError) {
-      println(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}"))
+      println(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}, request body: $body, request from: $form, targetURL: $targetURL"))
     }
     response.isSuccess
   }
