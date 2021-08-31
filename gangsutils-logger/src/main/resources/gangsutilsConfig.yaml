@@ -4,3 +4,4 @@ logger:
   fs:
     localFile:
       blockSize: 1048576 # 1M
+      split: true

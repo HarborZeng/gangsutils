@@ -12,12 +12,30 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
+/**
+ * object ConfigReader for accessing configuration from underlying variables or classpath files
+ */
 object ConfigReader {
 
+  /**
+   * properties configuration map
+   */
   private[helper] var gangPropertiesConfig: Option[Map[String, String]] = None
+
+  /**
+   * yaml configuration Json
+   */
   private[helper] var gangYamlConfig: Option[Json] = None
+
+  /**
+   * json configuration Json
+   */
   private[helper] var gangJsonConfig: Option[Json] = None
 
+  /**
+   * get from member variable or create properties configuration from classpath file gangsutilsConfig.properties
+   * @return properties configuration map
+   */
   def getGangPropertiesConfig: Map[String, String] = {
     gangPropertiesConfig match {
       case Some(m) => m
@@ -27,6 +45,10 @@ object ConfigReader {
     }
   }
 
+  /**
+   * get from member variable or create yaml configuration from classpath file gangsutilsConfig.yaml
+   * @return yaml configuration Json
+   */
   def getGangYamlConfig: Json = {
     gangYamlConfig match {
       case Some(m) => m
@@ -36,6 +58,10 @@ object ConfigReader {
     }
   }
 
+  /**
+   * get from member variable or create Json configuration from classpath file gangsutilsConfig.json
+   * @return json configuration Json
+   */
   def getGangJsonConfig: Json = {
     gangJsonConfig match {
       case Some(m) => m
@@ -45,8 +71,16 @@ object ConfigReader {
     }
   }
 
+  /**
+   * map of [file to Json] for storing Json objects
+   */
   private val filesInJsonFormat = mutable.Map.empty[String, Json]
 
+  /**
+   * get Json object from the underlying filesInJsonFormat or read from classpath
+   * @param path the path as key to look for configuration
+   * @return the Json configuration object
+   */
   def getJsonFromClassPath(path: String): Json = {
     if (filesInJsonFormat.keySet.contains(path))
       filesInJsonFormat(path)
@@ -63,8 +97,16 @@ object ConfigReader {
     }
   }
 
+  /**
+   * map of [file to Json] for storing Json objects
+   */
   private val filesInYamlFormat = mutable.Map.empty[String, Json]
 
+  /**
+   * get Json object from the underlying filesInYamlFormat or read from classpath
+   * @param path the path as key to look for configuration
+   * @return the Json configuration object
+   */
   def getYamlFromClassPath(path: String): Json = {
     if (filesInYamlFormat.keySet.contains(path))
       filesInYamlFormat(path)
@@ -81,8 +123,16 @@ object ConfigReader {
     }
   }
 
+  /**
+   * Map[String, Map[String, String]] for storing Json objects
+   */
   private val filesInPropertiesFormat = mutable.Map.empty[String, Map[String, String]]
 
+  /**
+   * get Json object from the underlying filesInPropertiesFormat or read from classpath
+   * @param path the path as key to look for configuration
+   * @return the Json configuration object
+   */
   def getPropertiesFromClassPath(path: String): Map[String, String] = {
     if (filesInPropertiesFormat.keySet.contains(path))
       filesInPropertiesFormat(path)

@@ -8,6 +8,18 @@ import java.io.OutputStream
 import java.nio.file.{Path, Paths}
 import scala.io.Source
 
+/**
+ * A logger that write colorful html to files
+ *
+ * <pre>
+ * &lt;div class="log"&gt;&lt;div class="head"&gt;【跟踪】&lt;/div&gt;&lt;pre&gt; - GANG-PC - 2021-08-31T23:17:14.913215700 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第96行: prefix - abc&lt;/pre&gt;&lt;/div&gt;
+ * &lt;div class="log"&gt;&lt;div class="head info"&gt;【信息】&lt;/div&gt;&lt;pre&gt; - GANG-PC - 2021-08-31T23:17:14.920216600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第96行: prefix - abc&lt;/pre&gt;&lt;/div&gt;
+ * &lt;div class="log"&gt;&lt;div class="head success"&gt;【成功】&lt;/div&gt;&lt;pre&gt; - GANG-PC - 2021-08-31T23:17:14.921216200 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第96行: prefix - abc&lt;/pre&gt;&lt;/div&gt;
+ * &lt;div class="log"&gt;&lt;div class="head error"&gt;【错误】&lt;/div&gt;&lt;pre&gt; - GANG-PC - 2021-08-31T23:17:14.923216 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第96行: prefix - abc&lt;/pre&gt;&lt;/div&gt;
+ * &lt;div class="log"&gt;&lt;div class="head warning"&gt;【警告】&lt;/div&gt;&lt;pre&gt; - GANG-PC - 2021-08-31T23:17:14.924215600 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第96行: prefix - abc&lt;/pre&gt;&lt;/div&gt;
+ * &lt;div class="log"&gt;&lt;div class="head critical"&gt;【致命】&lt;/div&gt;&lt;pre&gt; - GANG-PC - 2021-08-31T23:17:14.926215700 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第96行: prefix - abc&lt;/pre&gt;&lt;/div&gt;
+ * </pre>
+ */
 class LocalHtmlLogger extends LocalFileLogger {
 
   override private[fs] val logSavePath: Path = LocalHtmlLogger.logSavePath match {
@@ -21,11 +33,13 @@ class LocalHtmlLogger extends LocalFileLogger {
   }
 
   override def onEOF(os: OutputStream): Unit = {
+    // write enclosing tag of html, which is actually not necessary, because the compatibility of web browser
     os.write("</body></html>".getBytes("UTF-8"))
     os.flush()
   }
 
   override def onSOF(os: OutputStream): Unit = {
+    // read from template file and write to the log file
     os.write(Source.fromResource("gangsutils-logger-html-template.html").mkString.getBytes("UTF-8"))
     os.flush()
   }
@@ -36,31 +50,45 @@ class LocalHtmlLogger extends LocalFileLogger {
 
 }
 
+/**
+ * an object of LocalHtmlLogger to set LocalHtmlLogger class using
+ * <pre>
+ * LocalHtmlLogger.setLogSavePath(path: String)
+ * LocalHtmlLogger.resetLogSavePath()
+ * LocalHtmlLogger.initializeConfiguration(c: LoggerConfiguration)
+ * LocalHtmlLogger.resetConfiguration()
+ * </pre>
+ */
 object LocalHtmlLogger extends LoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger"
 
-  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
-
+  /**
+   * the file path to save html log
+   */
   private var logSavePath: Option[String] = None
 
+  /**
+   * set the file path to save html log
+   */
+  def setLogSavePath(path: String): Unit = logSavePath = Some(path)
+
+  /**
+   * reset the file path to None
+   */
+  def resetLogSavePath(): Unit = logSavePath = None
+
+  /**
+   * create a new LocalHtmlLogger with LoggerConfiguration and path
+   *
+   * @param c    LoggerConfiguration
+   * @param path file path to save html log
+   * @return
+   */
   def apply(c: LoggerConfiguration, path: String): Logger = {
     setLogSavePath(path)
     apply(c)
   }
-
-  def setLogSavePath(path: String): Unit = logSavePath = Some(path)
-
-  def resetLogSavePath(): Unit = logSavePath = None
-
-  override def apply(c: LoggerConfiguration): Logger = {
-    initializeConfiguration(c)
-    apply()
-  }
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
-
-  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): Logger = {
     if (loggerConfig.isEmpty)

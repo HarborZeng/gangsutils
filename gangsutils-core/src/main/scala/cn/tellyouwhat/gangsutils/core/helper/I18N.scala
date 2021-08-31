@@ -5,9 +5,20 @@ import cn.tellyouwhat.gangsutils.core.helper.chaining.TapIt
 
 import java.util.{Locale, ResourceBundle}
 
+/**
+ * Internationalization object for multi-lang
+ */
 private[gangsutils] object I18N {
+
+  /**
+   * the option object of resource bundle to store classpath file gangsutils_LANG_COUNTRY.properties
+   */
   private var rbo: Option[ResourceBundle] = None
 
+  /**
+   * get resource bundle object from the underlying variable rbo, or read from classpath
+   * @return
+   */
   def getRB: ResourceBundle = {
     rbo match {
       case Some(rb) => rb
@@ -29,5 +40,8 @@ private[gangsutils] object I18N {
     }
   }
 
+  /**
+   * set rbo to None
+   */
   def clearRB(): Unit = rbo = None
 }

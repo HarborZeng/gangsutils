@@ -5,6 +5,9 @@ import cn.tellyouwhat.gangsutils.core.helper.I18N.getRB
 import java.util.regex.Pattern
 import scala.io.AnsiColor._
 
+/**
+ * constants object for gangsutils
+ */
 object constants {
 
   /**

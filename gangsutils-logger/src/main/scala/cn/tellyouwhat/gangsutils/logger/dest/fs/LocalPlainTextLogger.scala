@@ -8,6 +8,9 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
 import java.io.OutputStream
 import java.nio.file.{Path, Paths}
 
+/**
+ * A logger that write plain text to files
+ */
 class LocalPlainTextLogger extends LocalFileLogger {
 
   override private[fs] val logSavePath: Path = LocalPlainTextLogger.logSavePath match {
@@ -34,31 +37,45 @@ class LocalPlainTextLogger extends LocalFileLogger {
 
 }
 
+/**
+ * an object of LocalPlainTextLogger to set LocalPlainTextLogger class using
+ * <pre>
+ * LocalPlainTextLogger.setLogSavePath(path: String)
+ * LocalPlainTextLogger.resetLogSavePath()
+ * LocalPlainTextLogger.initializeConfiguration(c: LoggerConfiguration)
+ * LocalPlainTextLogger.resetConfiguration()
+ * </pre>
+ */
 object LocalPlainTextLogger extends LoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.fs.LocalPlainTextLogger"
 
-  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
-
+  /**
+   * the file path to save plain text log
+   */
   private var logSavePath: Option[String] = None
 
+  /**
+   * set the file path to save plain text log
+   */
+  def setLogSavePath(path: String): Unit = logSavePath = Some(path)
+
+  /**
+   * reset the file path to None
+   */
   def resetLogSavePath(): Unit = logSavePath = None
 
+  /**
+   * create a new LocalPlainTextLogger with LoggerConfiguration and path
+   *
+   * @param c    LoggerConfiguration
+   * @param path file path to save html log
+   * @return
+   */
   def apply(c: LoggerConfiguration, path: String): Logger = {
     setLogSavePath(path)
     apply(c)
   }
-
-  def setLogSavePath(path: String): Unit = logSavePath = Some(path)
-
-  override def apply(c: LoggerConfiguration): Logger = {
-    initializeConfiguration(c)
-    apply()
-  }
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
-
-  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): Logger = {
     if (loggerConfig.isEmpty)

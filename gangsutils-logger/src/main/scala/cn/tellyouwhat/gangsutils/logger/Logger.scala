@@ -13,7 +13,14 @@ import java.time.LocalDateTime
  */
 trait Logger {
 
+  /**
+   * lazy value of hostname
+   */
   lazy val hostname: String = InetAddress.getLocalHost.getHostName
+
+  /**
+   * LoggerConfiguration for the logger to stylish the log
+   */
   val loggerConfig: LoggerConfiguration = null
 
   /**
@@ -44,6 +51,9 @@ trait Logger {
     doTheLogAction(msg.toString, level)
   }
 
+  /**
+   * check prerequisite before perform the real log action
+   */
   protected def checkPrerequisite(): Unit = {
     if (loggerConfig == null)
       throw GangException("loggerConfig is null")
@@ -130,16 +140,45 @@ trait Logger {
 
 }
 
+/**
+ * trait of Logger companion object
+ */
 trait LoggerCompanion {
 
+  /**
+   * the logger full name
+   */
   val loggerName: String = null
 
-  private[logger] var loggerConfig: Option[LoggerConfiguration]
+  /**
+   * the logger configuration
+   */
+  private[logger] var loggerConfig: Option[LoggerConfiguration] = None
 
+  /**
+   * create a default logger if loggerConfig is not None
+   *
+   * @return a Logger instance
+   */
   def apply(): Logger
 
-  def apply(c: LoggerConfiguration): Logger
+  /**
+   * create a logger with LoggerConfiguration
+   *
+   * @return a Logger instance
+   */
+  def apply(c: LoggerConfiguration): Logger = {
+    initializeConfiguration(c)
+    apply()
+  }
 
-  def initializeConfiguration(c: LoggerConfiguration): Unit
-  def resetConfiguration(): Unit
+  /**
+   * set LoggerConfiguration
+   */
+  def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
+
+  /**
+   * set LoggerConfiguration
+   */
+  def resetConfiguration(): Unit = loggerConfig = None
 }

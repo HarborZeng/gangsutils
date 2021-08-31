@@ -63,8 +63,8 @@ class LocalHtmlLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter 
   it should "log to local file with colorful html and rename the log file to timestamp-tailing name and continue logging with the old name" in {
     val logger = LocalHtmlLogger(LoggerConfiguration(isTraceEnabled = true, logPrefix = Some("some prefix string")), path)
 
-    1000 times logger.info("hello html info")
-    1000 times logger.success("hello html success")
+    2000 times logger.info("hello html info")
+    2000 times logger.success("hello html success")
     1000 times logger.error("hello html error")
     1000 times logger.warning("hello html warning")
     1000 times logger.critical("hello html critical")

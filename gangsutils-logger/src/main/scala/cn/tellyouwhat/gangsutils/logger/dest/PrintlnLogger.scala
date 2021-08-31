@@ -21,6 +21,7 @@ class PrintlnLogger extends Logger {
    *
    * @param msg   日志内容
    * @param level 日志级别
+   * @return 总是返回 true，除非有异常抛出
    */
   protected def printlnLog(msg: String, level: LogLevel.Value): Boolean = {
     buildLog(msg, level).toString |> println
@@ -30,23 +31,16 @@ class PrintlnLogger extends Logger {
 }
 
 /**
- * 打印到标准输出的日志期伴声对像
+ * an object of PrintlnLogger to set PrintlnLogger class using
+ * <pre>
+ * PrintlnLogger.resetRobotsKeys()
+ * PrintlnLogger.initializeConfiguration(c: LoggerConfiguration)
+ * PrintlnLogger.resetConfiguration()
+ * </pre>
  */
 object PrintlnLogger extends LoggerCompanion {
-  /**
-   * PRINTLN_LOGGER 字符串
-   */
+
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger"
-
-  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
-
-  override def apply(c: LoggerConfiguration): PrintlnLogger = {
-    initializeConfiguration(c)
-    apply()
-  }
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
-  override def resetConfiguration(): Unit = loggerConfig = None
 
   override def apply(): PrintlnLogger = {
     if (loggerConfig.isEmpty)

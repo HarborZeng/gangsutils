@@ -1,5 +1,8 @@
 package cn.tellyouwhat.gangsutils.core.exceptions
 
+/**
+ * GangException object
+ */
 object GangException {
   /**
    * 生成一个新的 GangException
