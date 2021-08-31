@@ -6,6 +6,9 @@ import cn.tellyouwhat.gangsutils.core.helper.I18N
 import java.time.Duration
 import scala.util.{Failure, Try}
 
+/**
+ * functions object for gangsutils
+ */
 object funcs {
 
   /**
@@ -33,7 +36,7 @@ object funcs {
     if (cc == null)
       return null
     cc.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) {
-      // ignore $ or __ initial member
+      // ignore $ or __ initialing members
       case (map, field) if !(field.getName.startsWith("$") || field.getName.startsWith("__")) =>
         field.setAccessible(true)
         val value = field.get(cc) match {
@@ -121,6 +124,12 @@ object funcs {
     }
   }
 
+  /**
+   * strip ANSI color using regex replace
+   *
+   * @param s from where to strip
+   * @return the striped string with ANSI color removed
+   */
   def stripANSIColor(s: String): String = s.replaceAll("""\e\[[\d;]*[^\d;]""", "")
 
   /**

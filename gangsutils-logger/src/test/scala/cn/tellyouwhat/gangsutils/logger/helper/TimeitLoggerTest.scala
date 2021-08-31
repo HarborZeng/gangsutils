@@ -3,11 +3,14 @@ package cn.tellyouwhat.gangsutils.logger.helper
 import cn.tellyouwhat.gangsutils.core.constants.{datetimeRe, successLog, traceLog}
 import cn.tellyouwhat.gangsutils.core.helper.I18N.getRB
 import cn.tellyouwhat.gangsutils.logger.GangLogger
-import org.scalatest.BeforeAndAfter
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
+class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter with BeforeAndAfterAll {
+
+  val stream = new java.io.ByteArrayOutputStream()
+
   before {
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
@@ -16,10 +19,14 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
   after {
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
+    stream.reset()
+  }
+
+  override protected def afterAll(): Unit = {
+    stream.close()
   }
 
   "timeit logger run without logger instance" should "run a method and print the start, end and time duration to invoke that method" in {
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       class TL extends Timeit {
         override def run(desc: String): Unit = {
@@ -41,7 +48,6 @@ class TimeitLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
   }
 
   "timeit logger run with logger instance" should "run a method and log the start, end and time duration to invoke that method" in {
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       class TL extends Timeit {
         override def run(desc: String): Unit = {

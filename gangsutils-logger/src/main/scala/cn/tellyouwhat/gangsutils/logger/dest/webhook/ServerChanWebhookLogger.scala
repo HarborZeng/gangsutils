@@ -5,10 +5,13 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
 
 import java.net.URLEncoder
 
+/**
+ * A logger that write logs to ServerChan (Server酱)
+ */
 class ServerChanWebhookLogger extends WebhookLogger {
   override val loggerConfig: LoggerConfiguration = ServerChanWebhookLogger.loggerConfig match {
     case Some(value) => value
@@ -37,14 +40,20 @@ class ServerChanWebhookLogger extends WebhookLogger {
   }
 }
 
+/**
+ * an object of ServerChanWebhookLogger to set ServerChanWebhookLogger class using
+ * <pre>
+ * ServerChanWebhookLogger.initializeServerChanWebhook(robotsKeys: String)
+ * ServerChanWebhookLogger.initializeServerChanWebhook(robotsKeys: Array[String])
+ * ServerChanWebhookLogger.resetRobotsKeys()
+ * ServerChanWebhookLogger.initializeConfiguration(c: LoggerConfiguration)
+ * ServerChanWebhookLogger.resetConfiguration()
+ * </pre>
+ */
 object ServerChanWebhookLogger extends LoggerCompanion {
 
-  /**
-   * SERVERCHAN_WEBHOOK_LOGGER 文本
-   */
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.ServerChanWebhookLogger"
 
-  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
@@ -74,16 +83,7 @@ object ServerChanWebhookLogger extends LoggerCompanion {
     robotsKeys
   }
 
-  override def apply(c: LoggerConfiguration): ServerChanWebhookLogger = {
-    initializeConfiguration(c)
-    apply()
-  }
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
-
-  override def resetConfiguration(): Unit = loggerConfig = None
-
-  override def apply(): ServerChanWebhookLogger = {
+  override def apply(): Logger = {
     if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new ServerChanWebhookLogger()

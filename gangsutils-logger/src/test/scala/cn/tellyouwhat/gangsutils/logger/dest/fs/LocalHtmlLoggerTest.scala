@@ -63,8 +63,8 @@ class LocalHtmlLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter 
   it should "log to local file with colorful html and rename the log file to timestamp-tailing name and continue logging with the old name" in {
     val logger = LocalHtmlLogger(LoggerConfiguration(isTraceEnabled = true, logPrefix = Some("some prefix string")), path)
 
-    1000 times logger.info("hello html info")
-    1000 times logger.success("hello html success")
+    2000 times logger.info("hello html info")
+    2000 times logger.success("hello html success")
     1000 times logger.error("hello html error")
     1000 times logger.warning("hello html warning")
     1000 times logger.critical("hello html critical")
@@ -74,13 +74,13 @@ class LocalHtmlLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter 
     Files.list(parentDir).toArray should have length 2
   }
 
+  // it will success in shell, but won't in Intellij Idea
 /*  it should "a NotFileException should be thrown if logSavePath was a directory" in {
     val logger = LocalHtmlLogger(LoggerConfiguration(), "gangsutils-logger")
-    a [IllegalStateException] should be thrownBy logger.info()
+    the [IllegalStateException] thrownBy logger.info() should have message "The underlying logSavePath: gangsutils-logger might does not have parent"
   }*/
 
   it should "be newed with an IllegalArgumentException thrown if logSavePath was not set" in {
-    LocalHtmlLogger.resetLogSavePath()
     the[IllegalArgumentException] thrownBy new LocalHtmlLogger() should have message "LocalHtmlLogger.logSavePath is None"
   }
 

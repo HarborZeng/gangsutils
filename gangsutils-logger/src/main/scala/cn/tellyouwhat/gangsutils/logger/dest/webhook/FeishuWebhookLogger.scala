@@ -4,13 +4,16 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
 import org.apache.commons.codec.binary.Base64
 
 import java.time.Duration
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * A logger that write logs to Feishu (飞书)
+ */
 class FeishuWebhookLogger extends WebhookLogger {
 
   override val loggerConfig: LoggerConfiguration = FeishuWebhookLogger.loggerConfig match {
@@ -19,7 +22,7 @@ class FeishuWebhookLogger extends WebhookLogger {
   }
 
   /**
-   * 要发往的机器人的密钥
+   * 要发往的机器人
    */
   val feishuRobotsToSend: Set[Robot] = FeishuWebhookLogger.robotsToSend.toSet
 
@@ -48,14 +51,20 @@ class FeishuWebhookLogger extends WebhookLogger {
       throw new IllegalArgumentException(I18N.getRB.getString("feishuWebhookLogger.prerequisite"))
 }
 
+/**
+ * an object of FeishuWebhookLogger to set FeishuWebhookLogger class using
+ * <pre>
+ * FeishuWebhookLogger.initializeFeishuWebhook(robotsKeysSigns: String)
+ * FeishuWebhookLogger.initializeFeishuWebhook(robotsKeysSigns: Array[Array[String]])
+ * FeishuWebhookLogger.resetRobots()
+ * FeishuWebhookLogger.initializeConfiguration(c: LoggerConfiguration)
+ * FeishuWebhookLogger.resetConfiguration()
+ * </pre>
+ */
 object FeishuWebhookLogger extends LoggerCompanion {
 
-  /**
-   * FEISHU_WEBHOOK_LOGGER 文本
-   */
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.FeishuWebhookLogger"
 
-  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
@@ -64,9 +73,9 @@ object FeishuWebhookLogger extends LoggerCompanion {
   def resetRobots(): Unit = robotsToSend = Array.empty[Robot]
 
   /**
-   * 初始化 feishu webhook 的密钥
+   * 初始化 feishu webhook 的密钥和签名
    *
-   * @param robotsKeysSigns 密钥，如果是多个，中间用逗号隔开
+   * @param robotsKeysSigns 密钥;签名，如果是多个，中间用逗号隔开，密钥和签名之间用分号隔开
    */
   def initializeFeishuWebhook(robotsKeysSigns: String): Unit = {
     robotsKeysSigns.split(",").map(_.trim.split(";").map(_.trim)) |! initializeFeishuWebhook
@@ -99,16 +108,7 @@ object FeishuWebhookLogger extends LoggerCompanion {
     })
   }
 
-  override def apply(c: LoggerConfiguration): FeishuWebhookLogger = {
-    initializeConfiguration(c)
-    apply()
-  }
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
-
-  override def resetConfiguration(): Unit = loggerConfig = None
-
-  override def apply(): FeishuWebhookLogger = {
+  override def apply(): Logger = {
     if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new FeishuWebhookLogger()

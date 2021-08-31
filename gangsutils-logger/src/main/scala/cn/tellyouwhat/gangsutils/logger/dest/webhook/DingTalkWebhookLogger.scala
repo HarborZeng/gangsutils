@@ -4,13 +4,16 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
 import org.apache.commons.codec.binary.Base64
 
 import java.net.URLEncoder
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * A logger that write logs to DingTalk (钉钉)
+ */
 class DingTalkWebhookLogger extends WebhookLogger {
 
   override val loggerConfig: LoggerConfiguration = DingTalkWebhookLogger.loggerConfig match {
@@ -19,7 +22,7 @@ class DingTalkWebhookLogger extends WebhookLogger {
   }
 
   /**
-   * 要发往的机器人的密钥
+   * 要发往的机器人
    */
   val dingTalkRobotsToSend: Set[Robot] = DingTalkWebhookLogger.robotsToSend.toSet
 
@@ -47,14 +50,20 @@ class DingTalkWebhookLogger extends WebhookLogger {
       throw new IllegalArgumentException(I18N.getRB.getString("dingTalkWebhookLogger.prerequisite"))
 }
 
+/**
+ * an object of DingTalkWebhookLogger to set DingTalkWebhookLogger class using
+ * <pre>
+ * DingTalkWebhookLogger.initializeDingTalkWebhook(robotsKeysSigns: String)
+ * DingTalkWebhookLogger.initializeDingTalkWebhook(robotsKeysSigns: Array[Array[String]])
+ * DingTalkWebhookLogger.resetRobots()
+ * DingTalkWebhookLogger.initializeConfiguration(c: LoggerConfiguration)
+ * DingTalkWebhookLogger.resetConfiguration()
+ * </pre>
+ */
 object DingTalkWebhookLogger extends LoggerCompanion {
 
-  /**
-   * DINGTALK_WEBHOOK_LOGGER 文本
-   */
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger"
 
-  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
@@ -98,16 +107,7 @@ object DingTalkWebhookLogger extends LoggerCompanion {
     })
   }
 
-  override def apply(c: LoggerConfiguration): DingTalkWebhookLogger = {
-    initializeConfiguration(c)
-    apply()
-  }
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
-
-  override def resetConfiguration(): Unit = loggerConfig = None
-
-  override def apply(): DingTalkWebhookLogger = {
+  override def apply(): Logger = {
     if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new DingTalkWebhookLogger()

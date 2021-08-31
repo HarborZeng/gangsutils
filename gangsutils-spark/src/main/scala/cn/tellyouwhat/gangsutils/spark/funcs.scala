@@ -8,6 +8,9 @@ import org.apache.spark.sql.SparkSession
 import java.time.{Instant, LocalDate, LocalDateTime, ZoneId}
 import scala.util.{Either, Left, Right}
 
+/**
+ * gangsutils spark functions
+ */
 object funcs {
 
   /**

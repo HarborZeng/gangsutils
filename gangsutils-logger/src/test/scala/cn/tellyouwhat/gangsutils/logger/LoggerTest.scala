@@ -6,15 +6,21 @@ import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongLogLevelException
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, PrivateMethodTester}
 
 import java.io.ByteArrayOutputStream
 
-class LoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
+class LoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter with BeforeAndAfterAll {
+  val stream = new ByteArrayOutputStream()
 
   after {
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
+    stream.reset()
+  }
+
+  override protected def afterAll(): Unit = {
+    stream.close()
   }
 
   behavior of "LoggerTest"
@@ -41,7 +47,6 @@ class LoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with
 
   "log" should "print a log" in {
     val logger = GangLogger(isTraceEnabled = false, isDTEnabled = false, isHostnameEnabled = false)
-    val stream = new ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.log("a info log", LogLevel.INFO)
     }

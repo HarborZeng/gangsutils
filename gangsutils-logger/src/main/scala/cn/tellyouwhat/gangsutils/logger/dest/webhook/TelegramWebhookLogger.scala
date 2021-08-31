@@ -4,8 +4,11 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, TelegramRobot}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
 
+/**
+ * A logger that write logs to telegram (won't work in mainland China)
+ */
 class TelegramWebhookLogger extends WebhookLogger {
 
   override val loggerConfig: LoggerConfiguration = TelegramWebhookLogger.loggerConfig match {
@@ -32,14 +35,20 @@ class TelegramWebhookLogger extends WebhookLogger {
   }
 }
 
+/**
+ * an object of TelegramWebhookLogger to set TelegramWebhookLogger class using
+ * <pre>
+ * TelegramWebhookLogger.initializeTelegramWebhook(robotsChatIdsTokens: String)
+ * TelegramWebhookLogger.initializeTelegramWebhook(robotsChatIdsTokens: Array[Array[String]])
+ * TelegramWebhookLogger.resetRobots()
+ * TelegramWebhookLogger.initializeConfiguration(c: LoggerConfiguration)
+ * TelegramWebhookLogger.resetConfiguration()
+ * </pre>
+ */
 object TelegramWebhookLogger extends LoggerCompanion {
 
-  /**
-   * TELEGRAM_WEBHOOK_LOGGER 文本
-   */
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.TelegramWebhookLogger"
 
-  override private[logger] var loggerConfig: Option[LoggerConfiguration] = None
   /**
    * 要发往的机器人的密钥
    */
@@ -50,7 +59,7 @@ object TelegramWebhookLogger extends LoggerCompanion {
   /**
    * 初始化 telegram webhook 的密钥
    *
-   * @param robotsChatIdsTokens 密钥，如果是多个，中间用逗号隔开
+   * @param robotsChatIdsTokens 密钥和签名，如果是多个，中间用逗号隔开，密钥与签名之间用分号隔开
    */
   def initializeTelegramWebhook(robotsChatIdsTokens: String): Unit = {
     robotsChatIdsTokens.split(",").map(_.trim.split(";").map(_.trim)) |! initializeTelegramWebhook
@@ -59,7 +68,7 @@ object TelegramWebhookLogger extends LoggerCompanion {
   /**
    * 初始化 telegram webhook 的密钥
    *
-   * @param robotsChatIdsTokens 密钥数组
+   * @param robotsChatIdsTokens 密钥和签名数组
    */
   def initializeTelegramWebhook(robotsChatIdsTokens: Array[Array[String]]): Unit = robotsToSend = {
     if (robotsChatIdsTokens == null ||
@@ -78,15 +87,7 @@ object TelegramWebhookLogger extends LoggerCompanion {
     })
   }
 
-  override def apply(c: LoggerConfiguration): TelegramWebhookLogger = {
-    initializeConfiguration(c)
-    apply()
-  }
-
-  override def initializeConfiguration(c: LoggerConfiguration): Unit = loggerConfig = Some(c)
-  override def resetConfiguration(): Unit = loggerConfig = None
-
-  override def apply(): TelegramWebhookLogger = {
+  override def apply(): Logger = {
     if (loggerConfig.isEmpty)
       throw new IllegalArgumentException("You did not pass parameter loggerConfig nor initializeConfiguration")
     new TelegramWebhookLogger()

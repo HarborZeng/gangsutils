@@ -345,6 +345,7 @@ for use cases.
 - [x] Make log a case class containing hostname, datetime, trace, content and etc, serialize it when using(println or
   send to webhook)
 - [x] Different log configurations for different logs by default value and config file
+- [ ] Add proxy settings for TelegramWebhookLogger
 
 ## License
 

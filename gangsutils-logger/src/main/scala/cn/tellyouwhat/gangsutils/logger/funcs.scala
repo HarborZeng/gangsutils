@@ -6,6 +6,9 @@ import cn.tellyouwhat.gangsutils.core.helper.I18N
 
 import scala.util.{Failure, Success, Try}
 
+/**
+ * gangsutils logger functions
+ */
 object funcs {
 
   /**

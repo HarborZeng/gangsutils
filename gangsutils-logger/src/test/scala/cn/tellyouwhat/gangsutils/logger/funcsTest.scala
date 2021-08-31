@@ -6,13 +6,14 @@ import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.PRINTLN_LOGGER
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, PrivateMethodTester}
 
 import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
 import scala.io.AnsiColor.RESET
 
-class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
+class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter with BeforeAndAfterAll {
+  val stream = new ByteArrayOutputStream()
 
   before {
     GangLogger.setLoggerAndConfiguration(Map(
@@ -24,10 +25,14 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
   after {
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
+    stream.reset()
+  }
+
+  override protected def afterAll(): Unit = {
+    stream.close()
   }
 
   "timeit" should "time a function invocation and log the start and execution duration" in {
-    val stream = new ByteArrayOutputStream()
     Console.withOut(stream) {
       funcs.timeit(1 + 1) shouldBe 2
     }
@@ -49,7 +54,6 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
 
 
   "printOrLog" should "print to stdout about the built log content or use logger(Logger) to do a log action if the parameter logger is fulfilled" in {
-    val stream = new ByteArrayOutputStream()
     Console.withOut(stream) {
       funcs.printOrLog("content", LogLevel.TRACE)
     }

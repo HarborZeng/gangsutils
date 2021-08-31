@@ -2,6 +2,9 @@ package cn.tellyouwhat.gangsutils.logger.dest.fs
 
 import java.io.OutputStream
 
+/**
+ * The trait for File Logger life cycle event
+ */
 trait FileLifeCycle {
   /**
    * hook end of file. you can do something when file ends, like appending some text

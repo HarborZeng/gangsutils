@@ -8,11 +8,14 @@ import cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger
 import cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.{BeforeAndAfter, PrivateMethodTester}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, PrivateMethodTester}
 
+import java.io.ByteArrayOutputStream
 import java.net.InetAddress
 
-class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
+class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter with BeforeAndAfterAll {
+
+  val stream = new ByteArrayOutputStream()
 
   before {
     GangLogger.clearLogger2Configuration()
@@ -20,13 +23,17 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   after {
     GangLogger.killLogger()
     GangLogger.clearLogger2Configuration()
+    stream.reset()
+  }
+
+  override protected def afterAll(): Unit = {
+    stream.close()
   }
 
   behavior of "GangLoggerTest"
 
   it should "success" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.success("a success log")
     }
@@ -35,7 +42,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "info" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.info("an info log")
     }
@@ -44,7 +50,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "trace" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.trace("a trace log")
     }
@@ -53,7 +58,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "log" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.log("a log", level = LogLevel.TRACE)
     }
@@ -62,7 +66,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "critical" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.critical("a critical log")
     }
@@ -71,7 +74,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "warning" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.warning("a warning log")
     }
@@ -80,7 +82,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "error" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.error("an error log")
     }
@@ -94,7 +95,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
       WOA_WEBHOOK_LOGGER -> LoggerConfiguration(),
     ))
     val logger = GangLogger()
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.trace("l")(enabled = DINGTALK_WEBHOOK_LOGGER :: Nil)
     }
@@ -108,7 +108,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "apply with logPrefix" in {
     val logger2 = GangLogger(isDTEnabled = false, logPrefix = Some("a prefix"), isHostnameEnabled = false)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger2.trace("a log with prefix")
     }
@@ -117,7 +116,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   it should "apply with hostname" in {
     val logger = GangLogger(isDTEnabled = false, isHostnameEnabled = true)
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger.trace("a log with hostname")
     }
@@ -129,7 +127,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
     logger1.loggers.head.asInstanceOf[PrintlnLogger].loggerConfig.logPrefix shouldBe Some("another prefix")
 
-    val stream = new java.io.ByteArrayOutputStream()
     Console.withOut(stream) {
       logger1.trace("another log with prefix")
     }
@@ -143,7 +140,6 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
     newLogger shouldEqual logger1
 
     GangLogger.killLogger()
-    val stream = new java.io.ByteArrayOutputStream()
     val logger3 = Console.withOut(stream) {
       GangLogger.getLogger
     }
@@ -162,11 +158,11 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   "setLoggerAndConfiguration" should "throw exceptions when m is illegal" in {
-    the [IllegalArgumentException] thrownBy {
+    the[IllegalArgumentException] thrownBy {
       GangLogger.setLoggerAndConfiguration(null: Map[SupportedLogDest.Value, LoggerConfiguration])
     } should have message "null m: Map[SupportedLogDest.Value, LoggerConfiguration]"
 
-    the [IllegalArgumentException] thrownBy {
+    the[IllegalArgumentException] thrownBy {
       GangLogger.setLoggerAndConfiguration(Map.empty[SupportedLogDest.Value, LoggerConfiguration])
     } should have message "empty m: Map[SupportedLogDest.Value, LoggerConfiguration]"
 
