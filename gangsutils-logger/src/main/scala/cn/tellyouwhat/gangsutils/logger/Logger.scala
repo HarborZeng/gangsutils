@@ -95,11 +95,11 @@ trait Logger {
     val (className, methodName, lineNumber) = if (loggerConfig.isTraceEnabled) {
       val stackTraceElements = Thread.currentThread().getStackTrace
       val slicedElements = stackTraceElements.drop(stackTraceElements
-        .lastIndexWhere(_.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.logger")) + 1
+        .lastIndexWhere(_.getClassName.startsWith("cn.tellyouwhat.gangsutils.logger")) + 1
       ).filterNot(e => e.getClassName.startsWith("sun.") ||
         e.getClassName.startsWith("java.") ||
         e.getClassName.startsWith("scala.") ||
-        e.getClassName.startsWith("cn.tellyouwhat.gangsutils.common.gangfunctions"))
+        e.getClassName.startsWith("cn.tellyouwhat.gangsutils"))
       val theTrace = slicedElements(0)
       val className = theTrace.getClassName
       val methodName = theTrace.getMethodName
