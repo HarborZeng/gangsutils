@@ -30,6 +30,7 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
     super.checkPrerequisite()
     if (logSavePath == null)
       throw new IllegalStateException("The underlying logSavePath is null")
+
     //target path can not be a directory
     if (Files.exists(logSavePath) && Files.isDirectory(logSavePath))
       throw NotFileException(logSavePath.toString, "Path is a directory, use specific file path instead")

@@ -12,7 +12,11 @@ import scala.Console.RED
 import scala.util.{Failure, Success}
 
 class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with BeforeAndAfter {
+  val stream = new ByteArrayOutputStream()
 
+  after {
+    stream.reset()
+  }
   "reduceByKey" should "group and for each group do a reduce by key" in {
     val ext_1 = Array("txt", "txt", "pdf", "docx", "docx", "ppt", "ppt", "ppt").map((_, 1))
     val ext_count = funcs.reduceByKey(ext_1)
@@ -214,7 +218,6 @@ class funcsTest extends AnyFlatSpec with Matchers with PrivateMethodTester with 
       case Success(v) => v shouldBe 2
     }
 
-    val stream = new ByteArrayOutputStream()
     Console.withOut(stream) {
       funcs.retry(3)(1 / 0)
     }
