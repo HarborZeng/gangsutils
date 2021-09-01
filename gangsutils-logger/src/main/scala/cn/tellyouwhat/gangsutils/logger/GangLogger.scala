@@ -96,6 +96,7 @@ class GangLogger {
         ))
       loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
     } else loggers)
+      .filter(level >= _.loggerConfig.logLevel)
       .map(_.log(msg, level)).forall(p => p)
   }
 

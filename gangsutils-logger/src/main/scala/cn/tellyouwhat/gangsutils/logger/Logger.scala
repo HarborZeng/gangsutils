@@ -48,7 +48,9 @@ trait Logger {
    */
   def log(msg: Any, level: LogLevel.Value): Boolean = {
     checkPrerequisite()
-    doTheLogAction(msg.toString, level)
+    if (level >= loggerConfig.logLevel)
+      doTheLogAction(msg.toString, level)
+    else false
   }
 
   /**
