@@ -51,6 +51,7 @@ trait WebhookLogger extends Logger {
       """"errcode":300001""", // DingTalk
       """"code":19001""", // feishu
       """"errcode":93000""", // qywx(企业微信)
+      """"code":600""", // push plus
     ).exists(response.body.contains)) {
       println(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))
       return false

@@ -133,6 +133,14 @@ object funcs {
   def stripANSIColor(s: String): String = s.replaceAll("""\e\[[\d;]*[^\d;]""", "")
 
   /**
+   * escape quotation mark using string replace
+   *
+   * @param s from where to escape
+   * @return the string with quotation mark escaped
+   */
+  def escapeQuotationMark(s: String): String = s.replace(""""""", """\"""")
+
+  /**
    * 使用字符串描述的两个时间差，如 1m20.3s
    *
    * @param t0 先前的时间

@@ -58,4 +58,9 @@ object SupportedLogDest extends Enumeration {
    */
   val LOCAL_HTML_LOGGER: SupportedLogDest.Value = Value(LocalHtmlLogger.loggerName)
 
+  /**
+   * push plus 日志枚举
+   */
+  val PUSHPULS_WEBHOOK_LOGGER: SupportedLogDest.Value = Value(PushPlusWebhookLogger.loggerName)
+
 }
