@@ -6,7 +6,7 @@
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.5</version>
+    <version>2.0.6-SNAPSHOT</version>
 
     <description>scala spark utils pack</description>
 
@@ -55,27 +55,27 @@
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-core</artifactId>
-                <version>2.0.5</version>
+                <version>2.0.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-logger</artifactId>
-                <version>2.0.5</version>
+                <version>2.0.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-spark</artifactId>
-                <version>2.0.5</version>
+                <version>2.0.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-hadoop</artifactId>
-                <version>2.0.5</version>
+                <version>2.0.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.tellyouwhat</groupId>
                 <artifactId>gangsutils-all</artifactId>
-                <version>2.0.5</version>
+                <version>2.0.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
