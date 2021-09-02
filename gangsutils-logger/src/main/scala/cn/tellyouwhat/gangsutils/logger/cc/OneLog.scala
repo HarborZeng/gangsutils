@@ -4,6 +4,8 @@ import cn.tellyouwhat.gangsutils.core.constants._
 import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.logger.LogLevel
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongLogLevelException
+import io.circe.Encoder
+import io.circe.syntax._
 
 import java.time.LocalDateTime
 import scala.io.AnsiColor._
@@ -30,6 +32,33 @@ case class OneLog(
                    prefix: Option[String],
                    msg: Option[String],
                  ) {
+
+  /**
+   * toJsonString can convert this case class to json string without space
+   *
+   * @return a json string without space
+   */
+  def toJsonString: String = {
+    this.asJson(Encoder.forProduct8(
+      "level",
+      "hostname",
+      "datetime",
+      "className",
+      "methodName",
+      "lineNumber",
+      "prefix",
+      "msg",
+    )(u => (
+      u.level.orNull.toString,
+      u.hostname,
+      u.datetime,
+      u.className,
+      u.methodName,
+      u.lineNumber,
+      u.prefix,
+      u.msg,
+    ))).noSpaces
+  }
 
   /**
    * toString is an alias for toStandardLogString

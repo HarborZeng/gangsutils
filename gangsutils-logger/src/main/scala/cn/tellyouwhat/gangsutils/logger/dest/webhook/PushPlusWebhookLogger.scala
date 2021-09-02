@@ -5,8 +5,6 @@ import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, OneLog}
 import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
-import io.circe.Encoder
-import io.circe.syntax._
 
 import scala.io.Source
 
@@ -31,33 +29,12 @@ class PushPlusWebhookLogger extends WebhookLogger {
    */
   val pushplusRobotsToSend: Set[String] = PushPlusWebhookLogger.robotsToSend.toSet
 
-  implicit val encodeOneLog: Encoder[OneLog] =
-    Encoder.forProduct8(
-      "level",
-      "hostname",
-      "datetime",
-      "className",
-      "methodName",
-      "lineNumber",
-      "prefix",
-      "msg",
-    )(u => (
-      u.level.orNull.toString,
-      u.hostname,
-      u.datetime,
-      u.className,
-      u.methodName,
-      u.lineNumber,
-      u.prefix,
-      u.msg,
-    ))
-
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
     val fullLog = buildLog(msg, level) |> (c =>
       if (loggerTemplate == "html")
         Source.fromResource("gangsutils-logger-html-template.html").mkString + c.toHtmlString + "</body></html>"
       else if (loggerTemplate == "json") {
-        c.asJson.noSpaces |> stripANSIColor
+        c.toJsonString |> stripANSIColor
       } else if (loggerTemplate == "plaintext") {
         c.toStandardLogString |> stripANSIColor
       } else
