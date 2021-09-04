@@ -14,8 +14,8 @@ import java.net.URLEncoder
  */
 class ServerChanWebhookLogger extends WebhookLogger {
 
-  override protected val proxyHost: String = ServerChanWebhookLogger.proxyHost
-  override protected val proxyPort: Int = ServerChanWebhookLogger.proxyPort
+  override protected val proxyHost: Option[String] = ServerChanWebhookLogger.proxyHost
+  override protected val proxyPort: Option[Int] = ServerChanWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = ServerChanWebhookLogger.loggerConfig match {
     case Some(value) => value
