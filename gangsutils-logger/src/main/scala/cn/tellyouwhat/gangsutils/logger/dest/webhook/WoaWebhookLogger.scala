@@ -4,12 +4,15 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 /**
  * 往 woa 里面发送日志
  */
 class WoaWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = WoaWebhookLogger.proxyHost
+  override protected val proxyPort: Int = WoaWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = WoaWebhookLogger.loggerConfig match {
     case Some(value) => value
@@ -46,7 +49,7 @@ class WoaWebhookLogger extends WebhookLogger {
  * WoaWebhookLogger.resetConfiguration()
  * </pre>
  */
-object WoaWebhookLogger extends LoggerCompanion {
+object WoaWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger"
 

@@ -2,6 +2,7 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
 import cn.tellyouwhat.gangsutils.core.exceptions.GangException
 import cn.tellyouwhat.gangsutils.core.helper.I18N
+import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongHttpMethodException
 import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 import scalaj.http.Http
@@ -10,6 +11,16 @@ import scalaj.http.Http
  * Webhook 日志器特质
  */
 trait WebhookLogger extends Logger {
+
+  /**
+   * proxy host
+   */
+  protected val proxyHost: String = ""
+
+  /**
+   * proxy port
+   */
+  protected val proxyPort: Int = -1
 
   /**
    * 执行 webhook 日志
@@ -27,13 +38,15 @@ trait WebhookLogger extends Logger {
    * @param body      请求带上的内容
    */
   private[logger] def sendRequest(targetURL: String, method: String = "POST", body: String = "", form: Seq[(String, String)] = Seq.empty[(String, String)]): Boolean = {
+    val httpRequest = Http(targetURL)
+      .pipe(r => if (proxyHost.nonEmpty && proxyPort != -1) r.proxy(proxyHost, proxyPort) else r)
     val response = if (method == "POST") {
       if (body.isEmpty && form.nonEmpty) {
-        Http(targetURL)
+        httpRequest
           .postForm(form)
           .asString
       } else if (body.nonEmpty && form.isEmpty) {
-        Http(targetURL)
+        httpRequest
           .header("Content-Type", "application/json")
           .postData(body)
           .asString
@@ -41,12 +54,11 @@ trait WebhookLogger extends Logger {
         throw new IllegalArgumentException(s"body $body, queryStrings $form, they can not be empty or non-empty at the same time.")
       }
     } else if (method == "GET") {
-      Http(targetURL)
-        .asString
+      httpRequest.asString
     } else {
       throw WrongHttpMethodException(I18N.getRB.getString("sendRequest.wrongHttpMethod").format(method))
     }
-    // some webhook get error response but with 200 Http Status code, so match them here and return false
+    // some webhooks get error response but with 200 Http Status code, so match them here and return false
     if (response.isSuccess && Seq(
       """"errcode":300001""", // DingTalk
       """"code":19001""", // feishu

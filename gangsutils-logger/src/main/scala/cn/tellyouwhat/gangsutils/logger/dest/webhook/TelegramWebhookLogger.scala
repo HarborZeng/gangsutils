@@ -4,12 +4,15 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, TelegramRobot}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 /**
  * A logger that write logs to telegram (won't work in mainland China)
  */
 class TelegramWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = TelegramWebhookLogger.proxyHost
+  override protected val proxyPort: Int = TelegramWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = TelegramWebhookLogger.loggerConfig match {
     case Some(value) => value
@@ -45,7 +48,7 @@ class TelegramWebhookLogger extends WebhookLogger {
  * TelegramWebhookLogger.resetConfiguration()
  * </pre>
  */
-object TelegramWebhookLogger extends LoggerCompanion {
+object TelegramWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.TelegramWebhookLogger"
 

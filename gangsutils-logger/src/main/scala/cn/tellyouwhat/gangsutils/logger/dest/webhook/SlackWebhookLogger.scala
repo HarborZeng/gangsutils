@@ -4,12 +4,15 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 /**
  * A logger that write logs to Slack
  */
 class SlackWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = SlackWebhookLogger.proxyHost
+  override protected val proxyPort: Int = SlackWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = SlackWebhookLogger.loggerConfig match {
     case Some(value) => value
@@ -44,7 +47,7 @@ class SlackWebhookLogger extends WebhookLogger {
  * SlackWebhookLogger.resetConfiguration()
  * </pre>
  */
-object SlackWebhookLogger extends LoggerCompanion {
+object SlackWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.SlackWebhookLogger"
 

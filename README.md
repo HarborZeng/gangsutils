@@ -10,9 +10,9 @@
 
 ## Utilities
 
-To use this utils pack right away, add the following dependencies to pom.xml or other dependencies file.
+Gangsutils stands for **Gang** **S**cala **Utils**, it includes several modules.
 
-Replace `${gangsutils.version}` to the latest stable version showed in the Maven Central
+Replace `${gangsutils.version}` to the latest stable version showed in the nexus repository
 badge [![Sonatype Nexus](https://img.shields.io/nexus/r/cn.tellyouwhat/gangsutils?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/releases/cn/tellyouwhat/gangsutils/)
 
 Note: Only import what you need to avoid unnecessary download.
@@ -20,7 +20,6 @@ Note: Only import what you need to avoid unnecessary download.
 **Maven**
 
 ```xml
-
 <dependency>
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils-logger</artifactId>
@@ -46,7 +45,6 @@ Note: Only import what you need to avoid unnecessary download.
 or import all by
 
 ```xml
-
 <dependency>
     <groupId>cn.tellyouwhat</groupId>
     <artifactId>gangsutils-all</artifactId>
@@ -120,33 +118,33 @@ All the properties are immutable, so they can not be change after the logger is 
 To config a logger, you can:
 
 1. config using pre-defined methods
-
-  ```scala
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.DINGTALK_WEBHOOK_LOGGER
-import cn.tellyouwhat.gangsutils.logger.GangLogger
-import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-
-GangLogger.setLoggerAndConfiguration(Map(
-  DINGTALK_WEBHOOK_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("prefix"), logLevel = LogLevel.TRACE)
-))
-DingTalkWebhookLogger.initializeDingTalkWebhook("key;signSecret")
-
-val logger = GangLogger()
-logger.info("dingtalk webhook logger send a log into dingtalk with correct key and sign")
-
-//If you new GangLogger in this way:
-val logger = GangLogger(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("prefix"), logLevel = LogLevel.TRACE)
-//the parameters you filled in GangLogger apply method are for PrintlnLogger if the underlying logger2Configuration is null
-
-//get an already exists(previously created) logger instance, or create a new `PrintlnLogger` with default `LoggerConfiguration`
-GangLogger.getLogger
-
-//set stored _logger variable to None
-GangLogger.killLogger()
-
-//set stored logger2Configuration to null
-GangLogger.clearLogger2Configuration()
-  ```
+    
+    ```scala
+    import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.DINGTALK_WEBHOOK_LOGGER
+    import cn.tellyouwhat.gangsutils.logger.GangLogger
+    import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+    
+    GangLogger.setLoggerAndConfiguration(Map(
+      DINGTALK_WEBHOOK_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("prefix"), logLevel = LogLevel.TRACE)
+    ))
+    DingTalkWebhookLogger.initializeDingTalkWebhook("key;signSecret")
+    
+    val logger = GangLogger()
+    logger.info("dingtalk webhook logger send a log into dingtalk with correct key and sign")
+    
+    //If you new GangLogger in this way:
+    val logger = GangLogger(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("prefix"), logLevel = LogLevel.TRACE)
+    //the parameters you filled in GangLogger apply method are for PrintlnLogger if the underlying logger2Configuration is null
+    
+    //get an already exists(previously created) logger instance, or create a new `PrintlnLogger` with default `LoggerConfiguration`
+    GangLogger.getLogger
+    
+    //set stored _logger variable to None
+    GangLogger.killLogger()
+    
+    //set stored logger2Configuration to null
+    GangLogger.clearLogger2Configuration()
+    ```
 
 #### log levels
 
@@ -186,6 +184,7 @@ We support
 - [Telegram](https://telegram.org/) webhook logger
 - [Feishu(飞书)](https://www.feishu.cn/) webhook logger
 - [ServerChan(方糖Server酱)](https://sct.ftqq.com/) webhook logger
+- [PushPlus(推送加)](https://pushplus.hxtrip.com/) webhook logger
 - local plain text logger (write log to file, if file size reach threshold, move it with a timestamp tailing new name)
 - local html logger (write log to file with colorful style, if file size reach threshold, move it with a timestamp
   tailing new name)
@@ -345,7 +344,7 @@ for use cases.
 - [x] Make log a case class containing hostname, datetime, trace, content and etc, serialize it when using(println or
   send to webhook)
 - [x] Different log configurations for different logs by default value and config file
-- [ ] Add proxy settings for TelegramWebhookLogger
+- [x] Add proxy settings for TelegramWebhookLogger
 
 ## License
 

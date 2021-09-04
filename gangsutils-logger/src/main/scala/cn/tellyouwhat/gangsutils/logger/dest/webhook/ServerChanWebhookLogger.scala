@@ -5,7 +5,7 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 import java.net.URLEncoder
 
@@ -13,6 +13,10 @@ import java.net.URLEncoder
  * A logger that write logs to ServerChan (Server酱)
  */
 class ServerChanWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = ServerChanWebhookLogger.proxyHost
+  override protected val proxyPort: Int = ServerChanWebhookLogger.proxyPort
+
   override val loggerConfig: LoggerConfiguration = ServerChanWebhookLogger.loggerConfig match {
     case Some(value) => value
     case None => throw new IllegalArgumentException("ServerChanWebhookLogger.loggerConfig is None")
@@ -50,7 +54,7 @@ class ServerChanWebhookLogger extends WebhookLogger {
  * ServerChanWebhookLogger.resetConfiguration()
  * </pre>
  */
-object ServerChanWebhookLogger extends LoggerCompanion {
+object ServerChanWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.ServerChanWebhookLogger"
 

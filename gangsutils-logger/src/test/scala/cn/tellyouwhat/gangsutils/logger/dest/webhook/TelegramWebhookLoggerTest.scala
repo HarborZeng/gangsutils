@@ -25,6 +25,7 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     GangLogger.clearLogger2Configuration()
     TelegramWebhookLogger.resetRobots()
     TelegramWebhookLogger.resetConfiguration()
+    TelegramWebhookLogger.clearProxy()
   }
 
   behavior of "TelegramWebhookLoggerTest"
@@ -58,6 +59,7 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   "telegram webhook logger" should "send a log into telegram with correct chat_id and token" in {
+    //TelegramWebhookLogger.setProxy("127.0.0.1", 6080)
     TelegramWebhookLogger.initializeTelegramWebhook("-541655508;1957795670:AAE8KlT0LFdbvgiG1TJlR2kPUKVXLrenDT8")
     val logger = GangLogger()
     retry(2)(logger.info("telegram webhook logger send a log into telegram with correct chat_id and token")) match {
