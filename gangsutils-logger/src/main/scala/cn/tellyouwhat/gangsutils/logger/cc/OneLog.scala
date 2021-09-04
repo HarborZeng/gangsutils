@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.cc
 
 import cn.tellyouwhat.gangsutils.core.constants._
+import cn.tellyouwhat.gangsutils.core.funcs.escapeQuotationMark
 import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.logger.LogLevel
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongLogLevelException
@@ -134,7 +135,7 @@ case class OneLog(
         sb.append(value)
       case None =>
     }
-    val content = sb.result()
+    val content = sb.result() |> escapeQuotationMark
 
     level match {
       case Some(value) => value match {
