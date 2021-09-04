@@ -4,12 +4,16 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 /**
  * 往企业微信里面发送日志
  */
 class QYWXWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = QYWXWebhookLogger.proxyHost
+  override protected val proxyPort: Int = QYWXWebhookLogger.proxyPort
+
   override val loggerConfig: LoggerConfiguration = QYWXWebhookLogger.loggerConfig match {
     case Some(value) => value
     case None => throw new IllegalArgumentException("QYWXWebhookLogger.loggerConfig is None")
@@ -45,7 +49,7 @@ class QYWXWebhookLogger extends WebhookLogger {
  * QYWXWebhookLogger.resetConfiguration()
  * </pre>
  */
-object QYWXWebhookLogger extends LoggerCompanion {
+object QYWXWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.QYWXWebhookLogger"
 

@@ -3,10 +3,8 @@ package cn.tellyouwhat.gangsutils.logger.dest.webhook
 import cn.tellyouwhat.gangsutils.core.funcs.{escapeQuotationMark, stripANSIColor}
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
-import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, OneLog}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
-import io.circe.Encoder
-import io.circe.syntax._
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 import scala.io.Source
 
@@ -14,6 +12,10 @@ import scala.io.Source
  * 往 push plus 里面发送日志
  */
 class PushPlusWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = PushPlusWebhookLogger.proxyHost
+  override protected val proxyPort: Int = PushPlusWebhookLogger.proxyPort
+
   override val loggerConfig: LoggerConfiguration = PushPlusWebhookLogger.loggerConfig match {
     case Some(value) => value
     case None => throw new IllegalArgumentException("PushPlusWebhookLogger.loggerConfig is None")
@@ -31,33 +33,12 @@ class PushPlusWebhookLogger extends WebhookLogger {
    */
   val pushplusRobotsToSend: Set[String] = PushPlusWebhookLogger.robotsToSend.toSet
 
-  implicit val encodeOneLog: Encoder[OneLog] =
-    Encoder.forProduct8(
-      "level",
-      "hostname",
-      "datetime",
-      "className",
-      "methodName",
-      "lineNumber",
-      "prefix",
-      "msg",
-    )(u => (
-      u.level.orNull.toString,
-      u.hostname,
-      u.datetime,
-      u.className,
-      u.methodName,
-      u.lineNumber,
-      u.prefix,
-      u.msg,
-    ))
-
   override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
     val fullLog = buildLog(msg, level) |> (c =>
       if (loggerTemplate == "html")
         Source.fromResource("gangsutils-logger-html-template.html").mkString + c.toHtmlString + "</body></html>"
       else if (loggerTemplate == "json") {
-        c.asJson.noSpaces |> stripANSIColor
+        c.toJsonString |> stripANSIColor
       } else if (loggerTemplate == "plaintext") {
         c.toStandardLogString |> stripANSIColor
       } else
@@ -94,7 +75,7 @@ class PushPlusWebhookLogger extends WebhookLogger {
  * PushPlusWebhookLogger.setLoggerTemplate(template: String)
  * </pre>
  */
-object PushPlusWebhookLogger extends LoggerCompanion {
+object PushPlusWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.PushPlusWebhookLogger"
 

@@ -4,7 +4,7 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 import org.apache.commons.codec.binary.Base64
 
 import java.time.Duration
@@ -15,6 +15,9 @@ import javax.crypto.spec.SecretKeySpec
  * A logger that write logs to Feishu (飞书)
  */
 class FeishuWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = FeishuWebhookLogger.proxyHost
+  override protected val proxyPort: Int = FeishuWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = FeishuWebhookLogger.loggerConfig match {
     case Some(value) => value
@@ -61,7 +64,7 @@ class FeishuWebhookLogger extends WebhookLogger {
  * FeishuWebhookLogger.resetConfiguration()
  * </pre>
  */
-object FeishuWebhookLogger extends LoggerCompanion {
+object FeishuWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.FeishuWebhookLogger"
 

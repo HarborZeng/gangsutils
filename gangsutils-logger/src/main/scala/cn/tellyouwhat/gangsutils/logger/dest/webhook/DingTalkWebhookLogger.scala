@@ -4,7 +4,7 @@ import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
-import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger, LoggerCompanion}
+import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 import org.apache.commons.codec.binary.Base64
 
 import java.net.URLEncoder
@@ -15,6 +15,9 @@ import javax.crypto.spec.SecretKeySpec
  * A logger that write logs to DingTalk (钉钉)
  */
 class DingTalkWebhookLogger extends WebhookLogger {
+
+  override protected val proxyHost: String = DingTalkWebhookLogger.proxyHost
+  override protected val proxyPort: Int = DingTalkWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = DingTalkWebhookLogger.loggerConfig match {
     case Some(value) => value
@@ -60,7 +63,7 @@ class DingTalkWebhookLogger extends WebhookLogger {
  * DingTalkWebhookLogger.resetConfiguration()
  * </pre>
  */
-object DingTalkWebhookLogger extends LoggerCompanion {
+object DingTalkWebhookLogger extends WebhookLoggerCompanion {
 
   override val loggerName: String = "cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger"
 
