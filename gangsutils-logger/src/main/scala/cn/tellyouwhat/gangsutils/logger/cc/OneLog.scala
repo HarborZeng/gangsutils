@@ -14,9 +14,9 @@ import scala.io.AnsiColor._
 /**
  * OneLog case class is for storing a real log, including level, hostname, datetime, className, methodName, lineNumber, prefix and msg
  *
- * @param level      option log level of {@link LogLevel}
+ * @param level      option log level of [[LogLevel]]
  * @param hostname   option hostname of String
- * @param datetime   option datetime of {@link LocalDateTime}
+ * @param datetime   option datetime of [[LocalDateTime]]
  * @param className  option className of String
  * @param methodName option methodName of String
  * @param lineNumber option lineNumber of String

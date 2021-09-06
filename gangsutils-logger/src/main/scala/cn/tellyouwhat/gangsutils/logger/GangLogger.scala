@@ -141,7 +141,7 @@ class GangLogger {
 object GangLogger {
 
   /**
-   * the specified map of log destination enumeration to LoggerConfiguration
+   * the specified map of log destination enumeration to [[LoggerConfiguration]]
    */
   private var logger2Configuration: Map[SupportedLogDest.Value, LoggerConfiguration] = _
 
@@ -151,9 +151,9 @@ object GangLogger {
   private[logger] var _logger: Option[GangLogger] = None
 
   /**
-   * set the log destination to LoggerConfiguration mappings
+   * set the log destination to [[LoggerConfiguration]] mappings
    *
-   * @param m the log destination to LoggerConfiguration mappings
+   * @param m the log destination to [[LoggerConfiguration]] mappings
    */
   def setLoggerAndConfiguration(m: Map[SupportedLogDest.Value, LoggerConfiguration]): Unit = {
     if (m == null)
@@ -164,7 +164,7 @@ object GangLogger {
   }
 
   /**
-   * if you fill these parameters without executing `setLoggerAndConfiguration`, a map of PRINTLN_LOGGER -> LoggerConfiguration will be created with the parameters you filled.
+   * if you fill these parameters without executing `setLoggerAndConfiguration`, a map of [[PRINTLN_LOGGER]] -> [[LoggerConfiguration]] will be created with the parameters you filled.
    *
    * if you fill these parameters with `setLoggerAndConfiguration` executed, the specified loggers will be create.
    *
@@ -172,8 +172,8 @@ object GangLogger {
    * @param isTraceEnabled    is trace enabled, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
    * @param isHostnameEnabled is hostname enabled, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
    * @param logPrefix         option of log prefix string, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
-   * @param logLevel          one of {@link LogLevel} log level, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
-   * @return the expected GangLogger instance
+   * @param logLevel          one of [[LogLevel]] log level, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
+   * @return the expected [[GangLogger]] instance
    */
   def apply(isDTEnabled: Boolean = true,
             isTraceEnabled: Boolean = false,
@@ -187,14 +187,14 @@ object GangLogger {
   }
 
   /**
-   * 清除单例 GangLogger 对象
+   * 清除单例 [[GangLogger]] 对象
    */
   def killLogger(): Unit = _logger = None
 
   /**
-   * get GangLogger instance if the underlying _logger is not None or apply a new one if it is
+   * get [[GangLogger]] instance if the underlying _logger is not None or apply a new one if it is
    *
-   * @return the GangLogger instance
+   * @return the [[GangLogger]] instance
    */
   def getLogger: GangLogger = _logger match {
     case Some(logger) => logger
@@ -205,11 +205,11 @@ object GangLogger {
   }
 
   /**
-   * if you have not execute `setLoggerAndConfiguration`, a map of PRINTLN_LOGGER -> LoggerConfiguration will be created with the default values.
+   * if you have not execute `setLoggerAndConfiguration`, a map of [[PRINTLN_LOGGER]] -> [[LoggerConfiguration]] will be created with the default values.
    *
    * if you have executed `setLoggerAndConfiguration`, the specified loggers will be create.
    *
-   * @return the expected GangLogger instance
+   * @return the expected [[GangLogger]] instance
    */
   def apply(): GangLogger = {
     if (logger2Configuration == null) {

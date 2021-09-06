@@ -28,9 +28,9 @@ object funcs {
   }
 
   /**
-   * convert case class of {@link Mappable} to map of Any recursively
+   * convert case class of [[Mappable]] to map of Any recursively
    *
-   * @param cc the object to convert, note that the object must be a {@link Mappable} object
+   * @param cc the object to convert, note that the object must be a [[Mappable]] object
    */
   def ccToMap(cc: Mappable): Map[String, Any] = {
     if (cc == null)
