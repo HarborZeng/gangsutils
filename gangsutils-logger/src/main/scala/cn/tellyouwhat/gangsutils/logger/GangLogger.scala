@@ -228,5 +228,5 @@ object GangLogger {
     new GangLogger() |! (l => _logger = Some(l))
   }
 
-  def clearLogger2Configuration(): Unit = logger2Configuration = null
+  def clearLogger2Configuration(): Unit = logger2Configuration = None
 }
