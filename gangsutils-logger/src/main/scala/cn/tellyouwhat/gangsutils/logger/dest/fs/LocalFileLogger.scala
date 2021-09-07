@@ -48,7 +48,7 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
    * close the underlying output stream if optionOS is not None
    */
   def closeOutputStream(): Unit = optionOS match {
-    case Some(os) => os.close()
+    case Some(os) => onEOF(os); os.close()
     case None =>
   }
 

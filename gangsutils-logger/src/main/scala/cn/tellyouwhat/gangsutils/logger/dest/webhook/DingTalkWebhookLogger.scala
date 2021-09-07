@@ -16,8 +16,8 @@ import javax.crypto.spec.SecretKeySpec
  */
 class DingTalkWebhookLogger extends WebhookLogger {
 
-  override protected val proxyHost: String = DingTalkWebhookLogger.proxyHost
-  override protected val proxyPort: Int = DingTalkWebhookLogger.proxyPort
+  override protected val proxyHost: Option[String] = DingTalkWebhookLogger.proxyHost
+  override protected val proxyPort: Option[Int] = DingTalkWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = DingTalkWebhookLogger.loggerConfig match {
     case Some(value) => value

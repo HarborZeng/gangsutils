@@ -72,7 +72,7 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     TelegramWebhookLogger.initializeTelegramWebhook("123123;1515:a3af")
     val logger = GangLogger()
     retry(2)(logger.info("telegram webhook logger not send a log into telegram with incorrect key")) match {
-      case Failure(e) => the[SocketTimeoutException] thrownBy (throw e) should have message "connect timed out"
+      case Failure(e) => the[SocketTimeoutException] thrownBy (throw e) should ((have message "connect timed out") or (have message "Read timed out"))
       case Success(v) => v shouldBe false
     }
   }
@@ -83,10 +83,10 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   }
 
   "TelegramWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {
-    the [IllegalArgumentException] thrownBy new TelegramWebhookLogger() should have message "TelegramWebhookLogger.loggerConfig is None"
+    the[IllegalArgumentException] thrownBy new TelegramWebhookLogger() should have message "TelegramWebhookLogger.loggerConfig is None"
   }
 
   it should "be applied with an IllegalArgumentException thrown if initializeConfiguration(c: LoggerConfiguration) or apply(c: LoggerConfiguration) was not set" in {
-    the [IllegalArgumentException] thrownBy TelegramWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
+    the[IllegalArgumentException] thrownBy TelegramWebhookLogger() should have message "You did not pass parameter loggerConfig nor initializeConfiguration"
   }
 }

@@ -1,8 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.fs
 
-import cn.tellyouwhat.gangsutils.core.constants.criticalHead_unquote
+import cn.tellyouwhat.gangsutils.core.helper.chaining.TapIt
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.exceptions.NotFileException
 import org.scalactic.TimesOnInt.convertIntToRepeater
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
@@ -56,8 +55,7 @@ class LocalHtmlLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter 
 
     val source = Source.fromFile(path, "UTF-8")
     // simple test, I don't want to get deep in html regexp match
-    source.mkString should (startWith("<!DOCTYPE html>") and endWith(s"""<div class="log"><div class="head critical">$criticalHead_unquote</div><pre>: hello html critical</pre></div>\n"""))
-    source.close()
+    source.mkString |! (_ => source.close()) should (startWith("<!DOCTYPE html>") and endWith(s"""</body></html>"""))
   }
 
   it should "log to local file with colorful html and rename the log file to timestamp-tailing name and continue logging with the old name" in {
@@ -75,10 +73,10 @@ class LocalHtmlLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter 
   }
 
   // it will success in shell, but won't in Intellij Idea
-/*  it should "a NotFileException should be thrown if logSavePath was a directory" in {
-    val logger = LocalHtmlLogger(LoggerConfiguration(), "gangsutils-logger")
-    the [IllegalStateException] thrownBy logger.info() should have message "The underlying logSavePath: gangsutils-logger might does not have parent"
-  }*/
+  /*  it should "a NotFileException should be thrown if logSavePath was a directory" in {
+      val logger = LocalHtmlLogger(LoggerConfiguration(), "gangsutils-logger")
+      the [IllegalStateException] thrownBy logger.info() should have message "The underlying logSavePath: gangsutils-logger might does not have parent"
+    }*/
 
   it should "be newed with an IllegalArgumentException thrown if logSavePath was not set" in {
     the[IllegalArgumentException] thrownBy new LocalHtmlLogger() should have message "LocalHtmlLogger.logSavePath is None"

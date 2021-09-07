@@ -11,8 +11,8 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
  */
 class TelegramWebhookLogger extends WebhookLogger {
 
-  override protected val proxyHost: String = TelegramWebhookLogger.proxyHost
-  override protected val proxyPort: Int = TelegramWebhookLogger.proxyPort
+  override protected val proxyHost: Option[String] = TelegramWebhookLogger.proxyHost
+  override protected val proxyPort: Option[Int] = TelegramWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = TelegramWebhookLogger.loggerConfig match {
     case Some(value) => value

@@ -1,7 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.cc
 
 import cn.tellyouwhat.gangsutils.core.constants._
-import cn.tellyouwhat.gangsutils.core.funcs.escapeQuotationMark
+import cn.tellyouwhat.gangsutils.core.funcs.escapeJsonString
 import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 import cn.tellyouwhat.gangsutils.logger.LogLevel
 import cn.tellyouwhat.gangsutils.logger.exceptions.WrongLogLevelException
@@ -14,9 +14,9 @@ import scala.io.AnsiColor._
 /**
  * OneLog case class is for storing a real log, including level, hostname, datetime, className, methodName, lineNumber, prefix and msg
  *
- * @param level      option log level of {@link LogLevel}
+ * @param level      option log level of [[LogLevel]]
  * @param hostname   option hostname of String
- * @param datetime   option datetime of {@link LocalDateTime}
+ * @param datetime   option datetime of [[LocalDateTime]]
  * @param className  option className of String
  * @param methodName option methodName of String
  * @param lineNumber option lineNumber of String
@@ -135,7 +135,7 @@ case class OneLog(
         sb.append(value)
       case None =>
     }
-    val content = sb.result() |> escapeQuotationMark
+    val content = sb.result() |> escapeJsonString
 
     level match {
       case Some(value) => value match {

@@ -11,8 +11,8 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
  */
 class WoaWebhookLogger extends WebhookLogger {
 
-  override protected val proxyHost: String = WoaWebhookLogger.proxyHost
-  override protected val proxyPort: Int = WoaWebhookLogger.proxyPort
+  override protected val proxyHost: Option[String] = WoaWebhookLogger.proxyHost
+  override protected val proxyPort: Option[Int] = WoaWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = WoaWebhookLogger.loggerConfig match {
     case Some(value) => value

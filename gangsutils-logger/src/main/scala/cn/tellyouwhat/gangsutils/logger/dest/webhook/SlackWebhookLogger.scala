@@ -11,8 +11,8 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
  */
 class SlackWebhookLogger extends WebhookLogger {
 
-  override protected val proxyHost: String = SlackWebhookLogger.proxyHost
-  override protected val proxyPort: Int = SlackWebhookLogger.proxyPort
+  override protected val proxyHost: Option[String] = SlackWebhookLogger.proxyHost
+  override protected val proxyPort: Option[Int] = SlackWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = SlackWebhookLogger.loggerConfig match {
     case Some(value) => value

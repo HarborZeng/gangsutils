@@ -15,12 +15,12 @@ trait WebhookLogger extends Logger {
   /**
    * proxy host
    */
-  protected val proxyHost: String = ""
+  protected val proxyHost: Option[String] = None
 
   /**
    * proxy port
    */
-  protected val proxyPort: Int = -1
+  protected val proxyPort: Option[Int] = None
 
   /**
    * 执行 webhook 日志
@@ -39,7 +39,7 @@ trait WebhookLogger extends Logger {
    */
   private[logger] def sendRequest(targetURL: String, method: String = "POST", body: String = "", form: Seq[(String, String)] = Seq.empty[(String, String)]): Boolean = {
     val httpRequest = Http(targetURL)
-      .pipe(r => if (proxyHost.nonEmpty && proxyPort != -1) r.proxy(proxyHost, proxyPort) else r)
+      .pipe(r => if (proxyHost.nonEmpty && proxyPort.nonEmpty) r.proxy(proxyHost.get, proxyPort.get) else r)
     val response = if (method == "POST") {
       if (body.isEmpty && form.nonEmpty) {
         httpRequest

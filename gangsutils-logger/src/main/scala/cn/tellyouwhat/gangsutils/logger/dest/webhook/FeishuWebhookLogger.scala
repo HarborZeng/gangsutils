@@ -16,8 +16,8 @@ import javax.crypto.spec.SecretKeySpec
  */
 class FeishuWebhookLogger extends WebhookLogger {
 
-  override protected val proxyHost: String = FeishuWebhookLogger.proxyHost
-  override protected val proxyPort: Int = FeishuWebhookLogger.proxyPort
+  override protected val proxyHost: Option[String] = FeishuWebhookLogger.proxyHost
+  override protected val proxyPort: Option[Int] = FeishuWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = FeishuWebhookLogger.loggerConfig match {
     case Some(value) => value

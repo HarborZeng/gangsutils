@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger.dest.fs
 
 import cn.tellyouwhat.gangsutils.core.constants.infoHead_unquote
+import cn.tellyouwhat.gangsutils.core.helper.chaining.TapIt
 import cn.tellyouwhat.gangsutils.logger.Logger
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import org.scalactic.TimesOnInt.convertIntToRepeater
@@ -51,8 +52,7 @@ class LocalPlainTextLoggerTest extends AnyFlatSpec with Matchers with BeforeAndA
     logger.asInstanceOf[LocalPlainTextLogger].closeOutputStream()
 
     val source = Source.fromFile(path, "UTF-8")
-    source.mkString should fullyMatch regex (infoHead_unquote + ": hello fs\\s+") * 20
-    source.close()
+    source.mkString |! (_ => source.close()) should fullyMatch regex (infoHead_unquote + ": hello fs\\s+") * 20
   }
 
   "LocalPlainTextLogger" should "be newed with an IllegalArgumentException thrown if logSavePath was not set" in {

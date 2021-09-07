@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.core.constants.{errorLog_unquote, infoLog_unquote}
+import cn.tellyouwhat.gangsutils.core.exceptions.GangException
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.TapIt
 import cn.tellyouwhat.gangsutils.logger.SupportedLogDest._
@@ -17,21 +18,41 @@ import scala.reflect.runtime.universe
 class GangLogger {
 
   /**
-   * the specified map of log destination enumeration to LoggerConfiguration
-   */
-  private val logger2Configuration: Map[SupportedLogDest.Value, LoggerConfiguration] = GangLogger.logger2Configuration
-
-  /**
    * a seq of loggers initialized using scala reflection
    */
-  private[logger] val loggers: Seq[Logger] = {
-    logger2Configuration.map {
-      case (loggerEnum, configuration) =>
-        val rm = universe.runtimeMirror(getClass.getClassLoader)
-        val module = rm.staticModule(loggerEnum.toString)
-        rm.reflectModule(module).instance.asInstanceOf[LoggerCompanion].apply(configuration)
+  val loggers: Seq[Logger] = {
+    GangLogger.logger2Configuration match {
+      case Some(v) => v.map {
+        case (loggerEnum, configuration) =>
+          val rm = universe.runtimeMirror(getClass.getClassLoader)
+          val module = rm.staticModule(loggerEnum.toString)
+          rm.reflectModule(module).instance.asInstanceOf[LoggerCompanion].apply(configuration)
+      }
+      case None => throw GangException("GangLogger.logger2Configuration is None")
     }
-  }.toSeq
+  }
+  
+   /**
+   * 通过参数指定级别的日志
+   *
+   * @param msg     日志内容
+   * @param level   日志级别
+   * @param enabled subset of logger2Configuration.keySet()
+   *
+   */
+  def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
+    // if the enabled parameter is not null nor empty, only those who occurred in both enabled parameter and loggers will perform the log action.
+    (if (enabled != null && enabled.nonEmpty) {
+      val unsupportedDests = enabled.map(_.toString).diff(loggers.map(_.getClass.getName))
+      if (unsupportedDests.nonEmpty)
+        println(errorLog_unquote.format(
+          s": Specified log destination ${unsupportedDests.toVector} in ${enabled.map(_.toString).toVector} does not support, supported are ${loggers.map(_.getClass.getName)}"
+        ))
+      loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
+    } else loggers)
+      .filter(level >= _.loggerConfig.logLevel)
+      .map(_.log(msg, level)).forall(p => p)
+  }
 
   /**
    * 记录一条跟踪级别的日志
@@ -79,28 +100,6 @@ class GangLogger {
   def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.ERROR)(enabled)
 
   /**
-   * 通过参数指定级别的日志
-   *
-   * @param msg     日志内容
-   * @param level   日志级别
-   * @param enabled subset of logger2Configuration.keySet()
-   *
-   */
-  def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
-    // if the enabled parameter is not null nor empty, only those who occurred in both enabled parameter and loggers will perform the log action.
-    (if (enabled != null && enabled.nonEmpty) {
-      val unsupportedDests = enabled.map(_.toString).diff(loggers.map(_.getClass.getName))
-      if (unsupportedDests.nonEmpty)
-        println(errorLog_unquote.format(
-          s": Specified log destination ${unsupportedDests.toVector} in ${enabled.map(_.toString).toVector} does not support, supported are ${loggers.map(_.getClass.getName)}"
-        ))
-      loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
-    } else loggers)
-      .filter(level >= _.loggerConfig.logLevel)
-      .map(_.log(msg, level)).forall(p => p)
-  }
-
-  /**
    * 记录一条致命级别的日志
    *
    * @param msg     日志内容
@@ -141,9 +140,9 @@ class GangLogger {
 object GangLogger {
 
   /**
-   * the specified map of log destination enumeration to LoggerConfiguration
+   * the specified map of log destination enumeration to [[LoggerConfiguration]]
    */
-  private var logger2Configuration: Map[SupportedLogDest.Value, LoggerConfiguration] = _
+  private var logger2Configuration: Option[Seq[(SupportedLogDest.Value, LoggerConfiguration)]] = None
 
   /**
    * the stored _logger singleton
@@ -151,20 +150,31 @@ object GangLogger {
   private[logger] var _logger: Option[GangLogger] = None
 
   /**
-   * set the log destination to LoggerConfiguration mappings
+   * set the log destination to [[LoggerConfiguration]] mappings
    *
-   * @param m the log destination to LoggerConfiguration mappings
+   * @param m the log destination to [[LoggerConfiguration]] mappings
    */
   def setLoggerAndConfiguration(m: Map[SupportedLogDest.Value, LoggerConfiguration]): Unit = {
     if (m == null)
-      throw new IllegalArgumentException("null m: Map[SupportedLogDest.Value, LoggerConfiguration]")
-    if (m.isEmpty)
-      throw new IllegalArgumentException("empty m: Map[SupportedLogDest.Value, LoggerConfiguration]")
-    logger2Configuration = m
+      throw new IllegalArgumentException("null parameter")
+    setLoggerAndConfiguration(m.toSeq)
+  }
+  
+  /**
+   * set the log destination to LoggerConfiguration sequence
+   *
+   * @param s the log destination to LoggerConfiguration sequence, duplicate destinations are supported
+   */
+  def setLoggerAndConfiguration(s: Seq[(SupportedLogDest.Value, LoggerConfiguration)]): Unit = {
+    if (s == null)
+      throw new IllegalArgumentException("null parameter")
+    if (s.isEmpty)
+      throw new IllegalArgumentException("empty parameter")
+    logger2Configuration = Some(s)
   }
 
   /**
-   * if you fill these parameters without executing `setLoggerAndConfiguration`, a map of PRINTLN_LOGGER -> LoggerConfiguration will be created with the parameters you filled.
+   * if you fill these parameters without executing `setLoggerAndConfiguration`, a map of [[PRINTLN_LOGGER]] -> [[LoggerConfiguration]] will be created with the parameters you filled.
    *
    * if you fill these parameters with `setLoggerAndConfiguration` executed, the specified loggers will be create.
    *
@@ -172,51 +182,51 @@ object GangLogger {
    * @param isTraceEnabled    is trace enabled, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
    * @param isHostnameEnabled is hostname enabled, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
    * @param logPrefix         option of log prefix string, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
-   * @param logLevel          one of {@link LogLevel} log level, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
-   * @return the expected GangLogger instance
+   * @param logLevel          one of [[LogLevel]] log level, if `setLoggerAndConfiguration` has already been executed, this parameter will be ignored
+   * @return the expected [[GangLogger]] instance
    */
   def apply(isDTEnabled: Boolean = true,
             isTraceEnabled: Boolean = false,
             isHostnameEnabled: Boolean = true,
             logPrefix: Option[String] = None,
             logLevel: LogLevel.Value = LogLevel.TRACE): GangLogger = {
-    if (logger2Configuration == null) {
-      logger2Configuration = Map(PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled, isTraceEnabled, isHostnameEnabled, logPrefix, logLevel))
+    if (logger2Configuration.isEmpty) {
+      Seq(PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled, isTraceEnabled, isHostnameEnabled, logPrefix, logLevel)) |! setLoggerAndConfiguration
     }
     apply()
   }
 
   /**
-   * 清除单例 GangLogger 对象
+   * 清除单例 [[GangLogger]] 对象
    */
   def killLogger(): Unit = _logger = None
 
   /**
-   * get GangLogger instance if the underlying _logger is not None or apply a new one if it is
+   * get [[GangLogger]] instance if the underlying _logger is not None or apply a new one if it is
    *
-   * @return the GangLogger instance
+   * @return the [[GangLogger]] instance
    */
   def getLogger: GangLogger = _logger match {
     case Some(logger) => logger
     case None =>
-      apply() |! (l => _logger = Some(l)) |! (_ => println(infoLog_unquote.format(
+      apply() |! (_ => println(infoLog_unquote.format(
         NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))
       )))
   }
 
   /**
-   * if you have not execute `setLoggerAndConfiguration`, a map of PRINTLN_LOGGER -> LoggerConfiguration will be created with the default values.
+   * if you have not execute `setLoggerAndConfiguration`, a map of [[PRINTLN_LOGGER]] -> [[LoggerConfiguration]] will be created with the default values.
    *
    * if you have executed `setLoggerAndConfiguration`, the specified loggers will be create.
    *
-   * @return the expected GangLogger instance
+   * @return the expected [[GangLogger]] instance
    */
   def apply(): GangLogger = {
-    if (logger2Configuration == null) {
-      logger2Configuration = Map(PRINTLN_LOGGER -> LoggerConfiguration())
+    if (logger2Configuration.isEmpty) {
+      Seq(PRINTLN_LOGGER -> LoggerConfiguration()) |! setLoggerAndConfiguration
     }
     new GangLogger() |! (l => _logger = Some(l))
   }
 
-  def clearLogger2Configuration(): Unit = logger2Configuration = null
+  def clearLogger2Configuration(): Unit = logger2Configuration = None
 }

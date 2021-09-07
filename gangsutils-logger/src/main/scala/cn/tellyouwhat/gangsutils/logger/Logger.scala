@@ -112,11 +112,15 @@ trait Logger {
         e.getClassName.startsWith("java.") ||
         e.getClassName.startsWith("scala.") ||
         e.getClassName.startsWith("cn.tellyouwhat.gangsutils"))
-      val theTrace = slicedElements(0)
-      val className = theTrace.getClassName
-      val methodName = theTrace.getMethodName
-      val lineNumber = s"${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
-      (Some(className), Some(methodName), Some(lineNumber))
+      if (slicedElements.isEmpty)
+        (None, None, None)
+      else {
+        val theTrace = slicedElements(0)
+        val className = theTrace.getClassName
+        val methodName = theTrace.getMethodName
+        val lineNumber = s"${getRB.getString("nth_line").format(theTrace.getLineNumber)}"
+        (Some(className), Some(methodName), Some(lineNumber))
+      }
     } else {
       (None, None, None)
     }

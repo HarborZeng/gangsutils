@@ -13,8 +13,8 @@ import scala.io.Source
  */
 class PushPlusWebhookLogger extends WebhookLogger {
 
-  override protected val proxyHost: String = PushPlusWebhookLogger.proxyHost
-  override protected val proxyPort: Int = PushPlusWebhookLogger.proxyPort
+  override protected val proxyHost: Option[String] = PushPlusWebhookLogger.proxyHost
+  override protected val proxyPort: Option[Int] = PushPlusWebhookLogger.proxyPort
 
   override val loggerConfig: LoggerConfiguration = PushPlusWebhookLogger.loggerConfig match {
     case Some(value) => value
