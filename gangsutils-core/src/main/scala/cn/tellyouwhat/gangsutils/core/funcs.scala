@@ -2,6 +2,7 @@ package cn.tellyouwhat.gangsutils.core
 
 import cn.tellyouwhat.gangsutils.core.cc.Mappable
 import cn.tellyouwhat.gangsutils.core.helper.I18N
+import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 
 import java.time.Duration
 import scala.util.{Failure, Try}
