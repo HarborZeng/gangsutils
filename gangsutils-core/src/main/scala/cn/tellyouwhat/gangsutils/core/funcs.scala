@@ -141,6 +141,14 @@ object funcs {
   def escapeQuotationMark(s: String): String = s.replace(""""""", """\"""")
 
   /**
+   * escape back slash using string replace
+   *
+   * @param s from where to escape
+   * @return the string with back slash escaped
+   */
+  def escapeBackSlash(s: String): String = s.replace("""\""", """\\""")
+
+  /**
    * 使用字符串描述的两个时间差，如 1m20.3s
    *
    * @param t0 先前的时间
