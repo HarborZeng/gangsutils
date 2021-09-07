@@ -2,6 +2,7 @@ package cn.tellyouwhat.gangsutils.core
 
 import cn.tellyouwhat.gangsutils.core.cc.Mappable
 import cn.tellyouwhat.gangsutils.core.helper.I18N
+import cn.tellyouwhat.gangsutils.core.helper.chaining.PipeIt
 
 import java.time.Duration
 import scala.util.{Failure, Try}
@@ -132,13 +133,18 @@ object funcs {
    */
   def stripANSIColor(s: String): String = s.replaceAll("""\e\[[\d;]*[^\d;]""", "")
 
-  /**
-   * escape quotation mark using string replace
-   *
-   * @param s from where to escape
-   * @return the string with quotation mark escaped
-   */
   def escapeQuotationMark(s: String): String = s.replace(""""""", """\"""")
+  def escapeBackSlash(s: String): String = s.replace("""\""", """\\""")
+  def escapeNewLine(s: String): String = s.replace("\n", "\\n")
+  def escapeBackspace(s: String): String = s.replace("\b", "\\b")
+  def escapeFormFeed(s: String): String = s.replace("\f", "\\f")
+  def escapeCarriageReturn(s: String): String = s.replace("\r", "\\r")
+  def escapeTab(s: String): String = s.replace("\t", "\\t")
+
+  def escapeJsonString(s: String): String =
+    // the order matters
+    s |> escapeBackSlash |> escapeQuotationMark |> escapeNewLine |> escapeBackspace |> escapeFormFeed |> escapeCarriageReturn |> escapeTab
+
 
   /**
    * 使用字符串描述的两个时间差，如 1m20.3s

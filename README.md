@@ -345,6 +345,7 @@ for use cases.
   send to webhook)
 - [x] Different log configurations for different logs by default value and config file
 - [x] Add proxy settings for TelegramWebhookLogger
+- [ ] `.replace("\n", "[[NEWLINE]]")`
 
 ## License
 
