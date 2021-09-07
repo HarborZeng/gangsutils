@@ -20,7 +20,7 @@ class GangLogger {
   /**
    * a seq of loggers initialized using scala reflection
    */
-  private[logger] val loggers: Seq[Logger] = {
+  val loggers: Seq[Logger] = {
     GangLogger.logger2Configuration match {
       case Some(v) => v.map {
         case (loggerEnum, configuration) =>

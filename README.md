@@ -111,6 +111,22 @@ in Chinese
 
 Language is based on your system, retrieved by `Locale` default or you can set in the configuration file
 
+#### configuration file
+
+```yaml
+logger:
+  lang: en # can be zh-hans, zh-hant and en
+  fs:
+    localFile:
+      # if the log file size reaches the threshold of this value,
+      # it will be moved to a new timestamp-tailing name,
+      # and create a new log file with the origin name.
+      # This behavior is called `rolling` in slf4j
+      blockSize: 1048576 # 1M 
+      # whether behave the `rolling` action
+      split: true
+```
+
 #### Change logger style
 
 All the properties are immutable, so they can not be change after the logger is instantiated unless you re-instantiate it.
@@ -124,7 +140,7 @@ To config a logger, you can:
     import cn.tellyouwhat.gangsutils.logger.GangLogger
     import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
     
-    GangLogger.setLoggerAndConfiguration(Map(
+    GangLogger.setLoggerAndConfiguration(Seq(
       DINGTALK_WEBHOOK_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("prefix"), logLevel = LogLevel.TRACE)
     ))
     DingTalkWebhookLogger.initializeDingTalkWebhook("key;signSecret")
@@ -203,7 +219,7 @@ import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.DINGTALK_WEBHOOK_LOGGER
 import cn.tellyouwhat.gangsutils.logger.GangLogger
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 
-GangLogger.setLoggerAndConfiguration(Map(
+GangLogger.setLoggerAndConfiguration(Seq(
   SLACK_WEBHOOK_LOGGER -> LoggerConfiguration(),
   // more loggers here
 ))
@@ -245,40 +261,114 @@ For more examples, see test <https://github.com/HarborZeng/gangsutils/tree/maste
 #### Full example
 
 ```scala
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.PRINTLN_LOGGER
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, LogLevel, Logger}
-import cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}
+import cn.tellyouwhat.gangsutils.logger.{GangLogger, LogLevel}
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{LOCAL_HTML_LOGGER, PRINTLN_LOGGER}
+import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
+import cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger
 
-class MyApp extends Timeit {
+object Application {
 
-  private val logger: GangLogger = MyApp.logger
-
-  override def run(desc: String): Unit = {
-    logger.info("123")
-  }
-
-}
-
-object MyApp {
-
-  private implicit var logger: GangLogger = _
+  LocalHtmlLogger.setLogSavePath("logs/ground.html")
+  GangLogger.setLoggerAndConfiguration(Seq(
+    PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger1")),
+    PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false, logPrefix = Some("logger2"), logLevel = LogLevel.SUCCESS),
+    LOCAL_HTML_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger3")),
+  ))
+  val logger: GangLogger = GangLogger()
 
   def main(args: Array[String]): Unit = {
-    logger = GangLogger(isTraceEnabled = true)
-    logger.trace("tracing")
-
-    MyApp().run()
+    logger.trace("abc")
+    logger.info("abc")
+    logger.success("abc")
+    logger.error("abc")
+    logger.warning("abc")
+    logger.critical("abc")
   }
-
-  def apply(): MyApp = new MyApp() with TimeitLogger
+  logger.loggers.last.asInstanceOf[LocalHtmlLogger].closeOutputStream()
 }
-
 ```
 
 ```
-【跟踪】 - GANG-PC - 2021-08-27T13:11:19.549114400 - cn.tellyouwhat.gangsutils.logger.Logger#buildLog 第108行: tracing
-...more output ...
+【跟踪】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第19行: logger1 - abc
+【信息】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第20行: logger1 - abc
+【成功】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第21行: logger1 - abc
+【成功】: logger2 - abc
+【错误】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第22行: logger1 - abc
+【错误】: logger2 - abc
+【警告】 - GANG-PC - 2021-09-07T20:40:40.711090400 - cn.tellyouwhat.ganground.Application$#main 第23行: logger1 - abc
+【警告】: logger2 - abc
+【致命】 - GANG-PC - 2021-09-07T20:40:40.711090400 - cn.tellyouwhat.ganground.Application$#main 第24行: logger1 - abc
+【致命】: logger2 - abc
 ```
+
+and ib the `logs/ground.html`, the following content are written:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>gangsutils-logger</title>
+</head>
+
+<style>
+
+    .info {
+        font-weight: bold;
+    }
+
+    .critical {
+        color: crimson;
+        font-weight: bold;
+    }
+
+    .error {
+        color: crimson;
+    }
+
+    .warning {
+        color: goldenrod;
+    }
+
+    .success {
+        color: forestgreen;
+    }
+
+    .trace {
+
+    }
+
+    pre {
+        line-height: 100%;
+        margin: 6px 0;
+        font-size: large;
+        display: inline;
+    }
+
+    .log {
+        white-space: pre;
+    }
+
+    .head {
+        display: inline;
+
+    }
+</style>
+
+<body>
+
+<!--</body>-->
+<!--</html>-->
+<div class="log"><div class="head">【跟踪】</div><pre> - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第19行: logger3 - abc</pre></div>
+<div class="log"><div class="head info">【信息】</div><pre> - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第20行: logger3 - abc</pre></div>
+<div class="log"><div class="head success">【成功】</div><pre> - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第21行: logger3 - abc</pre></div>
+<div class="log"><div class="head error">【错误】</div><pre> - GANG-PC - 2021-09-07T20:40:40.711090400 - cn.tellyouwhat.ganground.Application$#main 第22行: logger3 - abc</pre></div>
+<div class="log"><div class="head warning">【警告】</div><pre> - GANG-PC - 2021-09-07T20:40:40.711090400 - cn.tellyouwhat.ganground.Application$#main 第23行: logger3 - abc</pre></div>
+<div class="log"><div class="head critical">【致命】</div><pre> - GANG-PC - 2021-09-07T20:40:40.711090400 - cn.tellyouwhat.ganground.Application$#main 第24行: logger3 - abc</pre></div>
+</body></html>
+```
+
+Note that, the html code
 
 In this example, we used `cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}` to implement an AOP logger to
 calculate the start and end(success or failure) of a function. You can use it elsewhere too.
@@ -345,7 +435,7 @@ for use cases.
   send to webhook)
 - [x] Different log configurations for different logs by default value and config file
 - [x] Add proxy settings for TelegramWebhookLogger
-- [ ] `.replace("\n", "[[NEWLINE]]")`
+- [x] `.replace("\n", "\\n")`
 
 ## License
 
