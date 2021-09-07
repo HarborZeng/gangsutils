@@ -99,7 +99,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
       logger.trace("l")(enabled = DINGTALK_WEBHOOK_LOGGER :: Nil)
     }
     stream.toString should fullyMatch regex errorLog.format(
-      """: Specified log destination Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) in Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) does not support, supported are List\(cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger, cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger\)"""
+      """: Specified log destination Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) in Vector\(cn.tellyouwhat.gangsutils.logger.dest.webhook.DingTalkWebhookLogger\) does not support, supported are Vector\(cn.tellyouwhat.gangsutils.logger.dest.PrintlnLogger, cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger\)"""
     )
     stream.close()
     WoaWebhookLogger.resetConfiguration()
