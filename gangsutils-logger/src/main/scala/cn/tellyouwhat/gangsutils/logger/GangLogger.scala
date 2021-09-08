@@ -8,6 +8,7 @@ import cn.tellyouwhat.gangsutils.logger.SupportedLogDest._
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException
 
+import scala.language.implicitConversions
 import scala.reflect.runtime.universe
 
 /**
@@ -29,7 +30,7 @@ class GangLogger {
           val module = rm.staticModule(loggerEnum.toString)
           rm.reflectModule(module).instance.asInstanceOf[LoggerCompanion].apply(configuration)
       }
-      case None => throw GangException("GangLogger.logger2Configuration is None")
+      case None => throw GangException("GangLogger.logger2ConfigurationAndInitBlock is None")
     }
   }
   
@@ -243,4 +244,10 @@ object GangLogger {
   }
 
   def clearLogger2Configuration(): Unit = logger2ConfigurationAndInitBlock = None
+  
+  /**
+   * helps to call by-name parameter without the thunk syntax
+   */
+  implicit def blockToThunk(bl: => Unit): () => Unit = () => bl
+
 }
