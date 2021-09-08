@@ -436,6 +436,8 @@ for use cases.
 - [x] Different log configurations for different logs by default value and config file
 - [x] Add proxy settings for TelegramWebhookLogger
 - [x] `.replace("\n", "\\n")`
+- [ ] async log
+- [ ] static members setup for each logger individually
 
 ## License
 
