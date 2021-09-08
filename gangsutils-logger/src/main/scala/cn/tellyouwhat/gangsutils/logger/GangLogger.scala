@@ -8,6 +8,7 @@ import cn.tellyouwhat.gangsutils.logger.SupportedLogDest._
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException
 
+import scala.language.implicitConversions
 import scala.reflect.runtime.universe
 
 /**
@@ -21,14 +22,15 @@ class GangLogger {
    * a seq of loggers initialized using scala reflection
    */
   val loggers: Seq[Logger] = {
-    GangLogger.logger2Configuration match {
+    GangLogger.logger2ConfigurationAndInitBlock match {
       case Some(v) => v.map {
-        case (loggerEnum, configuration) =>
+        case (loggerEnum, (configuration, initBlock)) =>
+          initBlock()
           val rm = universe.runtimeMirror(getClass.getClassLoader)
           val module = rm.staticModule(loggerEnum.toString)
           rm.reflectModule(module).instance.asInstanceOf[LoggerCompanion].apply(configuration)
       }
-      case None => throw GangException("GangLogger.logger2Configuration is None")
+      case None => throw GangException("GangLogger.logger2ConfigurationAndInitBlock is None")
     }
   }
   
@@ -142,7 +144,7 @@ object GangLogger {
   /**
    * the specified map of log destination enumeration to [[LoggerConfiguration]]
    */
-  private var logger2Configuration: Option[Seq[(SupportedLogDest.Value, LoggerConfiguration)]] = None
+  private var logger2ConfigurationAndInitBlock: Option[Seq[(SupportedLogDest.Value, (LoggerConfiguration, () => Unit))]] = None
 
   /**
    * the stored _logger singleton
@@ -170,9 +172,22 @@ object GangLogger {
       throw new IllegalArgumentException("null parameter")
     if (s.isEmpty)
       throw new IllegalArgumentException("empty parameter")
-    logger2Configuration = Some(s)
+    logger2ConfigurationAndInitBlock = Some(s.map(o => (o._1, (o._2, () => {}))))
   }
 
+  /**
+   * set the log destination to (LoggerConfiguration, InitBlock) sequence
+   *
+   * @param s the log destination to LoggerConfiguration sequence, duplicate destinations are supported
+   */
+  def setLoggerAndConfigurationAndInitBlock(s: Seq[(SupportedLogDest.Value, (LoggerConfiguration, () => Unit))]): Unit = {
+    if (s == null)
+      throw new IllegalArgumentException("null parameter")
+    if (s.isEmpty)
+      throw new IllegalArgumentException("empty parameter")
+    logger2ConfigurationAndInitBlock = Some(s)
+  }
+  
   /**
    * if you fill these parameters without executing `setLoggerAndConfiguration`, a map of [[PRINTLN_LOGGER]] -> [[LoggerConfiguration]] will be created with the parameters you filled.
    *
@@ -190,7 +205,7 @@ object GangLogger {
             isHostnameEnabled: Boolean = true,
             logPrefix: Option[String] = None,
             logLevel: LogLevel.Value = LogLevel.TRACE): GangLogger = {
-    if (logger2Configuration.isEmpty) {
+    if (logger2ConfigurationAndInitBlock.isEmpty) {
       Seq(PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled, isTraceEnabled, isHostnameEnabled, logPrefix, logLevel)) |! setLoggerAndConfiguration
     }
     apply()
@@ -222,11 +237,17 @@ object GangLogger {
    * @return the expected [[GangLogger]] instance
    */
   def apply(): GangLogger = {
-    if (logger2Configuration.isEmpty) {
+    if (logger2ConfigurationAndInitBlock.isEmpty) {
       Seq(PRINTLN_LOGGER -> LoggerConfiguration()) |! setLoggerAndConfiguration
     }
     new GangLogger() |! (l => _logger = Some(l))
   }
 
-  def clearLogger2Configuration(): Unit = logger2Configuration = None
+  def clearLogger2Configuration(): Unit = logger2ConfigurationAndInitBlock = None
+  
+  /**
+   * helps to call by-name parameter without the thunk syntax
+   */
+  implicit def blockToThunk(bl: => Unit): () => Unit = () => bl
+
 }

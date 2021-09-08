@@ -268,11 +268,17 @@ import cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger
 
 object Application {
 
-  LocalHtmlLogger.setLogSavePath("logs/ground.html")
-  GangLogger.setLoggerAndConfiguration(Seq(
-    PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger1")),
-    PRINTLN_LOGGER -> LoggerConfiguration(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false, logPrefix = Some("logger2"), logLevel = LogLevel.SUCCESS),
-    LOCAL_HTML_LOGGER -> LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger3")),
+  GangLogger.setLoggerAndConfigurationAndInitBlock(Seq(
+    PRINTLN_LOGGER -> (LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger1")), () => {}),
+    PRINTLN_LOGGER -> (LoggerConfiguration(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false, logPrefix = Some("logger2"), logLevel = LogLevel.SUCCESS), () => {}),
+    LOCAL_HTML_LOGGER -> (LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger3")), () => {
+        LocalHtmlLogger.resetLogSavePath()
+        LocalHtmlLogger.setLogSavePath("logs/ground.html")
+    }),
+    LOCAL_HTML_LOGGER -> (LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger4")), () => {
+        LocalHtmlLogger.resetLogSavePath()
+        LocalHtmlLogger.setLogSavePath("logs/ground2.html")
+    }),
   ))
   val logger: GangLogger = GangLogger()
 
@@ -368,7 +374,7 @@ and ib the `logs/ground.html`, the following content are written:
 </body></html>
 ```
 
-Note that, the html code
+Note that, the html code, with or without `</body></html>` is ok to render for modern browsers.
 
 In this example, we used `cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}` to implement an AOP logger to
 calculate the start and end(success or failure) of a function. You can use it elsewhere too.
@@ -436,6 +442,8 @@ for use cases.
 - [x] Different log configurations for different logs by default value and config file
 - [x] Add proxy settings for TelegramWebhookLogger
 - [x] `.replace("\n", "\\n")`
+- [ ] async log
+- [x] static members setup for each logger individually
 
 ## License
 
