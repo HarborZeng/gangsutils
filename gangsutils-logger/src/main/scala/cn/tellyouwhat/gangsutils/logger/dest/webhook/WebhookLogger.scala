@@ -69,7 +69,7 @@ trait WebhookLogger extends Logger {
       return false
     }
     if (response.isError) {
-      println(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}, request body: $body, request from: $form, targetURL: $targetURL"))
+      println(GangException(s"send logger response is error: ${response.code}, response body: ${response.body}, request body: $body, request form: $form, targetURL: $targetURL"))
     }
     response.isSuccess
   }
