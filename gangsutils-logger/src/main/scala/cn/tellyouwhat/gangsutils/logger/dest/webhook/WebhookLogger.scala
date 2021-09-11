@@ -60,10 +60,10 @@ trait WebhookLogger extends Logger {
     }
     // some webhooks get error response but with 200 Http Status code, so match them here and return false
     if (response.isSuccess && Seq(
-      """"errcode":300001""", // DingTalk
-      """"code":19001""", // feishu
-      """"errcode":93000""", // qywx(企业微信)
-      """"code":600""", // push plus
+      """"errcode":300001""", // DingTalk token is not exist
+      """"code":19001""", // feishu param invalid: incoming webhook access token invalid
+      """"errcode":93000""", // qywx(企业微信) invalid webhook url, hint ......
+      """"code":600""", // push plus 用户信息状态不合法
     ).exists(response.body.contains)) {
       println(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))
       return false
