@@ -86,7 +86,7 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
    * @param logBytes the byte array which is encoded using UTF-8
    * @return always true unless an exception was thrown
    */
-  protected def writeBytes(logBytes: Array[Byte]): Boolean = {
+  protected def writeBytes(logBytes: Array[Byte]): Boolean = synchronized {
     getOS.write(logBytes)
     //append a new line
     getOS.write("\n".getBytes("UTF-8"))

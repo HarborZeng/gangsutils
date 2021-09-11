@@ -7,6 +7,10 @@ import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, OneLog}
 
 import java.net.InetAddress
 import java.time.LocalDateTime
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.language.postfixOps
+import scala.util.{Failure, Success}
 
 /**
  * 日志基础特质
@@ -48,9 +52,18 @@ trait Logger {
    */
   def log(msg: Any, level: LogLevel.Value): Boolean = {
     checkPrerequisite()
-    if (level >= loggerConfig.logLevel)
-      doTheLogAction(msg.toString, level)
-    else false
+    if (level >= loggerConfig.logLevel) {
+      if (loggerConfig.async) {
+        val f = doTheLogActionAsync(msg.toString, level)
+        f.onComplete {
+          case Failure(exception) => exception.printStackTrace()
+          case Success(_) =>
+        }
+        // async log always return true
+        true
+      } else
+        doTheLogAction(msg.toString, level)
+    } else false
   }
 
   /**
@@ -106,12 +119,11 @@ trait Logger {
   protected def buildLog(msg: String, level: LogLevel.Value): OneLog = {
     val (className, methodName, lineNumber) = if (loggerConfig.isTraceEnabled) {
       val stackTraceElements = Thread.currentThread().getStackTrace
-      val slicedElements = stackTraceElements.drop(stackTraceElements
-        .lastIndexWhere(_.getClassName.startsWith("cn.tellyouwhat.gangsutils.logger")) + 1
-      ).filterNot(e => e.getClassName.startsWith("sun.") ||
-        e.getClassName.startsWith("java.") ||
-        e.getClassName.startsWith("scala.") ||
-        e.getClassName.startsWith("cn.tellyouwhat.gangsutils"))
+      val slicedElements = stackTraceElements
+        .filterNot(e => e.getClassName.startsWith("sun.") ||
+          e.getClassName.startsWith("java.") ||
+          e.getClassName.startsWith("scala.") ||
+          e.getClassName.startsWith("cn.tellyouwhat.gangsutils"))
       if (slicedElements.isEmpty)
         (None, None, None)
       else {
@@ -143,6 +155,14 @@ trait Logger {
    * @param level 日志级别
    */
   protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean
+
+  /**
+   * 异步地真正去输出一条日志
+   *
+   * @param msg   日志内容
+   * @param level 日志级别
+   */
+  protected def doTheLogActionAsync(msg: String, level: LogLevel.Value): Future[Boolean] = Future(doTheLogAction(msg, level))
 
 }
 
