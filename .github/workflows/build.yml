@@ -2,11 +2,11 @@ name: develop build
 
 on:
   push:
-    branches-ignore:
-      - master
+    branches:
+      - develop
   pull_request:
-    branches-ignore:
-      - master
+    branches:
+      - develop
 
 jobs:
   develop-build:
