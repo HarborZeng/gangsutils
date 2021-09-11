@@ -42,7 +42,7 @@ object MyApp {
     try {
       1 / 0
     } catch {
-      case e: Exception => logger.error("1/0", e); throw e
+      case e: Exception => logger.error("1/0", e)
     }
 
     MyApp().run()

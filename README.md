@@ -261,53 +261,77 @@ For more examples, see test <https://github.com/HarborZeng/gangsutils/tree/maste
 #### Full example
 
 ```scala
-import cn.tellyouwhat.gangsutils.logger.{GangLogger, LogLevel}
-import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{LOCAL_HTML_LOGGER, PRINTLN_LOGGER}
+import cn.tellyouwhat.gangsutils.logger.GangLogger
+import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{LOCAL_HTML_LOGGER, LOCAL_PLAIN_TEXT_LOGGER, PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
-import cn.tellyouwhat.gangsutils.logger.dest.fs.LocalHtmlLogger
+import cn.tellyouwhat.gangsutils.logger.dest.fs.{LocalHtmlLogger, LocalPlainTextLogger}
+import cn.tellyouwhat.gangsutils.logger.dest.webhook.WoaWebhookLogger
+import cn.tellyouwhat.gangsutils.logger.funcs.timeit
+import cn.tellyouwhat.gangsutils.logger.helper.{Timeit, TimeitLogger}
 
-object Application {
 
-  GangLogger.setLoggerAndConfigurationAndInitBlock(Seq(
-    PRINTLN_LOGGER -> (LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger1")), () => {}),
-    PRINTLN_LOGGER -> (LoggerConfiguration(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false, logPrefix = Some("logger2"), logLevel = LogLevel.SUCCESS), () => {}),
-    LOCAL_HTML_LOGGER -> (LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger3")), () => {
-        LocalHtmlLogger.resetLogSavePath()
-        LocalHtmlLogger.setLogSavePath("logs/ground.html")
-    }),
-    LOCAL_HTML_LOGGER -> (LoggerConfiguration(isDTEnabled = true, isTraceEnabled = true, isHostnameEnabled = true, logPrefix = Some("logger4")), () => {
-        LocalHtmlLogger.resetLogSavePath()
-        LocalHtmlLogger.setLogSavePath("logs/ground2.html")
-    }),
-  ))
-  val logger: GangLogger = GangLogger()
+/**
+ * 代码实验田
+ */
+class MyApp extends Timeit {
+
+  private val logger: GangLogger = GangLogger.getLogger
+
+  override def run(desc: String): Unit = {
+    timeit(
+      logger.info("123")
+    )
+  }
+
+}
+
+object MyApp {
+
+  private implicit var logger: GangLogger = _
 
   def main(args: Array[String]): Unit = {
-    logger.trace("abc")
-    logger.info("abc")
-    logger.success("abc")
-    logger.error("abc")
-    logger.warning("abc")
-    logger.critical("abc")
+    import GangLogger.blockToThunk
+    GangLogger.setLoggerAndConfigurationAndInitBlock(Seq(
+      PRINTLN_LOGGER -> (LoggerConfiguration(async = false, isTraceEnabled = true), {}),
+      WOA_WEBHOOK_LOGGER -> (LoggerConfiguration(async = false), WoaWebhookLogger.initializeWoaWebhook("a35a9ed09b9a7bb50dc5cc13c4cc20af")),
+      LOCAL_HTML_LOGGER -> (LoggerConfiguration(async = false), LocalHtmlLogger.setLogSavePath("html_log/3.html")),
+      LOCAL_PLAIN_TEXT_LOGGER -> (LoggerConfiguration(async = false), LocalPlainTextLogger.setLogSavePath("text_log/3.txt")),
+    ))
+    logger = GangLogger()
+    logger.trace("tracing")
+
+    try {
+      1 / 0
+    } catch {
+      case e: Exception => logger.error("1/0", e)
+    }
+
+    MyApp().run()
+
   }
-  logger.loggers.last.asInstanceOf[LocalHtmlLogger].closeOutputStream()
+
+  def apply(): MyApp = new MyApp() with TimeitLogger
 }
+
 ```
 
 ```
-【跟踪】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第19行: logger1 - abc
-【信息】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第20行: logger1 - abc
-【成功】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第21行: logger1 - abc
-【成功】: logger2 - abc
-【错误】 - GANG-PC - 2021-09-07T20:40:40.695464600 - cn.tellyouwhat.ganground.Application$#main 第22行: logger1 - abc
-【错误】: logger2 - abc
-【警告】 - GANG-PC - 2021-09-07T20:40:40.711090400 - cn.tellyouwhat.ganground.Application$#main 第23行: logger1 - abc
-【警告】: logger2 - abc
-【致命】 - GANG-PC - 2021-09-07T20:40:40.711090400 - cn.tellyouwhat.ganground.Application$#main 第24行: logger1 - abc
-【致命】: logger2 - abc
+【跟踪】 - GANG-PC - 2021-09-11T23:10:32.938954500 - cn.tellyouwhat.gangsutils.useless.MyApp$#main(MyApp.scala:40): tracing
+【错误】 - GANG-PC - 2021-09-11T23:10:33.479234900 - cn.tellyouwhat.gangsutils.useless.MyApp$#main(MyApp.scala:45): 1/0
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at cn.tellyouwhat.gangsutils.useless.MyApp$.main(MyApp.scala:43)
+	at cn.tellyouwhat.gangsutils.useless.MyApp.main(MyApp.scala)
+
+【跟踪】 - GANG-PC - 2021-09-11T23:10:33.560235600 - cn.tellyouwhat.gangsutils.useless.MyApp$$anon$1#run(MyApp.scala:52): 开始任务
+【跟踪】 - GANG-PC - 2021-09-11T23:10:33.639921900 - cn.tellyouwhat.gangsutils.useless.MyApp#run(MyApp.scala:20): 开始任务
+【信息】 - GANG-PC - 2021-09-11T23:10:33.717026300 - cn.tellyouwhat.gangsutils.useless.MyApp#$anonfun$run$1(MyApp.scala:21): 123
+【成功】 - GANG-PC - 2021-09-11T23:10:33.795233500 - cn.tellyouwhat.gangsutils.useless.MyApp#run(MyApp.scala:20): 完成任务，耗时0.078s
+【成功】 - GANG-PC - 2021-09-11T23:10:33.879250600 - cn.tellyouwhat.gangsutils.useless.MyApp$$anon$1#run(MyApp.scala:52): 完成任务，耗时0.24s
 ```
 
-and ib the `logs/ground.html`, the following content are written:
+![](https://tellyouwhat-static-1251995834.cos.ap-chongqing.myqcloud.com/images/2021/9/1631373109573.png)
+
+and ib the `html_log/3.html`, the following content are written:
 
 ```html
 <!DOCTYPE html>
