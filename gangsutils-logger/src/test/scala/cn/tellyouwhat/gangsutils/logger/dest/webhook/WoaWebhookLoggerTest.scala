@@ -25,6 +25,8 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     GangLogger.clearLogger2Configuration()
     WoaWebhookLogger.resetRobotsKeys()
     WoaWebhookLogger.resetConfiguration()
+    // rate limit
+    Thread.sleep(500)
   }
 
   behavior of "WoaWebhookLoggerTest"
@@ -63,6 +65,14 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     }
   }
 
+  it should "send a log into woa in async way" in {
+    WoaWebhookLogger.initializeWoaWebhook("a35a9ed09b9a7bb50dc5cc13c4cc20af")
+    val logger = WoaWebhookLogger(LoggerConfiguration(isTraceEnabled = true, async = true))
+    logger.info("abc") shouldBe true
+    // wait for the future task to finish
+    Thread.sleep(500)
+  }
+
   it should "not send a log into woa with incorrect key" in {
     WoaWebhookLogger.initializeWoaWebhook("a3af")
     val logger = GangLogger()
@@ -74,7 +84,7 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger()
-    an[IllegalArgumentException] should be thrownBy logger.info()
+    an[IllegalArgumentException] should be thrownBy logger.info("")
   }
 
   "WoaWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {

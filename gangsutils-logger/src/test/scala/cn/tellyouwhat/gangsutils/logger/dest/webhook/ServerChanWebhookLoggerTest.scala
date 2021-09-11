@@ -25,6 +25,8 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
     GangLogger.clearLogger2Configuration()
     ServerChanWebhookLogger.resetRobotsKeys()
     ServerChanWebhookLogger.resetConfiguration()
+    // rate limit
+    Thread.sleep(500)
   }
 
   behavior of "ServerChanWebhookLoggerTest"
@@ -75,7 +77,7 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger()
-    an[IllegalArgumentException] should be thrownBy logger.info()
+    an[IllegalArgumentException] should be thrownBy logger.info("")
   }
 
   "ServerChanWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {

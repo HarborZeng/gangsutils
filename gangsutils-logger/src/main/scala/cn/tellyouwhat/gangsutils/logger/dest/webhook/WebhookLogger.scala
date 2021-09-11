@@ -28,7 +28,7 @@ trait WebhookLogger extends Logger {
    * @param msg   日志内容
    * @param level 日志级别
    */
-  protected def webhookLog(msg: String, level: LogLevel.Value): Boolean
+  protected def webhookLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean
 
   /**
    * 发送 http 请求
@@ -74,6 +74,6 @@ trait WebhookLogger extends Logger {
     response.isSuccess
   }
 
-  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = webhookLog(msg, level)
+  override protected def doTheLogAction(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = webhookLog(msg, optionThrowable, level)
 
 }

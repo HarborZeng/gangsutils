@@ -44,8 +44,8 @@ class LocalHtmlLogger extends LocalFileLogger {
     os.flush()
   }
 
-  override protected def fileLog(msg: String, level: LogLevel.Value): Boolean = {
-    buildLog(msg, level).toHtmlString |> writeString
+  override protected def fileLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = {
+    buildLog(msg, optionThrowable, level).toHtmlString |> writeString
   }
 
 }

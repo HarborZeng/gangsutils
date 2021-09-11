@@ -27,7 +27,7 @@ class PrintlnLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTest
     val printlnLog = PrivateMethod[String]('printlnLog)
     val logger = GangLogger.getLogger
     a[WrongLogLevelException] should be thrownBy {
-      logger.loggers.head.asInstanceOf[PrintlnLogger] invokePrivate printlnLog("a msg", null)
+      logger.loggers.head.asInstanceOf[PrintlnLogger] invokePrivate printlnLog("a msg", None, null)
     }
   }
 

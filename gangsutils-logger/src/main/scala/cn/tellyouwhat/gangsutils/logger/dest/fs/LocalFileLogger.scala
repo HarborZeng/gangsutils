@@ -153,11 +153,12 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
   /**
    * the action to perform logging to file
    *
-   * @param msg   the log message
-   * @param level the log level
+   * @param msg             the log message
+   * @param optionThrowable the exception
+   * @param level           the log level
    * @return
    */
-  protected def fileLog(msg: String, level: LogLevel.Value): Boolean
+  protected def fileLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean
 
-  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = fileLog(msg, level)
+  override protected def doTheLogAction(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = fileLog(msg, optionThrowable, level)
 }

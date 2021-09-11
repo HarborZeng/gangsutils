@@ -14,7 +14,7 @@ class PrintlnLogger extends Logger {
     case None => throw new IllegalArgumentException("PrintlnLogger.loggerConfig is None")
   }
 
-  override protected def doTheLogAction(msg: String, level: LogLevel.Value): Boolean = printlnLog(msg, level)
+  override protected def doTheLogAction(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = printlnLog(msg, optionThrowable, level)
 
   /**
    * 具体的将内容打印到标准输出
@@ -23,8 +23,8 @@ class PrintlnLogger extends Logger {
    * @param level 日志级别
    * @return 总是返回 true，除非有异常抛出
    */
-  protected def printlnLog(msg: String, level: LogLevel.Value): Boolean = {
-    buildLog(msg, level).toString |> println
+  protected def printlnLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = {
+    buildLog(msg, optionThrowable, level).toString |> println
     true
   }
 

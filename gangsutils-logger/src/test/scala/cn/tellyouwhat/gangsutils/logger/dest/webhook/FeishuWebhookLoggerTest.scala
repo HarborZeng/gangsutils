@@ -25,6 +25,8 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
     GangLogger.clearLogger2Configuration()
     FeishuWebhookLogger.resetRobots()
     FeishuWebhookLogger.resetConfiguration()
+    // rate limit
+    Thread.sleep(500)
   }
 
   behavior of "FeishuWebhookLoggerTest"
@@ -92,7 +94,7 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger()
-    an[IllegalArgumentException] should be thrownBy logger.info()
+    an[IllegalArgumentException] should be thrownBy logger.info("")
   }
 
   "FeishuWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {

@@ -46,6 +46,6 @@ object funcs {
     if (logger == null) {
       println(s"${placeholderHead_unquote.format(level)}: $content")
     } else {
-      logger.log(content, level)
+      logger.log(content, None, level)
     }
 }

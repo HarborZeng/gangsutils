@@ -31,8 +31,8 @@ class LocalPlainTextLogger extends LocalFileLogger {
     //do nothing
   }
 
-  override protected def fileLog(msg: String, level: LogLevel.Value): Boolean = {
-    buildLog(msg, level).toStandardLogString |> stripANSIColor |> writeString
+  override protected def fileLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = {
+    buildLog(msg, optionThrowable, level).toStandardLogString |> stripANSIColor |> writeString
   }
 
 }

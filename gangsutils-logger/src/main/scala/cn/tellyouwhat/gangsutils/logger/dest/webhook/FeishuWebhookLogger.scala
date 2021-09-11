@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
-import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
+import cn.tellyouwhat.gangsutils.core.funcs.{escapeJsonString, stripANSIColor}
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, Robot}
@@ -29,8 +29,8 @@ class FeishuWebhookLogger extends WebhookLogger {
    */
   val feishuRobotsToSend: Set[Robot] = FeishuWebhookLogger.robotsToSend.toSet
 
-  override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val fullLog = buildLog(msg, level).toString |> stripANSIColor
+  override protected def webhookLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = {
+    val fullLog = buildLog(msg, optionThrowable, level).toString |> stripANSIColor |> escapeJsonString
     feishuRobotsToSend.map(robot => {
       // feishu use second as timestamp
       val t = Duration.ofMillis(System.currentTimeMillis()).getSeconds
