@@ -10,6 +10,7 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
  * @param isHostnameEnabled is hostname enabled
  * @param logPrefix         option of log prefix string
  * @param logLevel          one of [[LogLevel]] log level
+ * @param async             do the log action asynchronously or not
  */
 case class LoggerConfiguration(
                                 isDTEnabled: Boolean = true,
@@ -17,4 +18,5 @@ case class LoggerConfiguration(
                                 isHostnameEnabled: Boolean = true,
                                 logPrefix: Option[String] = None,
                                 logLevel: LogLevel.Value = LogLevel.TRACE,
+                                async: Boolean = false,
                               )

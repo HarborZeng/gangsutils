@@ -75,7 +75,7 @@ class LocalHtmlLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter 
   // it will success in shell, but won't in Intellij Idea
   /*  it should "a NotFileException should be thrown if logSavePath was a directory" in {
       val logger = LocalHtmlLogger(LoggerConfiguration(), "gangsutils-logger")
-      the [IllegalStateException] thrownBy logger.info() should have message "The underlying logSavePath: gangsutils-logger might does not have parent"
+      the [IllegalStateException] thrownBy logger.info("") should have message "The underlying logSavePath: gangsutils-logger might does not have parent"
     }*/
 
   it should "be newed with an IllegalArgumentException thrown if logSavePath was not set" in {

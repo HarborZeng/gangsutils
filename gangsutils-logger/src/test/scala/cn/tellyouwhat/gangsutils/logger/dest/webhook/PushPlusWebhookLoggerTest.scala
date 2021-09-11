@@ -25,6 +25,9 @@ class PushPlusWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     GangLogger.clearLogger2Configuration()
     PushPlusWebhookLogger.resetRobotsKeys()
     PushPlusWebhookLogger.resetConfiguration()
+    PushPlusWebhookLogger.clearProxy()
+    // rate limit to prevent 系统繁忙 error
+    Thread.sleep(1000)
   }
 
   behavior of "PushPlusWebhookLoggerTest"
@@ -102,7 +105,6 @@ class PushPlusWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     PushPlusWebhookLogger.setLoggerTemplate("plaintext")
     PushPlusWebhookLogger.setLoggerTopic("gangsutils")
     val logger = GangLogger()
-    logger.loggers.head.asInstanceOf[PushPlusWebhookLogger].loggerConfig
     retry(2)(logger.warning("pushplus webhook logger send a log into pushplus gangsutils topic with correct key")) match {
       case Failure(e) => a[SocketTimeoutException] should be thrownBy (throw e)
       case Success(v) => v shouldBe true
@@ -121,7 +123,7 @@ class PushPlusWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger()
-    an[IllegalArgumentException] should be thrownBy logger.info()
+    an[IllegalArgumentException] should be thrownBy logger.info("")
   }
 
   "PushPlusWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {

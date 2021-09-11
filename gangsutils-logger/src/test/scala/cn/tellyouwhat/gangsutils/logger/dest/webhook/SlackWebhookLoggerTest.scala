@@ -26,6 +26,8 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
     GangLogger.clearLogger2Configuration()
     SlackWebhookLogger.resetSlackUrls()
     SlackWebhookLogger.resetConfiguration()
+    // rate limit
+    Thread.sleep(500)
   }
 
   behavior of "SlackWebhookLoggerTest"
@@ -77,7 +79,7 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
 
   "checkPrerequisite" should "throw an IllegalArgumentException if slackWebhookURLs is empty" in {
     val logger = GangLogger()
-    an[IllegalArgumentException] should be thrownBy logger.info()
+    an[IllegalArgumentException] should be thrownBy logger.info("")
   }
 
   "SlackWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {

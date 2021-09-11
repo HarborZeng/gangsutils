@@ -8,7 +8,7 @@ import cn.tellyouwhat.gangsutils.logger.SupportedLogDest._
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException
 
-import scala.language.implicitConversions
+import scala.language.{implicitConversions, postfixOps}
 import scala.reflect.runtime.universe
 
 /**
@@ -33,8 +33,8 @@ class GangLogger {
       case None => throw GangException("GangLogger.logger2ConfigurationAndInitBlock is None")
     }
   }
-  
-   /**
+
+  /**
    * 通过参数指定级别的日志
    *
    * @param msg     日志内容
@@ -42,7 +42,7 @@ class GangLogger {
    * @param enabled subset of logger2Configuration.keySet()
    *
    */
-  def log(msg: Any, level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
+  def log(msg: Any, optionThrowable: Option[Throwable], level: LogLevel.Value)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
     // if the enabled parameter is not null nor empty, only those who occurred in both enabled parameter and loggers will perform the log action.
     (if (enabled != null && enabled.nonEmpty) {
       val unsupportedDests = enabled.map(_.toString).diff(loggers.map(_.getClass.getName))
@@ -53,7 +53,7 @@ class GangLogger {
       loggers.filter(logger => enabled.exists(_.toString == logger.getClass.getName))
     } else loggers)
       .filter(level >= _.loggerConfig.logLevel)
-      .map(_.log(msg, level)).forall(p => p)
+      .map(_.log(msg, optionThrowable, level)).forall(p => p)
   }
 
   /**
@@ -63,7 +63,11 @@ class GangLogger {
    * @param enabled subset of logger2Configuration.keySet()
    *
    */
-  def trace(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.TRACE)(enabled)
+  def trace(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean =
+    log(msg, throwable match {
+      case null => None
+      case t => Some(t)
+    }, LogLevel.TRACE)(enabled)
 
   /**
    * 记录一条信息级别的日志
@@ -72,7 +76,11 @@ class GangLogger {
    * @param enabled subset of logger2Configuration.keySet()
    *
    */
-  def info(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.INFO)(enabled)
+  def info(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean =
+    log(msg, throwable match {
+      case null => None
+      case t => Some(t)
+    }, LogLevel.INFO)(enabled)
 
   /**
    * 记录一条成功级别的日志
@@ -81,7 +89,11 @@ class GangLogger {
    * @param enabled subset of logger2Configuration.keySet()
    *
    */
-  def success(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.SUCCESS)(enabled)
+  def success(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean =
+    log(msg, throwable match {
+      case null => None
+      case t => Some(t)
+    }, LogLevel.SUCCESS)(enabled)
 
   /**
    * 记录一条警告级别的日志
@@ -90,7 +102,11 @@ class GangLogger {
    * @param enabled subset of logger2Configuration.keySet()
    *
    */
-  def warning(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.WARNING)(enabled)
+  def warning(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean =
+    log(msg, throwable match {
+      case null => None
+      case t => Some(t)
+    }, LogLevel.WARNING)(enabled)
 
   /**
    * 记录一条错误级别的日志
@@ -99,7 +115,11 @@ class GangLogger {
    * @param enabled subset of logger2Configuration.keySet()
    *
    */
-  def error(msg: Any)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = log(msg, LogLevel.ERROR)(enabled)
+  def error(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean =
+    log(msg, throwable match {
+      case null => None
+      case t => Some(t)
+    }, LogLevel.ERROR)(enabled)
 
   /**
    * 记录一条致命级别的日志
@@ -108,14 +128,11 @@ class GangLogger {
    * @param enabled subset of logger2Configuration.keySet()
    *
    */
-  def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean = {
-    if (msg == null) false
-    else {
-      val msgStr = msg.toString
-      log(if (throwable != null) s"$msgStr，message is ${throwable.getMessage}" else msgStr, LogLevel.CRITICAL)(enabled)
-    }
-  }
-
+  def critical(msg: Any, throwable: Throwable = null)(implicit enabled: Seq[SupportedLogDest.Value] = Nil): Boolean =
+    log(msg, throwable match {
+      case null => None
+      case t => Some(t)
+    }, LogLevel.CRITICAL)(enabled)
 }
 
 /**
@@ -161,7 +178,7 @@ object GangLogger {
       throw new IllegalArgumentException("null parameter")
     setLoggerAndConfiguration(m.toSeq)
   }
-  
+
   /**
    * set the log destination to LoggerConfiguration sequence
    *
@@ -187,7 +204,7 @@ object GangLogger {
       throw new IllegalArgumentException("empty parameter")
     logger2ConfigurationAndInitBlock = Some(s)
   }
-  
+
   /**
    * if you fill these parameters without executing `setLoggerAndConfiguration`, a map of [[PRINTLN_LOGGER]] -> [[LoggerConfiguration]] will be created with the parameters you filled.
    *
@@ -244,7 +261,7 @@ object GangLogger {
   }
 
   def clearLogger2Configuration(): Unit = logger2ConfigurationAndInitBlock = None
-  
+
   /**
    * helps to call by-name parameter without the thunk syntax
    */

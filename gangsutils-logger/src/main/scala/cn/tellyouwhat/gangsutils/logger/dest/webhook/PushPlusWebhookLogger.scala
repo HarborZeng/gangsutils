@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
-import cn.tellyouwhat.gangsutils.core.funcs.{escapeQuotationMark, stripANSIColor}
+import cn.tellyouwhat.gangsutils.core.funcs.{escapeJsonString, stripANSIColor}
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
@@ -33,8 +33,8 @@ class PushPlusWebhookLogger extends WebhookLogger {
    */
   val pushplusRobotsToSend: Set[String] = PushPlusWebhookLogger.robotsToSend.toSet
 
-  override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val fullLog = buildLog(msg, level) |> (c =>
+  override protected def webhookLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = {
+    val fullLog = buildLog(msg, optionThrowable, level) |> (c =>
       if (loggerTemplate == "html")
         Source.fromResource("gangsutils-logger-html-template.html").mkString + c.toHtmlString + "</body></html>"
       else if (loggerTemplate == "json") {
@@ -43,7 +43,7 @@ class PushPlusWebhookLogger extends WebhookLogger {
         c.toStandardLogString |> stripANSIColor
       } else
         throw new IllegalArgumentException("template can only be one of html, json, plaintext and cloud_monitor")
-      ) |> escapeQuotationMark
+      ) |> escapeJsonString
     pushplusRobotsToSend.map(token =>
       sendRequest(s"http://pushplus.hxtrip.com/send",
         body =

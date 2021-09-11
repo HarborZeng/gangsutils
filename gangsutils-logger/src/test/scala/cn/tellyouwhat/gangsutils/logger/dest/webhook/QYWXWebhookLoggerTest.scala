@@ -25,6 +25,8 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
     GangLogger.clearLogger2Configuration()
     QYWXWebhookLogger.resetRobotsKeys()
     QYWXWebhookLogger.resetConfiguration()
+    // rate limit
+    Thread.sleep(500)
   }
 
   behavior of "QYWXWebhookLoggerTest"
@@ -74,7 +76,7 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger()
-    an[IllegalArgumentException] should be thrownBy logger.info()
+    an[IllegalArgumentException] should be thrownBy logger.info("")
   }
 
   "QYWXWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {

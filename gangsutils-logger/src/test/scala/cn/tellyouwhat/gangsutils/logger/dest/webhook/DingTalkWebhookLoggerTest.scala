@@ -25,6 +25,8 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     GangLogger.clearLogger2Configuration()
     DingTalkWebhookLogger.resetRobots()
     DingTalkWebhookLogger.resetConfiguration()
+    // rate limit
+    Thread.sleep(500)
   }
 
 
@@ -101,7 +103,7 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger()
     an[IllegalArgumentException] should be thrownBy {
-      logger.info()
+      logger.info("")
     }
   }
 

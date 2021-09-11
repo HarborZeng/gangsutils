@@ -1,6 +1,6 @@
 package cn.tellyouwhat.gangsutils.logger.dest.webhook
 
-import cn.tellyouwhat.gangsutils.core.funcs.stripANSIColor
+import cn.tellyouwhat.gangsutils.core.funcs.{escapeJsonString, stripANSIColor}
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
@@ -24,8 +24,8 @@ class SlackWebhookLogger extends WebhookLogger {
    */
   val slackWebhookURLs: Set[String] = SlackWebhookLogger.slackWebhookURLs.toSet
 
-  override protected def webhookLog(msg: String, level: LogLevel.Value): Boolean = {
-    val fullLog = buildLog(msg, level).toString |> stripANSIColor
+  override protected def webhookLog(msg: String, optionThrowable: Option[Throwable], level: LogLevel.Value): Boolean = {
+    val fullLog = buildLog(msg, optionThrowable, level).toString |> stripANSIColor |> escapeJsonString
     slackWebhookURLs.map(url => sendRequest(url, body = s"""{"text": "$fullLog"}"""))
       .forall(b => b)
   }

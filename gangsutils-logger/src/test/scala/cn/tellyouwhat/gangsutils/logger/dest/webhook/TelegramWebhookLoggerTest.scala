@@ -26,6 +26,8 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     TelegramWebhookLogger.resetRobots()
     TelegramWebhookLogger.resetConfiguration()
     TelegramWebhookLogger.clearProxy()
+    // rate limit
+    Thread.sleep(500)
   }
 
   behavior of "TelegramWebhookLoggerTest"
@@ -79,7 +81,7 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
 
   "checkPrerequisite" should "throw an IllegalArgumentException if robotsToSend is empty" in {
     val logger = GangLogger()
-    an[IllegalArgumentException] should be thrownBy logger.info()
+    an[IllegalArgumentException] should be thrownBy logger.info("")
   }
 
   "TelegramWebhookLogger" should "be newed with an IllegalArgumentException thrown if loggerConfig was not set" in {

@@ -67,6 +67,8 @@ object constants {
   val criticalLog_unquote: String = s"$RED$BOLD$criticalHead_unquote$RESET%s"
   val errorLog_unquote: String = s"$RED$errorHead_unquote$RESET%s"
   val traceLog_unquote: String = s"$traceHead_unquote$RESET%s"
+
+
   val datetimeRe = """\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+"""
 
 }

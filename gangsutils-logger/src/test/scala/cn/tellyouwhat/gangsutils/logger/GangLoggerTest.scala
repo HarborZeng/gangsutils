@@ -1,6 +1,7 @@
 package cn.tellyouwhat.gangsutils.logger
 
 import cn.tellyouwhat.gangsutils.core.constants._
+import cn.tellyouwhat.gangsutils.core.exceptions.GangException
 import cn.tellyouwhat.gangsutils.core.helper.I18N
 import cn.tellyouwhat.gangsutils.logger.SupportedLogDest.{DINGTALK_WEBHOOK_LOGGER, PRINTLN_LOGGER, WOA_WEBHOOK_LOGGER}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
@@ -59,7 +60,7 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   it should "log" in {
     val logger = GangLogger(isDTEnabled = false, isTraceEnabled = false, isHostnameEnabled = false)
     Console.withOut(stream) {
-      logger.log("a log", level = LogLevel.TRACE)
+      logger.log("a log", None, level = LogLevel.TRACE)
     }
     stream.toString() should fullyMatch regex traceLog.format(": a log")
   }
@@ -120,6 +121,16 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
       logger.trace("a log with hostname")
     }
     stream.toString() should fullyMatch regex traceLog.format(s" - ${InetAddress.getLocalHost.getHostName}: a log with hostname")
+  }
+
+  it should "log with exception stack trace" in {
+    val logger = GangLogger(isDTEnabled = false, isHostnameEnabled = false)
+    Console.withOut(stream) {
+      logger.trace("a log with stacktrace", GangException("reason"))
+    }
+    stream.toString() should fullyMatch regex
+      traceLog.format(s": a log with stacktrace") +
+        redPattern + """Exception in thread "[^"]+" [^:]+: reason\s+""" + resetPattern + """\s+"""
   }
 
   "setLogPrefix" should "set logPrefix variable" in {
