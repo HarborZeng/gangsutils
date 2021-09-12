@@ -84,6 +84,7 @@ implementation 'cn.tellyouwhat:gangsutils-all:${gangsutils.version}'
 
 ### logger
 
+see [gangsutils-logger 使用指南.md](https://github.com/HarborZeng/gangsutils/blob/develop/gangsutils-logger/gangsutils-logger%20%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.md)
 
 ### functions and helpers
 
