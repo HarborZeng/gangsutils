@@ -48,9 +48,9 @@ class ServerChanWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeA
     the[IllegalArgumentException] thrownBy {
       ServerChanWebhookLogger.initializeServerChanWebhook("123,,abc")
     } should have message I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format("Array(123, , abc)")
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       ServerChanWebhookLogger.initializeServerChanWebhook(null: Array[String])
-    } should have message I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format("null")
+    } should have message null
     the[IllegalArgumentException] thrownBy {
       ServerChanWebhookLogger.initializeServerChanWebhook(Array.empty[String])
     } should have message I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format("Array()")

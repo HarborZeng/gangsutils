@@ -49,9 +49,9 @@ class SlackWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAft
     the[IllegalArgumentException] thrownBy {
       SlackWebhookLogger.initializeSlackUrls("123,,abc")
     } should have message I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format("Array(123, , abc)")
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       SlackWebhookLogger.initializeSlackUrls(null: Array[String])
-    } should have message I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format("null")
+    } should have message null
     the[IllegalArgumentException] thrownBy {
       SlackWebhookLogger.initializeSlackUrls(Array.empty[String])
     } should have message I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format("Array()")

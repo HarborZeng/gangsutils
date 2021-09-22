@@ -57,9 +57,9 @@ class FeishuWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAf
     the[IllegalArgumentException] thrownBy {
       FeishuWebhookLogger.initializeFeishuWebhook("123,,abc;123;234")
     } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array(Array(123), Array(), Array(abc, 123, 234))")
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       FeishuWebhookLogger.initializeFeishuWebhook(null: Array[Array[String]])
-    } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("null")
+    } should have message null
     the[IllegalArgumentException] thrownBy {
       FeishuWebhookLogger.initializeFeishuWebhook(Array.empty[Array[String]])
     } should have message I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format("Array()")

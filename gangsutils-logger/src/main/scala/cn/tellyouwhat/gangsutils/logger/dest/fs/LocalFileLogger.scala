@@ -7,6 +7,7 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 import java.io.OutputStream
 import java.nio.file._
+import java.util.Objects
 
 /**
  * Trait of LocalFileLogger for all locally-saved-as-files loggers, including open, close output stream and write
@@ -55,8 +56,7 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
   override protected def checkPrerequisite(): Unit = {
     super.checkPrerequisite()
     // make sure the logSavePath is not null
-    if (logSavePath == null)
-      throw new IllegalStateException("The underlying logSavePath is null")
+    Objects.requireNonNull(logSavePath)
 
     //target path can not be a directory
     if (Files.exists(logSavePath) && Files.isDirectory(logSavePath))

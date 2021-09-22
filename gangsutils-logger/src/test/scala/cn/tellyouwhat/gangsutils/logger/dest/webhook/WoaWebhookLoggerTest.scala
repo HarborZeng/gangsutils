@@ -48,9 +48,9 @@ class WoaWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter
     the[IllegalArgumentException] thrownBy {
       WoaWebhookLogger.initializeWoaWebhook("123,,abc")
     } should have message I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format("Array(123, , abc)")
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       WoaWebhookLogger.initializeWoaWebhook(null: Array[String])
-    } should have message I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format("null")
+    } should have message null
     the[IllegalArgumentException] thrownBy {
       WoaWebhookLogger.initializeWoaWebhook(Array.empty[String])
     } should have message I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format("Array()")

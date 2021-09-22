@@ -51,9 +51,9 @@ class PushPlusWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     the[IllegalArgumentException] thrownBy {
       PushPlusWebhookLogger.initializePushplusWebhook("123,,abc")
     } should have message I18N.getRB.getString("pushplusWebhookLogger.initializePushplusWebhook").format("Array(123, , abc)")
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       PushPlusWebhookLogger.initializePushplusWebhook(null: Array[String])
-    } should have message I18N.getRB.getString("pushplusWebhookLogger.initializePushplusWebhook").format("null")
+    } should have message null
     the[IllegalArgumentException] thrownBy {
       PushPlusWebhookLogger.initializePushplusWebhook(Array.empty[String])
     } should have message I18N.getRB.getString("pushplusWebhookLogger.initializePushplusWebhook").format("Array()")

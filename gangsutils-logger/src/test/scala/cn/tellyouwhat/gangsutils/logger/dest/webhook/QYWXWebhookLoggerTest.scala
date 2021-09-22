@@ -48,9 +48,9 @@ class QYWXWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfte
     the[IllegalArgumentException] thrownBy {
       QYWXWebhookLogger.initializeQYWXWebhook("123,,abc")
     } should have message I18N.getRB.getString("qyexWebhookLogger.initializeQYWXWebhook").format("Array(123, , abc)")
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       QYWXWebhookLogger.initializeQYWXWebhook(null: Array[String])
-    } should have message I18N.getRB.getString("qyexWebhookLogger.initializeQYWXWebhook").format("null")
+    } should have message null
     the[IllegalArgumentException] thrownBy {
       QYWXWebhookLogger.initializeQYWXWebhook(Array.empty[String])
     } should have message I18N.getRB.getString("qyexWebhookLogger.initializeQYWXWebhook").format("Array()")
