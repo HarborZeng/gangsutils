@@ -8,6 +8,7 @@ import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
 import java.net.URLEncoder
+import java.util.Objects
 
 /**
  * A logger that write logs to ServerChan (Server酱)
@@ -80,9 +81,10 @@ object ServerChanWebhookLogger extends WebhookLoggerCompanion {
    * @param robotsKeys 密钥数组
    */
   def initializeServerChanWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
-    if (robotsKeys == null || robotsKeys.isEmpty || robotsKeys.exists(_.isEmpty)) {
+    Objects.requireNonNull(robotsKeys)
+    if (robotsKeys.isEmpty || robotsKeys.exists(_.isEmpty)) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format(if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("serverChanWebhookLogger.initializeServerChanWebhook").format(robotsKeys.mkString("Array(", ", ", ")")))
     }
     robotsKeys
   }

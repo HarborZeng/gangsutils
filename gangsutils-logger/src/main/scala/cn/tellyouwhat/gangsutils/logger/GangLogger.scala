@@ -8,6 +8,7 @@ import cn.tellyouwhat.gangsutils.logger.SupportedLogDest._
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.exceptions.NoAliveLoggerException
 
+import java.util.Objects
 import scala.language.{implicitConversions, postfixOps}
 import scala.reflect.runtime.universe
 
@@ -174,8 +175,7 @@ object GangLogger {
    * @param m the log destination to [[LoggerConfiguration]] mappings
    */
   def setLoggerAndConfiguration(m: Map[SupportedLogDest.Value, LoggerConfiguration]): Unit = {
-    if (m == null)
-      throw new IllegalArgumentException("null parameter")
+    Objects.requireNonNull(m)
     setLoggerAndConfiguration(m.toSeq)
   }
 
@@ -185,8 +185,7 @@ object GangLogger {
    * @param s the log destination to LoggerConfiguration sequence, duplicate destinations are supported
    */
   def setLoggerAndConfiguration(s: Seq[(SupportedLogDest.Value, LoggerConfiguration)]): Unit = {
-    if (s == null)
-      throw new IllegalArgumentException("null parameter")
+    Objects.requireNonNull(s)
     if (s.isEmpty)
       throw new IllegalArgumentException("empty parameter")
     logger2ConfigurationAndInitBlock = Some(s.map(o => (o._1, (o._2, () => {}))))
@@ -198,8 +197,7 @@ object GangLogger {
    * @param s the log destination to LoggerConfiguration sequence, duplicate destinations are supported
    */
   def setLoggerAndConfigurationAndInitBlock(s: Seq[(SupportedLogDest.Value, (LoggerConfiguration, () => Unit))]): Unit = {
-    if (s == null)
-      throw new IllegalArgumentException("null parameter")
+    Objects.requireNonNull(s)
     if (s.isEmpty)
       throw new IllegalArgumentException("empty parameter")
     logger2ConfigurationAndInitBlock = Some(s)

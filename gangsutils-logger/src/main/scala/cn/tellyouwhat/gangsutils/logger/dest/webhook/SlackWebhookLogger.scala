@@ -6,6 +6,8 @@ import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
+import java.util.Objects
+
 /**
  * A logger that write logs to Slack
  */
@@ -72,9 +74,10 @@ object SlackWebhookLogger extends WebhookLoggerCompanion {
    * @param slackUrls webhook url 数组
    */
   def initializeSlackUrls(slackUrls: Array[String]): Unit = slackWebhookURLs = {
-    if (slackUrls == null || slackUrls.isEmpty || slackUrls.exists(_.isEmpty)) {
+    Objects.requireNonNull(slackUrls)
+    if (slackUrls.isEmpty || slackUrls.exists(_.isEmpty)) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format(if (slackUrls == null) null else slackUrls.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("slackWebhookLogger.initializeSlackUrls").format(slackUrls.mkString("Array(", ", ", ")")))
     }
     slackUrls
   }

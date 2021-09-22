@@ -52,9 +52,9 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     the[IllegalArgumentException] thrownBy {
       TelegramWebhookLogger.initializeTelegramWebhook("123,,abc;123;234")
     } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("Array(Array(123), Array(), Array(abc, 123, 234))")
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       TelegramWebhookLogger.initializeTelegramWebhook(null: Array[Array[String]])
-    } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("null")
+    } should have message null
     the[IllegalArgumentException] thrownBy {
       TelegramWebhookLogger.initializeTelegramWebhook(Array.empty[Array[String]])
     } should have message I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format("Array()")

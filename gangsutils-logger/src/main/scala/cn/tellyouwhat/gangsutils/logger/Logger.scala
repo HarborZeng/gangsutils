@@ -6,6 +6,7 @@ import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, OneLog}
 
 import java.net.InetAddress
 import java.time.LocalDateTime
+import java.util.Objects
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.postfixOps
@@ -53,8 +54,7 @@ trait Logger {
    * check prerequisite before perform the real log action
    */
   protected def checkPrerequisite(): Unit = {
-    if (loggerConfig == null)
-      throw GangException("loggerConfig is null")
+    Objects.requireNonNull(loggerConfig)
   }
 
   /**

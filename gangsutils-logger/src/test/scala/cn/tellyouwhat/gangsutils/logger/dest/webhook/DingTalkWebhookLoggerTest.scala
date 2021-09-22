@@ -63,9 +63,9 @@ class DingTalkWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
       DingTalkWebhookLogger.initializeDingTalkWebhook("123,,abc;123;234")
     } should have message I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format("Array(Array(123), Array(), Array(abc, 123, 234))")
 
-    the[IllegalArgumentException] thrownBy {
+    the[NullPointerException] thrownBy {
       DingTalkWebhookLogger.initializeDingTalkWebhook(null: Array[Array[String]])
-    } should have message I18N.getRB.getString("dingTalkWebhookLogger.initializeDingTalkWebhook").format("null")
+    } should have message null
 
     the[IllegalArgumentException] thrownBy {
       DingTalkWebhookLogger.initializeDingTalkWebhook(Array.empty[Array[String]])

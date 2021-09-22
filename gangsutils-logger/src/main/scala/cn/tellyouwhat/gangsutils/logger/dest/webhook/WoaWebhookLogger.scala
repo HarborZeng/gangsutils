@@ -6,6 +6,8 @@ import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.LoggerConfiguration
 import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
+import java.util.Objects
+
 /**
  * 往 woa 里面发送日志
  */
@@ -75,9 +77,10 @@ object WoaWebhookLogger extends WebhookLoggerCompanion {
    * @param robotsKeys 密钥数组
    */
   def initializeWoaWebhook(robotsKeys: Array[String]): Unit = robotsToSend = {
-    if (robotsKeys == null || robotsKeys.isEmpty || robotsKeys.exists(_.isEmpty)) {
+    Objects.requireNonNull(robotsKeys)
+    if (robotsKeys.isEmpty || robotsKeys.exists(_.isEmpty)) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format(if (robotsKeys == null) null else robotsKeys.mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("woaWebhookLogger.initializeWoaWebhook").format(robotsKeys.mkString("Array(", ", ", ")")))
     }
     robotsKeys
   }

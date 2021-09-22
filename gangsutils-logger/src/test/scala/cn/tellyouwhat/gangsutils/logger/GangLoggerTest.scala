@@ -169,9 +169,9 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
 
   "setLoggerAndConfiguration" should "throw exceptions when m is illegal" in {
-    the[IllegalArgumentException] thrownBy {
+    a [NullPointerException] shouldBe thrownBy {
       GangLogger.setLoggerAndConfiguration(null: Map[SupportedLogDest.Value, LoggerConfiguration])
-    } should have message "null parameter"
+    }
 
     the[IllegalArgumentException] thrownBy {
       GangLogger.setLoggerAndConfiguration(Map.empty[SupportedLogDest.Value, LoggerConfiguration])
@@ -180,9 +180,9 @@ class GangLoggerTest extends AnyFlatSpec with Matchers with PrivateMethodTester 
   }
   
   it should "throw exceptions when s is illegal" in {
-    the[IllegalArgumentException] thrownBy {
+    a[NullPointerException] shouldBe thrownBy {
       GangLogger.setLoggerAndConfiguration(null: Seq[(SupportedLogDest.Value, LoggerConfiguration)])
-    } should have message "null parameter"
+    }
 
     the[IllegalArgumentException] thrownBy {
       GangLogger.setLoggerAndConfiguration(Seq.empty[(SupportedLogDest.Value, LoggerConfiguration)])

@@ -8,6 +8,7 @@ import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 import org.apache.commons.codec.binary.Base64
 
 import java.time.Duration
+import java.util.Objects
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -90,14 +91,14 @@ object FeishuWebhookLogger extends WebhookLoggerCompanion {
    * @param robotsKeysSigns 密钥数组
    */
   def initializeFeishuWebhook(robotsKeysSigns: Array[Array[String]]): Unit = robotsToSend = {
-    if (robotsKeysSigns == null ||
-      robotsKeysSigns.isEmpty ||
+    Objects.requireNonNull(robotsKeysSigns)
+    if (robotsKeysSigns.isEmpty ||
       robotsKeysSigns.exists(_.isEmpty) ||
       robotsKeysSigns.exists(_.exists(_.isEmpty)) ||
       robotsKeysSigns.exists(p => p.length > 2 || p.length == 0)
     ) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format(if (robotsKeysSigns == null) null else robotsKeysSigns.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("feishuWebhookLogger.initializeFeishuWebhook").format(robotsKeysSigns.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
     }
     robotsKeysSigns.map(keySign => {
       if (keySign.length == 1) {

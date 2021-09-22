@@ -6,6 +6,8 @@ import cn.tellyouwhat.gangsutils.core.helper.chaining.{PipeIt, TapIt}
 import cn.tellyouwhat.gangsutils.logger.cc.{LoggerConfiguration, TelegramRobot}
 import cn.tellyouwhat.gangsutils.logger.{LogLevel, Logger}
 
+import java.util.Objects
+
 /**
  * A logger that write logs to telegram (won't work in mainland China)
  */
@@ -74,14 +76,14 @@ object TelegramWebhookLogger extends WebhookLoggerCompanion {
    * @param robotsChatIdsTokens 密钥和签名数组
    */
   def initializeTelegramWebhook(robotsChatIdsTokens: Array[Array[String]]): Unit = robotsToSend = {
-    if (robotsChatIdsTokens == null ||
-      robotsChatIdsTokens.isEmpty ||
+    Objects.requireNonNull(robotsChatIdsTokens)
+    if (robotsChatIdsTokens.isEmpty ||
       robotsChatIdsTokens.exists(_.isEmpty) ||
       robotsChatIdsTokens.exists(_.exists(_.isEmpty)) ||
       robotsChatIdsTokens.exists(p => p.length != 2)
     ) {
       throw new IllegalArgumentException(
-        I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format(if (robotsChatIdsTokens == null) null else robotsChatIdsTokens.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
+        I18N.getRB.getString("telegramWebhookLogger.initializeTelegramWebhook").format(robotsChatIdsTokens.map(_.mkString("Array(", ", ", ")")).mkString("Array(", ", ", ")")))
     }
     robotsChatIdsTokens.map(chatIDToken => {
       val chatID = chatIDToken.head
