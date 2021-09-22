@@ -167,7 +167,7 @@ case class OneLog(
       case None => throw WrongLogLevelException("Empty log level")
     }
     val stackTrace = renderThrowable()
-    if (stackTrace.isBlank)
+    if (stackTrace.isEmpty)
       logString
     else
       logString + "\n" + stackTrace
