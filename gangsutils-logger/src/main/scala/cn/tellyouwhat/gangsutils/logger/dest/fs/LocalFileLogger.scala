@@ -49,7 +49,7 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
    * close the underlying output stream if optionOS is not None
    */
   def closeOutputStream(): Unit = optionOS match {
-    case Some(os) => onEOF(os); os.close(); optionOS = None
+    case Some(os) => onEOF(os); os.close()
     case None =>
   }
 
@@ -111,6 +111,8 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
       val newFileName = logSaveFileName + s".${System.currentTimeMillis()}"
       val newSavePath = logSavePath.resolveSibling(newFileName)
       Files.move(logSavePath, newSavePath, StandardCopyOption.ATOMIC_MOVE)
+      // reset optionOS to None
+      optionOS = None
     }
     true
   }

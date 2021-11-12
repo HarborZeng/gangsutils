@@ -63,7 +63,7 @@ trait WebhookLogger extends Logger {
       """"errcode":300001""", // DingTalk token is not exist
       """"code":19001""", // feishu param invalid: incoming webhook access token invalid
       """"errcode":93000""", // qywx(企业微信) invalid webhook url, hint ......
-      """"code":600""", // push plus 用户信息状态不合法
+      """<code>600</code>""", // push plus 用户信息状态不合法
     ).exists(response.body.contains)) {
       println(new IllegalArgumentException(s"sendRequest response body is wrong: ${response.body}"))
       return false
