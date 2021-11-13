@@ -75,7 +75,8 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     TelegramWebhookLogger.initializeTelegramWebhook("123123;1515:a3af")
     val logger = GangLogger()
     retry(2)(logger.info("telegram webhook logger not send a log into telegram with incorrect key")) match {
-      case Failure(e) => the[SocketTimeoutException] thrownBy (throw e) should ((have message "connect timed out") or (have message "Read timed out"))
+      case Failure(e: SocketTimeoutException) => the[SocketTimeoutException] thrownBy (throw e) should ((have message "connect timed out") or (have message "Read timed out"))
+      case Failure(e: SocketException) => the[SocketException] thrownBy (throw e) should have message "Connection reset"
       case Success(v) => v shouldBe false
     }
   }
