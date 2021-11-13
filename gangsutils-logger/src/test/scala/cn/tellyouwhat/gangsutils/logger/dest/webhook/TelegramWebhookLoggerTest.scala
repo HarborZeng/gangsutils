@@ -9,7 +9,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import java.net.SocketTimeoutException
+import java.net.{SocketException, SocketTimeoutException}
 import scala.util.{Failure, Success}
 
 class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
@@ -65,7 +65,8 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     TelegramWebhookLogger.initializeTelegramWebhook("-541655508;1957795670:AAE8KlT0LFdbvgiG1TJlR2kPUKVXLrenDT8")
     val logger = GangLogger()
     retry(2)(logger.info("telegram webhook logger send a log into telegram with correct chat_id and token")) match {
-      case Failure(e) => the[SocketTimeoutException] thrownBy (throw e) should have message "connect timed out"
+      case Failure(e: SocketTimeoutException) => the[SocketTimeoutException] thrownBy (throw e) should have message "connect timed out"
+      case Failure(e: SocketException) => a[SocketException] shouldBe thrownBy (throw e)
       case Success(v) => v shouldBe true
     }
   }
@@ -74,7 +75,8 @@ class TelegramWebhookLoggerTest extends AnyFlatSpec with Matchers with BeforeAnd
     TelegramWebhookLogger.initializeTelegramWebhook("123123;1515:a3af")
     val logger = GangLogger()
     retry(2)(logger.info("telegram webhook logger not send a log into telegram with incorrect key")) match {
-      case Failure(e) => the[SocketTimeoutException] thrownBy (throw e) should ((have message "connect timed out") or (have message "Read timed out"))
+      case Failure(e: SocketTimeoutException) => the[SocketTimeoutException] thrownBy (throw e) should ((have message "connect timed out") or (have message "Read timed out"))
+      case Failure(e: SocketException) => the[SocketException] thrownBy (throw e) should have message "Connection reset"
       case Success(v) => v shouldBe false
     }
   }

@@ -167,7 +167,7 @@ object GangLogger {
   /**
    * the stored _logger singleton
    */
-  private[logger] var _logger: Option[GangLogger] = None
+  @volatile private[logger] var _logger: Option[GangLogger] = None
 
   /**
    * set the log destination to [[LoggerConfiguration]] mappings
@@ -239,9 +239,15 @@ object GangLogger {
   def getLogger: GangLogger = _logger match {
     case Some(logger) => logger
     case None =>
-      apply() |! (_ => println(infoLog_unquote.format(
-        NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))
-      )))
+      synchronized {
+        if (_logger.isEmpty) {
+          apply() |! (_ => println(infoLog_unquote.format(
+            NoAliveLoggerException(I18N.getRB.getString("getLogger.NoAliveLogger"))
+          )))
+        } else {
+          getLogger
+        }
+      }
   }
 
   /**

@@ -43,7 +43,7 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
   /**
    * the optional of output stream for writing logs
    */
-  private var optionOS: Option[OutputStream] = None
+  @volatile private var optionOS: Option[OutputStream] = None
 
   /**
    * close the underlying output stream if optionOS is not None
@@ -78,7 +78,7 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
    * @param s string
    * @return always true unless an exception was thrown
    */
-  protected def writeString(s: String): Boolean = writeBytes(s.getBytes("UTF-8"))
+  @inline protected def writeString(s: String): Boolean = writeBytes(s.getBytes("UTF-8"))
 
   /**
    * write byte array to the file
@@ -87,10 +87,12 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
    * @return always true unless an exception was thrown
    */
   protected def writeBytes(logBytes: Array[Byte]): Boolean = synchronized {
-    getOS.write(logBytes)
+    val outputStream: OutputStream = getOS
+
+    outputStream.write(logBytes)
     //append a new line
-    getOS.write("\n".getBytes("UTF-8"))
-    getOS.flush()
+    outputStream.write("\n".getBytes("UTF-8"))
+    outputStream.flush()
 
     val split = ConfigReader.getGangYamlConfig.hcursor
       .downField("logger")
@@ -103,9 +105,9 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
     }
 
     if (split && isLogFileSizeTooLarge) {
-      onEOF(getOS)
+      onEOF(outputStream)
       // close os, ready to move
-      getOS.close()
+      outputStream.close()
       val newFileName = logSaveFileName + s".${System.currentTimeMillis()}"
       val newSavePath = logSavePath.resolveSibling(newFileName)
       Files.move(logSavePath, newSavePath, StandardCopyOption.ATOMIC_MOVE)
@@ -124,10 +126,16 @@ trait LocalFileLogger extends Logger with FileLifeCycle {
   private def getOS: OutputStream = optionOS match {
     case Some(os) => os
     case None =>
-      val needHookSOF = !Files.exists(logSavePath)
-      Files.newOutputStream(logSavePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
-        .tap(os => optionOS = Some(os))
-        .tap(os => if (needHookSOF) onSOF(os))
+      synchronized {
+        if (optionOS.isEmpty) {
+          val needHookSOF = !Files.exists(logSavePath)
+          Files.newOutputStream(logSavePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
+            .tap(os => optionOS = Some(os))
+            .tap(os => if (needHookSOF) onSOF(os))
+        } else {
+          getOS
+        }
+      }
   }
 
   /**
